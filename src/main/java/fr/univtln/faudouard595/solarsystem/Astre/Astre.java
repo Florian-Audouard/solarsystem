@@ -25,7 +25,6 @@ public abstract class Astre {
     @ToString.Exclude
     private Spatial model;
     private float rotationPeriod;
-
     private static final String TEXTUREPATH = "Textures/Planet/";
 
     public Astre(String name, float size, float rotationPeriod) {
@@ -58,8 +57,8 @@ public abstract class Astre {
         model.setLocalRotation(q);
     }
 
-    public void scale(float size) {
-        model.scale(size);
+    public void scale(float scaleMultiplier) {
+        model.scale(scaleMultiplier);
     }
 
     public void update(float time) {

@@ -27,6 +27,7 @@ public class Planet extends Astre {
     private float eccentricity;
     private float orbitalPeriod;
     private float sunDistance;
+    private float distanceMultiplier;
     public static float realSunSize;
     public static Star sun;
     public Mesh orbitMesh;
@@ -39,6 +40,7 @@ public class Planet extends Astre {
         this.eccentricity = eccentricity;
         this.orbitalPeriod = orbitalPeriod * 60 * 60 * 24;
         orbitMesh = new Mesh();
+        distanceMultiplier = 1;
 
     }
 
@@ -53,7 +55,7 @@ public class Planet extends Astre {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
         });
         points[numPoints - 1] = points[0];
-        orbitMesh.setMode(Mesh.Mode.LineStrip);
+
         orbitMesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
         orbitMesh.updateBound();
     }
@@ -65,6 +67,7 @@ public class Planet extends Astre {
         Material lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         lineMaterial.setColor("Color", ColorRGBA.White);
         Geometry orbitGeometry = new Geometry("OrbitLine");
+        orbitMesh.setMode(Mesh.Mode.LineStrip);
         orbitGeometry.setMesh(orbitMesh);
         orbitGeometry.setMaterial(lineMaterial);
         rootNode.attachChild(orbitGeometry);
@@ -73,20 +76,23 @@ public class Planet extends Astre {
     }
 
     public Vector3f calcTrajectory(float time) {
+        float workingDistance = sunDistance * distanceMultiplier;
         float angle = (2 * FastMath.PI / (orbitalPeriod)) * time;
-        float x = FastMath.cos(angle) * sunDistance * (1 - eccentricity * eccentricity)
+        float x = FastMath.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));
-        float z = FastMath.sin(angle) * sunDistance * (1 - eccentricity * eccentricity)
+        float z = FastMath.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));
         return new Vector3f(x, 0, z);
     }
 
-    public void drawNewOrbit() {
-
+    public void changeDistance(float distanceMultiplier) {
+        this.distanceMultiplier = distanceMultiplier;
+        generateLine();
     }
 
     public void trajectory(float time) {
-        super.getModel().setLocalTranslation(calcTrajectory(time));
+        Vector3f position = calcTrajectory(time);
+        super.getModel().setLocalTranslation(position);
 
     }
 
