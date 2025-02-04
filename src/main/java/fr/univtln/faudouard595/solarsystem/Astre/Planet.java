@@ -2,7 +2,6 @@ package fr.univtln.faudouard595.solarsystem.Astre;
 
 import java.util.stream.IntStream;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -26,17 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 public class Planet extends Astre {
     private float eccentricity;
     private float orbitalPeriod;
-    private float sunDistance;
+    private float primaryBodyDistance;
     private float distanceMultiplier;
     public static float realSunSize;
     public static Star sun;
     public Mesh orbitMesh;
 
-    public Planet(String name, float size, float sunDistance, float eccentricity, float orbitalPeriod,
+    public Planet(String name, float size, float primaireDistance, float eccentricity, float orbitalPeriod,
             float rotationPeriod) {
         super(name, convertion(size), rotationPeriod);
 
-        this.sunDistance = convertion(sunDistance);
+        this.primaryBodyDistance = convertion(primaireDistance);
         this.eccentricity = eccentricity;
         this.orbitalPeriod = orbitalPeriod * 60 * 60 * 24;
         orbitMesh = new Mesh();
@@ -49,7 +48,7 @@ public class Planet extends Astre {
     }
 
     public void generateLine() {
-        int numPoints = (int) sun.getSize() + 1;
+        int numPoints = (int) (sun.getSize() * 10) + 1;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints - 1).forEach(i -> {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
@@ -60,8 +59,8 @@ public class Planet extends Astre {
         orbitMesh.updateBound();
     }
 
-    public void generatePlanet(AssetManager assetManager, Node rootNode) {
-        generateAstre(assetManager, rootNode, false);
+    public void generatePlanet(Node rootNode) {
+        generateAstre(rootNode, false);
 
         generateLine();
         Material lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -76,7 +75,7 @@ public class Planet extends Astre {
     }
 
     public Vector3f calcTrajectory(float time) {
-        float workingDistance = sunDistance * distanceMultiplier;
+        float workingDistance = primaryBodyDistance * distanceMultiplier;
         float angle = (2 * FastMath.PI / (orbitalPeriod)) * time;
         float x = FastMath.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));
@@ -86,13 +85,14 @@ public class Planet extends Astre {
     }
 
     public void changeDistance(float distanceMultiplier) {
+        // super.changeDistancePlanets(distanceMultiplier);
         this.distanceMultiplier = distanceMultiplier;
         generateLine();
     }
 
     public void trajectory(float time) {
         Vector3f position = calcTrajectory(time);
-        super.getModel().setLocalTranslation(position);
+        super.getNode().setLocalTranslation(position);
 
     }
 

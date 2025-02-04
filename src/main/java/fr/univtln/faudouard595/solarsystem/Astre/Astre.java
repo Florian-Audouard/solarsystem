@@ -1,5 +1,8 @@
 package fr.univtln.faudouard595.solarsystem.Astre;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.FastMath;
@@ -21,19 +24,23 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class Astre {
     private String name;
     private float size;
-    private float realSize;
     @ToString.Exclude
     private Spatial model;
+    private Node node;
+    private Map<String, Planet> planets;
     private float rotationPeriod;
     private static final String TEXTUREPATH = "Textures/Planet/";
+    public static AssetManager assetManager;
 
     public Astre(String name, float size, float rotationPeriod) {
         this.name = name;
         this.size = size;
         this.rotationPeriod = rotationPeriod * 60 * 60 * 24;
+        this.planets = new HashMap<>();
+        this.node = new Node(name);
     }
 
-    public void generateAstre(AssetManager assetManager, Node rootNode, boolean isSun) {
+    public void generateAstre(Node rootNode, boolean isSun) {
         Sphere sphere = new Sphere(30, 30, size / 2);
         this.model = new Geometry("Sphere_" + name, sphere);
         Material mat;
@@ -45,24 +52,48 @@ public abstract class Astre {
             mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
             typeMap = "DiffuseMap";
         }
+        log.info(TEXTUREPATH + name + ".jpg");
         mat.setTexture(typeMap, assetManager.loadTexture(TEXTUREPATH + name + ".jpg"));
         model.setMaterial(mat);
-        rootNode.attachChild(model);
+        node.attachChild(model);
+        rootNode.attachChild(node);
     }
 
     public void rotation(float time) {
         float rotationSpeed = (FastMath.TWO_PI / rotationPeriod);
         Quaternion q = new Quaternion();
-        q.fromAngles(FastMath.HALF_PI, rotationSpeed * time, 0);
+        q.fromAngles(-FastMath.HALF_PI, rotationSpeed * time, 0);
         model.setLocalRotation(q);
     }
 
     public void scale(float scaleMultiplier) {
+        scalePlanets(scaleMultiplier);
         model.scale(scaleMultiplier);
+    }
+
+    public void addPlanet(String name, float size, float primaryBodyDistance, float eccentricity, float orbitalPeriod,
+            float rotationPeriod) {
+        Planet planet = new Planet(name, size, primaryBodyDistance, eccentricity, orbitalPeriod, rotationPeriod);
+        planet.generatePlanet(node);
+        planets.put(name, planet);
+    }
+
+    public Planet getPlanet(String name) {
+        return planets.get(name);
+    }
+
+    public void scalePlanets(float scaleMultiplier) {
+        planets.values().forEach(planet -> planet.scale(scaleMultiplier));
+
+    }
+
+    public void changeDistancePlanets(float distanceMultiplier) {
+        planets.values().forEach(planet -> planet.changeDistance(planet.getDistanceMultiplier() * distanceMultiplier));
     }
 
     public void update(float time) {
         rotation(time);
+        planets.values().forEach(planet -> planet.update(time));
     }
 
 }
