@@ -58,6 +58,10 @@ public abstract class Astre {
         model.setLocalRotation(q);
     }
 
+    public void scale(float size) {
+        model.scale(size);
+    }
+
     public void update(float time) {
         rotation(time);
     }

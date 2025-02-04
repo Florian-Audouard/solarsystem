@@ -102,21 +102,22 @@ public class App extends SimpleApplication {
         Planet.sun = sun;
         Planet.realSunSize = 1_392_700;
         // TODO Verify the values
-        // planets.add(new Planet("Mercury", 2_439.7f, 57_909_227f, 0.0553f, 58.646f,
-        // 3.7f));
-        // planets.add(new Planet("Venus", 6_051.8f, 108_208_930f, 0.815f, 243.025f,
-        // 8.87f));
-        // planets.add(new Planet("Earth", 6_371f, 149_597_870f, 1.0f, 24f, 9.81f));
-        planets.add(new Planet("Mars", 6_77900f, 227_939_2f, 0.107f, 686.98f, 3.72076f));
-        // planets.add(new Planet("Jupiter", 69_911f, 778_340_821f, 317.8f, 9.925f,
-        // 24.79f));
-        // planets.add(new Planet("Saturn", 58_232f, 1_426_666_422f, 95.2f, 10.7f,
-        // 10.44f));
-        // planets.add(new Planet("Uranus", 25_362f, 2_870_658_186f, 14.5f, 17.24f,
-        // 8.69f));
-        // planets.add(new Planet("Neptune", 24_622f, 4_498_396_441f, 17.1f, 16.11f,
-        // 11.15f));
+        planets.add(new Planet("Mercury", 2_439.7f, 57_909_227f, 0.0553f, 58.646f,
+                3.7f));
+        planets.add(new Planet("Venus", 6_051.8f, 108_208_930f, 0.815f, 243.025f,
+                8.87f));
+        planets.add(new Planet("Earth", 6_371f, 149_597_870f, 1.0f, 24f, 9.81f));
+        planets.add(new Planet("Mars", 6_779f, 227_939_200f, 0.107f, 686.98f, 3.72076f));
+        planets.add(new Planet("Jupiter", 69_911f, 778_340_821f, 317.8f, 9.925f,
+                24.79f));
+        planets.add(new Planet("Saturn", 58_232f, 1_426_666_422f, 95.2f, 10.7f,
+                10.44f));
+        planets.add(new Planet("Uranus", 25_362f, 2_870_658_186f, 14.5f, 17.24f,
+                8.69f));
+        planets.add(new Planet("Neptune", 24_622f, 4_498_396_441f, 17.1f, 16.11f,
+                11.15f));
         planets.forEach(planet -> planet.generatePlanet(assetManager, rootNode));
+        planets.forEach(planet -> planet.scale(100));
 
     }
 
