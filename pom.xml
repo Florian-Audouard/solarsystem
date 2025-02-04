@@ -61,11 +61,6 @@
 			<artifactId>jme3-core</artifactId>
 			<version>${jme3_v}</version>
 		</dependency>
-    <dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-core</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>${jme3_g}</groupId>
@@ -126,11 +121,12 @@
 			<artifactId>jme3-vr</artifactId>
 			<version>${jme3_v}</version>
 		</dependency>
-    		<dependency>
+    <dependency>
 			<groupId>${jme3_g}</groupId>
 			<artifactId>jme3-testdata</artifactId>
 			<version>${jme3_v}</version>
 		</dependency>
+
   </dependencies>
 
   <build>
