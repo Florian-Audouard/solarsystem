@@ -19,6 +19,7 @@ import com.jme3.util.SkyFactory;
 import fr.univtln.faudouard595.solarsystem.Astre.Astre;
 import fr.univtln.faudouard595.solarsystem.Astre.Planet;
 import fr.univtln.faudouard595.solarsystem.Astre.Star;
+import fr.univtln.faudouard595.solarsystem.util.CameraTool;
 import fr.univtln.faudouard595.solarsystem.Astre.Astre.TYPE;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +41,7 @@ public class App extends SimpleApplication {
     private BitmapText helloText;
     private BitmapFont font;
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
+    private CameraTool ct;
 
     public static void main(String[] args) {
         App app = new App();
@@ -172,7 +174,7 @@ public class App extends SimpleApplication {
         sun.addPlanet("Earth", 12_756f, 149_597_870f, 0.017f,
                 365.25f, 1f, TYPE.SPHERE);
         sun.addPlanet("Mars", 6_779f, 227_939_200f, 0.0963f,
-                686.98f, 1.02f, TYPE.OBJ);
+                686.98f, 1.02f, TYPE.SPHERE);
         sun.addPlanet("Jupiter", 139_820f, 778_340_821f, 0.048f,
                 4_330.6f, 0.413f, TYPE.SPHERE);
         sun.addPlanet("Saturn", 116_460f, 1_426_666_422f, 0.056f,
@@ -184,8 +186,8 @@ public class App extends SimpleApplication {
         Planet earth = sun.getPlanet("Earth");
         earth.addPlanet("Moon", 3_474.8f, 384_400f, 0.0549f,
                 27.3f, 27.3f, TYPE.SPHERE);
-        sun.scalePlanets(10f);
-        sun.changeDistancePlanets(0.08f);
+        sun.scalePlanets(1f);
+        sun.changeDistancePlanets(0.005f);
 
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
@@ -200,6 +202,10 @@ public class App extends SimpleApplication {
         // Ajouter au GUI (HUD)
         guiNode.attachChild(helloText);
 
+        ct = new CameraTool(cam);
+        Planet mars = sun.getPlanet("Mars");
+        ct.setPlanet(mars);
+
     }
 
     @Override
@@ -211,5 +217,7 @@ public class App extends SimpleApplication {
         String formattedDate = dateTime.format(formatter);
         helloText.setText(formattedDate);
         sun.update(time);
+        ct.update(time);
+
     }
 }

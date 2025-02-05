@@ -87,9 +87,9 @@ public abstract class Astre {
         } else {
             mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
             mat.setBoolean("UseMaterialColors", true);
-            mat.setColor("Diffuse", ColorRGBA.White);
-            mat.setColor("Specular", ColorRGBA.White);
-            mat.setFloat("Shininess", 12f);
+            mat.setColor("Diffuse", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+            mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+            mat.setFloat("Shininess", 10f);
             typeMap = "DiffuseMap";
         }
 
@@ -114,11 +114,15 @@ public abstract class Astre {
     }
 
     public void scale(float scaleMultiplier) {
+        objSize = calcObjSize();
         this.scaleMultiplier *= scaleMultiplier;
         scalePlanets(scaleMultiplier);
-        model.setLocalScale((getSize() / getObjSize()) * this.scaleMultiplier);
-        log.info("{}: size: {} , {}", name, Float.toString((getSize() / getObjSize()) * this.scaleMultiplier),
-                calcObjSize());
+        // model.setLocalScale();
+        Float newSize = (getSize() / getObjSize()) * this.scaleMultiplier;
+        model.setLocalScale(new Vector3f(newSize, newSize, newSize));
+
+        log.info("{}: size: {} ", name, calcObjSize());
+
     }
 
     public void addPlanet(String name, float size, float primaryBodyDistance, float eccentricity, float orbitalPeriod,

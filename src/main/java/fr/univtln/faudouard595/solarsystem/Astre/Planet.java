@@ -79,15 +79,23 @@ public class Planet extends Astre {
         super.rotation(0);
     }
 
-    public Vector3f calcTrajectory(double time) {
+    public Vector3f calcTrajectory(double time, float add) {
         float workingDistance = super.getScaleSize() / 2 + primary.getScaleSize() / 2
-                + ((primaryBodyDistance) * distanceMultiplier);
+                + add + ((primaryBodyDistance) * distanceMultiplier);
+        // float workingDistance = (primaryBodyDistance) * distanceMultiplier;
+        // log.info("name: {} , {} , {}", super.getScaleSize() / 2, primary.getSize(),
+        // workingDistance);
+
         double angle = (2 * FastMath.PI / (orbitalPeriod)) * time;
         double x = Math.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * Math.cos(angle));
         double z = Math.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * Math.cos(angle));
         return new Vector3f((float) x, 0f, (float) z);
+    }
+
+    public Vector3f calcTrajectory(double time) {
+        return calcTrajectory(time, 0);
     }
 
     @Override
