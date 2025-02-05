@@ -29,7 +29,8 @@ public class Planet extends Astre {
     private float distanceMultiplier;
     public static float realSunSize;
     public static Star sun;
-    public Mesh orbitMesh;
+    private Mesh orbitMesh;
+    private boolean displayLines;
 
     public Planet(String name, float size, float primaireDistance, float eccentricity, float orbitalPeriod,
             float rotationPeriod) {
@@ -40,6 +41,7 @@ public class Planet extends Astre {
         this.orbitalPeriod = orbitalPeriod * 60 * 60 * 24;
         orbitMesh = new Mesh();
         distanceMultiplier = 1;
+        displayLines = true;
 
     }
 
@@ -48,6 +50,9 @@ public class Planet extends Astre {
     }
 
     public void generateLine() {
+        if (!displayLines) {
+            return;
+        }
         int numPoints = (int) (sun.getSize() * 10) + 1;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints - 1).forEach(i -> {
@@ -59,9 +64,8 @@ public class Planet extends Astre {
         orbitMesh.updateBound();
     }
 
-    public void generatePlanet(Node rootNode) {
-        generateAstre(rootNode, false);
-
+    public void generatePlanet(Node node) {
+        generateAstre(node, false);
         generateLine();
         Material lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         lineMaterial.setColor("Color", ColorRGBA.White);
@@ -69,7 +73,7 @@ public class Planet extends Astre {
         orbitMesh.setMode(Mesh.Mode.LineStrip);
         orbitGeometry.setMesh(orbitMesh);
         orbitGeometry.setMaterial(lineMaterial);
-        rootNode.attachChild(orbitGeometry);
+        node.attachChild(orbitGeometry);
         trajectory(0);
         super.rotation(0);
     }
@@ -99,6 +103,21 @@ public class Planet extends Astre {
     public void update(float time) {
         super.update(time);
         trajectory(time);
+    }
+
+    public void removeLine() {
+        orbitMesh.clearBuffer(VertexBuffer.Type.Position);
+    }
+
+    public void switchDisplayLine() {
+        displayLines = !displayLines;
+        if (displayLines) {
+            generateLine();
+        } else {
+            removeLine();
+        }
+        super.switchDisplayLines();
+
     }
 
 }

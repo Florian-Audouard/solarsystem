@@ -3,7 +3,6 @@ package fr.univtln.faudouard595.solarsystem;
 import java.util.Random;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.math.Plane;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
@@ -34,7 +33,6 @@ public class App extends SimpleApplication {
         settings.setWidth(1920);
         settings.setHeight(1080);
         app.setSettings(settings);
-
         app.start();
 
     }
@@ -49,7 +47,10 @@ public class App extends SimpleApplication {
         inputManager.addMapping("DistanceUp", new KeyTrigger(KeyInput.KEY_F5));
         inputManager.addMapping("DistanceDown", new KeyTrigger(KeyInput.KEY_F6));
         inputManager.addMapping("moveSun", new KeyTrigger(KeyInput.KEY_F7));
-        inputManager.addListener(actionListener, "Sprint", "UltaSpeed", "moveSun");
+
+        inputManager.addMapping("removeLines", new KeyTrigger(KeyInput.KEY_F8));
+
+        inputManager.addListener(actionListener, "Sprint", "UltaSpeed", "moveSun", "removeLines");
         inputManager.addListener(analogListener, "SpeedUp", "SpeedDown", "ScaleUp", "ScaleDown",
                 "DistanceUp", "DistanceDown");
     }
@@ -103,6 +104,9 @@ public class App extends SimpleApplication {
                 sun.getNode().move(rand.nextFloat(sunSize * 2) - sunSize, rand.nextFloat(sunSize * 2) - sunSize,
                         rand.nextFloat(sunSize * 2) - sunSize);
             }
+            if (keyPressed && name.equals("removeLines")) {
+                sun.switchDisplayLines();
+            }
         }
     };
 
@@ -113,7 +117,7 @@ public class App extends SimpleApplication {
         rootNode.attachChild(sky);
 
         sun = new Star("Sun", sunSize, 25.05f);
-        sun.generateStar(rootNode);
+        sun.generateStar(rootNode, viewPort);
     }
 
     private void initSettings() {
@@ -150,9 +154,6 @@ public class App extends SimpleApplication {
         earth.addPlanet("Moon", 3_474.8f, 384_400f, 0.0549f, 27.3f, 27.3f);
         sun.scalePlanets(20f);
         sun.changeDistancePlanets(0.05f);
-
-        log.info(earth.getNode().getWorldTranslation().toString());
-        log.info(earth.getPlanet("Moon").getNode().getWorldTranslation().toString());
 
     }
 

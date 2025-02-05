@@ -5,8 +5,10 @@ import java.util.Map;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -50,11 +52,17 @@ public abstract class Astre {
             typeMap = "ColorMap";
         } else {
             mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+            mat.setBoolean("UseMaterialColors", true);
+            mat.setColor("Diffuse", ColorRGBA.White);
+            mat.setColor("Specular", ColorRGBA.White);
+            mat.setFloat("Shininess", 12f);
             typeMap = "DiffuseMap";
         }
-        log.info(TEXTUREPATH + name + ".jpg");
         mat.setTexture(typeMap, assetManager.loadTexture(TEXTUREPATH + name + ".jpg"));
+
         model.setMaterial(mat);
+        model.setShadowMode(ShadowMode.CastAndReceive);
+
         node.attachChild(model);
         rootNode.attachChild(node);
     }
@@ -94,6 +102,10 @@ public abstract class Astre {
     public void update(float time) {
         rotation(time);
         planets.values().forEach(planet -> planet.update(time));
+    }
+
+    public void switchDisplayLines() {
+        planets.values().forEach(planet -> planet.switchDisplayLine());
     }
 
 }
