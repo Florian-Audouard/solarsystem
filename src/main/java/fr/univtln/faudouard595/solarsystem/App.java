@@ -1,8 +1,15 @@
 package fr.univtln.faudouard595.solarsystem;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
@@ -12,6 +19,7 @@ import com.jme3.util.SkyFactory;
 import fr.univtln.faudouard595.solarsystem.Astre.Astre;
 import fr.univtln.faudouard595.solarsystem.Astre.Planet;
 import fr.univtln.faudouard595.solarsystem.Astre.Star;
+import fr.univtln.faudouard595.solarsystem.Astre.Astre.TYPE;
 import lombok.extern.slf4j.Slf4j;
 
 import com.jme3.input.KeyInput;
@@ -23,9 +31,15 @@ import com.jme3.input.controls.KeyTrigger;
 public class App extends SimpleApplication {
 
     private static final float sunSize = 100;
-    private float time = 0f;
+    private double time = 0f;
     private float speed = 1f;
+    private float minSpeed = 1f;
+    private float timeScaler = 1.1f;
+    private float flowOfTime = 1;
     private Star sun;
+    private BitmapText helloText;
+    private BitmapFont font;
+    private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
 
     public static void main(String[] args) {
         App app = new App();
@@ -73,10 +87,25 @@ public class App extends SimpleApplication {
                 sun.changeDistancePlanets(0.99f);
             }
             if (name.equals("SpeedUp")) {
-                speed *= 1.1;
+                if (flowOfTime == -1) {
+                    speed = Math.max(speed / timeScaler, minSpeed);
+                    if (speed == minSpeed) {
+                        flowOfTime *= -1;
+                    }
+                } else {
+                    speed *= timeScaler;
+                }
             }
             if (name.equals("SpeedDown")) {
-                speed = Math.max(speed / 1.1f, 0.1f);
+                if (flowOfTime == 1) {
+                    speed = Math.max(speed / timeScaler, minSpeed);
+                    if (speed == minSpeed) {
+                        flowOfTime *= -1;
+                    }
+                } else {
+                    speed *= timeScaler;
+                }
+
             }
 
         }
@@ -116,7 +145,7 @@ public class App extends SimpleApplication {
         Spatial sky = SkyFactory.createSky(assetManager, starTexture, SkyFactory.EnvMapType.EquirectMap);
         rootNode.attachChild(sky);
 
-        sun = new Star("Sun", sunSize, 25.05f);
+        sun = new Star("Sun", sunSize, 25.05f, Astre.TYPE.SPHERE);
         sun.generateStar(rootNode, viewPort);
     }
 
@@ -136,30 +165,51 @@ public class App extends SimpleApplication {
         createSpace();
         Planet.sun = sun;
         Planet.realSunSize = 1_392_700;
-        sun.addPlanet("Mercury", 4_879.4f, 57_909_227f, 0.206f, 88f,
-                59f);
-        sun.addPlanet("Venus", 12_104f, 108_208_930f, 0.007f, 225.025f,
-                243f);
-        sun.addPlanet("Earth", 12_756f, 149_597_870f, 0.017f, 365.25f, 1f);
-        sun.addPlanet("Mars", 6_779f, 227_939_200f, 0.0963f, 686.98f, 1.02f);
-        sun.addPlanet("Jupiter", 139_820f, 778_340_821f, 0.048f, 4_330.6f,
-                0.413f);
-        sun.addPlanet("Saturn", 116_460f, 1_426_666_422f, 0.056f, 10_756f,
-                0.446f);
-        sun.addPlanet("Uranus", 50_724f, 2_870_658_186f, 0.047f, 30_687f,
-                0.71f);
-        sun.addPlanet("Neptune", 49_244f, 4_498_396_441f, 0.248f, 60_190f,
-                0.667f);
+        sun.addPlanet("Mercury", 4_879.4f, 57_909_227f, 0.206f,
+                88f, 59f, TYPE.SPHERE);
+        sun.addPlanet("Venus", 12_104f, 108_208_930f, 0.007f,
+                225.025f, 243f, TYPE.SPHERE);
+        sun.addPlanet("Earth", 12_756f, 149_597_870f, 0.017f,
+                365.25f, 1f, TYPE.SPHERE);
+        sun.addPlanet("Mars", 6_779f, 227_939_200f, 0.0963f,
+                686.98f, 1.02f, TYPE.OBJ);
+        sun.addPlanet("Jupiter", 139_820f, 778_340_821f, 0.048f,
+                4_330.6f, 0.413f, TYPE.SPHERE);
+        sun.addPlanet("Saturn", 116_460f, 1_426_666_422f, 0.056f,
+                10_756f, 0.446f, TYPE.SPHERE);
+        sun.addPlanet("Uranus", 50_724f, 2_870_658_186f, 0.047f,
+                30_687f, 0.71f, TYPE.SPHERE);
+        sun.addPlanet("Neptune", 49_244f, 4_498_396_441f, 0.248f,
+                60_190f, 0.667f, TYPE.SPHERE);
         Planet earth = sun.getPlanet("Earth");
-        earth.addPlanet("Moon", 3_474.8f, 384_400f, 0.0549f, 27.3f, 27.3f);
-        sun.scalePlanets(20f);
-        sun.changeDistancePlanets(0.05f);
+        earth.addPlanet("Moon", 3_474.8f, 384_400f, 0.0549f,
+                27.3f, 27.3f, TYPE.SPHERE);
+        sun.scalePlanets(10f);
+        sun.changeDistancePlanets(0.08f);
+
+        time = startOfUniver + ((double) Instant.now().getEpochSecond());
+
+        // Charger la police par défaut
+        font = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        // Créer un BitmapText via la factory
+        helloText = font.createLabel("Hello, jMonkey!");
+        helloText.setSize(40); // Taille du texte
+        helloText.setColor(ColorRGBA.White); // Couleur du texte
+        helloText.setLocalTranslation(100, settings.getHeight() - 50, 0); // Position à l'écran
+
+        // Ajouter au GUI (HUD)
+        guiNode.attachChild(helloText);
 
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        time += tpf * speed;
+        time += (tpf) * speed * flowOfTime;
+        Instant instant = Instant.ofEpochSecond((long) (time - startOfUniver));
+        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        String formattedDate = dateTime.format(formatter);
+        helloText.setText(formattedDate);
         sun.update(time);
     }
 }

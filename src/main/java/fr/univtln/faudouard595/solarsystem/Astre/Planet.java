@@ -26,6 +26,7 @@ public class Planet extends Astre {
     private float eccentricity;
     private float orbitalPeriod;
     private float primaryBodyDistance;
+    private Astre primary;
     private float distanceMultiplier;
     public static float realSunSize;
     public static Star sun;
@@ -33,8 +34,8 @@ public class Planet extends Astre {
     private boolean displayLines;
 
     public Planet(String name, float size, float primaireDistance, float eccentricity, float orbitalPeriod,
-            float rotationPeriod) {
-        super(name, convertion(size), rotationPeriod);
+            float rotationPeriod, Astre primary, TYPE type) {
+        super(name, convertion(size), rotationPeriod, type);
 
         this.primaryBodyDistance = convertion(primaireDistance);
         this.eccentricity = eccentricity;
@@ -42,7 +43,7 @@ public class Planet extends Astre {
         orbitMesh = new Mesh();
         distanceMultiplier = 1;
         displayLines = true;
-
+        this.primary = primary;
     }
 
     public static float convertion(float value) {
@@ -78,29 +79,36 @@ public class Planet extends Astre {
         super.rotation(0);
     }
 
-    public Vector3f calcTrajectory(float time) {
-        float workingDistance = primaryBodyDistance * distanceMultiplier;
-        float angle = (2 * FastMath.PI / (orbitalPeriod)) * time;
-        float x = FastMath.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
-                / (1 + eccentricity * FastMath.cos(angle));
-        float z = FastMath.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
-                / (1 + eccentricity * FastMath.cos(angle));
-        return new Vector3f(x, 0, z);
+    public Vector3f calcTrajectory(double time) {
+        float workingDistance = super.getScaleSize() / 2 + primary.getScaleSize() / 2
+                + ((primaryBodyDistance) * distanceMultiplier);
+        double angle = (2 * FastMath.PI / (orbitalPeriod)) * time;
+        double x = Math.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
+                / (1 + eccentricity * Math.cos(angle));
+        double z = Math.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
+                / (1 + eccentricity * Math.cos(angle));
+        return new Vector3f((float) x, 0f, (float) z);
+    }
+
+    @Override
+    public void scale(float scaleMultiplier) {
+        super.scale(scaleMultiplier);
+        generateLine();
     }
 
     public void changeDistance(float distanceMultiplier) {
-        // super.changeDistancePlanets(distanceMultiplier);
+        super.changeDistancePlanets(distanceMultiplier);
         this.distanceMultiplier = distanceMultiplier;
         generateLine();
     }
 
-    public void trajectory(float time) {
+    public void trajectory(double time) {
         Vector3f position = calcTrajectory(time);
         super.getNode().setLocalTranslation(position);
 
     }
 
-    public void update(float time) {
+    public void update(double time) {
         super.update(time);
         trajectory(time);
     }
