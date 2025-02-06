@@ -1,5 +1,7 @@
 package fr.univtln.faudouard595.solarsystem.Astre;
 
+import static fr.univtln.faudouard595.solarsystem.Astre.Astre.TEXTUREPATH;
+
 import java.util.stream.IntStream;
 
 import com.jme3.material.Material;
@@ -34,8 +36,8 @@ public class Planet extends Astre {
     private boolean displayLines;
 
     public Planet(String name, float size, float primaireDistance, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, Astre primary, TYPE type) {
-        super(name, convertion(size), rotationPeriod, type);
+            float rotationPeriod, Astre primary, TYPE type, ColorRGBA color) {
+        super(name, convertion(size), rotationPeriod, type, color);
 
         this.primaryBodyDistance = convertion(primaireDistance);
         this.eccentricity = eccentricity;
@@ -65,11 +67,23 @@ public class Planet extends Astre {
         orbitMesh.updateBound();
     }
 
+    public Material generateMat() {
+        Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        mat.setBoolean("UseMaterialColors", true);
+        mat.setColor("Diffuse", ColorRGBA.White);
+        mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+        mat.setColor("Ambient", ColorRGBA.Gray);
+        mat.setFloat("Shininess", 12f);
+        mat.setTexture("DiffuseMap", assetManager.loadTexture(Astre.TEXTUREPATH + super.getName() + ".jpg"));
+
+        return mat;
+    }
+
     public void generatePlanet(Node node) {
         generateAstre(node, false);
         generateLine();
         Material lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        lineMaterial.setColor("Color", ColorRGBA.White);
+        lineMaterial.setColor("Color", super.getColor());
         Geometry orbitGeometry = new Geometry("OrbitLine");
         orbitMesh.setMode(Mesh.Mode.LineStrip);
         orbitGeometry.setMesh(orbitMesh);

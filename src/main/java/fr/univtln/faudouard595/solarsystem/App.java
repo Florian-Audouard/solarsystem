@@ -10,9 +10,13 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.BloomFilter;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
+import com.jme3.terrain.noise.Color;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
@@ -23,10 +27,13 @@ import fr.univtln.faudouard595.solarsystem.util.CameraTool;
 import fr.univtln.faudouard595.solarsystem.Astre.Astre.TYPE;
 import lombok.extern.slf4j.Slf4j;
 
+import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
+
+import com.jme3.light.AmbientLight;
 
 @Slf4j
 public class App extends SimpleApplication {
@@ -42,6 +49,7 @@ public class App extends SimpleApplication {
     private BitmapFont font;
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
     private CameraTool ct;
+    private ChaseCamera chaseCam;
 
     public static void main(String[] args) {
         App app = new App();
@@ -54,8 +62,6 @@ public class App extends SimpleApplication {
     }
 
     private void initKeys() {
-        inputManager.addMapping("Sprint", new KeyTrigger(KeyInput.KEY_LSHIFT));
-        inputManager.addMapping("UltaSpeed", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("SpeedUp", new KeyTrigger(KeyInput.KEY_F1));
         inputManager.addMapping("SpeedDown", new KeyTrigger(KeyInput.KEY_F2));
         inputManager.addMapping("ScaleUp", new KeyTrigger(KeyInput.KEY_F3));
@@ -63,10 +69,14 @@ public class App extends SimpleApplication {
         inputManager.addMapping("DistanceUp", new KeyTrigger(KeyInput.KEY_F5));
         inputManager.addMapping("DistanceDown", new KeyTrigger(KeyInput.KEY_F6));
         inputManager.addMapping("moveSun", new KeyTrigger(KeyInput.KEY_F7));
+        inputManager.addMapping("nextAstre", new KeyTrigger(KeyInput.KEY_RIGHT));
+        inputManager.addMapping("prevAstre", new KeyTrigger(KeyInput.KEY_LEFT));
 
         inputManager.addMapping("removeLines", new KeyTrigger(KeyInput.KEY_F8));
 
-        inputManager.addListener(actionListener, "Sprint", "UltaSpeed", "moveSun", "removeLines");
+        // inputManager.addMapping("lockPlanet", new KeyTrigger(KeyInput.KEY_F9));
+
+        inputManager.addListener(actionListener, "moveSun", "removeLines", "nextAstre", "prevAstre");
         inputManager.addListener(analogListener, "SpeedUp", "SpeedDown", "ScaleUp", "ScaleDown",
                 "DistanceUp", "DistanceDown");
     }
@@ -74,6 +84,7 @@ public class App extends SimpleApplication {
     final private AnalogListener analogListener = new AnalogListener() {
         @Override
         public void onAnalog(String name, float value, float tpf) {
+
             if (name.equals("ScaleUp")) {
                 sun.scalePlanets(1.01f);
                 // sun.scale(1.01f);
@@ -116,20 +127,7 @@ public class App extends SimpleApplication {
     final private ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("Sprint")) {
-                if (keyPressed) {
-                    flyCam.setMoveSpeed(sunSize);
-                } else {
-                    flyCam.setMoveSpeed(sunSize / 50);
-                }
-            }
-            if (name.equals("UltaSpeed")) {
-                if (keyPressed) {
-                    flyCam.setMoveSpeed(sunSize * 10);
-                } else {
-                    flyCam.setMoveSpeed(sunSize / 50);
-                }
-            }
+
             if (name.equals("moveSun") && keyPressed) {
                 Random rand = new Random();
                 sun.getNode().move(rand.nextFloat(sunSize * 2) - sunSize, rand.nextFloat(sunSize * 2) - sunSize,
@@ -137,6 +135,12 @@ public class App extends SimpleApplication {
             }
             if (keyPressed && name.equals("removeLines")) {
                 sun.switchDisplayLines();
+            }
+            if (keyPressed && name.equals("nextAstre")) {
+                ct.nextAstre();
+            }
+            if (keyPressed && name.equals("prevAstre")) {
+                ct.prevAstre();
             }
         }
     };
@@ -146,48 +150,67 @@ public class App extends SimpleApplication {
         Texture starTexture = assetManager.loadTexture("Textures/Sky/StarSky.jpg");
         Spatial sky = SkyFactory.createSky(assetManager, starTexture, SkyFactory.EnvMapType.EquirectMap);
         rootNode.attachChild(sky);
+        Astre.assetManager = assetManager;
+        Astre.guiNode = guiNode;
+        Astre.cam = cam;
 
-        sun = new Star("Sun", sunSize, 25.05f, Astre.TYPE.SPHERE);
+        sun = new Star("Sun", sunSize, 25.05f, Astre.TYPE.SPHERE, ColorRGBA.Yellow);
         sun.generateStar(rootNode, viewPort);
+        Planet.sun = sun;
+        Planet.realSunSize = 1_392_700;
+
+        AmbientLight al = new AmbientLight();
+        al.setColor(ColorRGBA.White.mult(0.1f));
+        rootNode.addLight(al);
     }
 
     private void initSettings() {
-        flyCam.setMoveSpeed(sunSize / 50);
-        cam.setLocation(new Vector3f(sunSize * 10, sunSize * 10, sunSize * 10));
-        cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
-        cam.setFrustumNear(1f);
-        cam.setFrustumFar(sunSize * 1000);
+        flyCam.setEnabled(false);
+        chaseCam = new ChaseCamera(cam, rootNode, inputManager);
+        chaseCam.setSmoothMotion(true);
+        chaseCam.setLookAtOffset(Vector3f.ZERO);
+        chaseCam.setRotationSpeed(3f); // Vitesse de rotation
+        chaseCam.setMaxVerticalRotation(Float.MAX_VALUE); // Pas de limite maximale sur l'axe vertical
+        chaseCam.setMinVerticalRotation(-Float.MAX_VALUE); // Pas de limite minimale sur l'axe vertical
+        chaseCam.setChasingSensitivity(10f);
+        // chaseCam.setTrailingEnabled(true);
+
+        chaseCam.setUpVector(cam.getUp());
+        cam.setFrustumFar(sunSize * 100000);
+
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Objects);
+        bloom.setBloomIntensity(2.0f); // Ajuste l'intensité selon le besoin
+        fpp.addFilter(bloom);
+        viewPort.addProcessor(fpp);
+
     }
 
     @Override
     public void simpleInitApp() {
         initSettings();
         initKeys();
-        Astre.assetManager = assetManager;
         createSpace();
-        Planet.sun = sun;
-        Planet.realSunSize = 1_392_700;
+
         sun.addPlanet("Mercury", 4_879.4f, 57_909_227f, 0.206f,
-                88f, 59f, TYPE.SPHERE);
+                88f, 59f, TYPE.SPHERE, new ColorRGBA(151f / 255, 104f / 255, 172f / 255, 1f));
         sun.addPlanet("Venus", 12_104f, 108_208_930f, 0.007f,
-                225.025f, 243f, TYPE.SPHERE);
+                225.025f, 243f, TYPE.SPHERE, new ColorRGBA(176f / 255, 121f / 255, 25f / 255, 1f));
         sun.addPlanet("Earth", 12_756f, 149_597_870f, 0.017f,
-                365.25f, 1f, TYPE.SPHERE);
+                365.25f, 1f, TYPE.SPHERE, new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f));
         sun.addPlanet("Mars", 6_779f, 227_939_200f, 0.0963f,
-                686.98f, 1.02f, TYPE.SPHERE);
+                686.98f, 1.02f, TYPE.SPHERE, new ColorRGBA(154f / 255, 78f / 255, 25f / 255, 1f));
         sun.addPlanet("Jupiter", 139_820f, 778_340_821f, 0.048f,
-                4_330.6f, 0.413f, TYPE.SPHERE);
+                4_330.6f, 0.413f, TYPE.SPHERE, new ColorRGBA(218f / 255, 139f / 255, 114f / 255, 1f));
         sun.addPlanet("Saturn", 116_460f, 1_426_666_422f, 0.056f,
-                10_756f, 0.446f, TYPE.SPHERE);
+                10_756f, 0.446f, TYPE.SPHERE, new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f));
         sun.addPlanet("Uranus", 50_724f, 2_870_658_186f, 0.047f,
-                30_687f, 0.71f, TYPE.SPHERE);
+                30_687f, 0.71f, TYPE.SPHERE, new ColorRGBA(104f / 255, 204f / 255, 218f / 255, 1f));
         sun.addPlanet("Neptune", 49_244f, 4_498_396_441f, 0.248f,
-                60_190f, 0.667f, TYPE.SPHERE);
+                60_190f, 0.667f, TYPE.SPHERE, new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f));
         Planet earth = sun.getPlanet("Earth");
         earth.addPlanet("Moon", 3_474.8f, 384_400f, 0.0549f,
-                27.3f, 27.3f, TYPE.SPHERE);
-        sun.scalePlanets(1f);
-        sun.changeDistancePlanets(0.005f);
+                27.3f, 27.3f, TYPE.SPHERE, ColorRGBA.Gray);
 
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
@@ -202,22 +225,20 @@ public class App extends SimpleApplication {
         // Ajouter au GUI (HUD)
         guiNode.attachChild(helloText);
 
-        ct = new CameraTool(cam);
-        Planet mars = sun.getPlanet("Mars");
-        ct.setPlanet(mars);
+        ct = new CameraTool(chaseCam);
+        ct.setAstre(sun);
 
     }
 
     @Override
     public void simpleUpdate(float tpf) {
         time += (tpf) * speed * flowOfTime;
+        sun.update(time);
+        ct.update(speed);
         Instant instant = Instant.ofEpochSecond((long) (time - startOfUniver));
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         String formattedDate = dateTime.format(formatter);
         helloText.setText(formattedDate);
-        sun.update(time);
-        ct.update(time);
-
     }
 }

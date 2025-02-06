@@ -1,16 +1,21 @@
 package fr.univtln.faudouard595.solarsystem.Astre;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -35,17 +40,22 @@ public abstract class Astre {
     private Node node;
     private Map<String, Planet> planets;
     private float rotationPeriod;
-    private static final String TEXTUREPATH = "Textures/Planet/";
+    protected static final String TEXTUREPATH = "Textures/Planet/";
+    protected static final String OBJPATH = "Models/Planet/";
     public static AssetManager assetManager;
     public TYPE type;
     public float scaleMultiplier;
     public float objSize;
+    private ColorRGBA color;
+    public static Node guiNode;
+    private BitmapText text;
+    public static Camera cam;
 
     public enum TYPE {
         OBJ, SPHERE
     }
 
-    public Astre(String name, float size, float rotationPeriod, TYPE type) {
+    public Astre(String name, float size, float rotationPeriod, TYPE type, ColorRGBA color) {
         this.name = name;
         this.size = size;
         this.scaleSize = size;
@@ -55,6 +65,7 @@ public abstract class Astre {
         this.type = type;
         this.scaleMultiplier = 1;
         this.objSize = 1;
+        this.color = color;
     }
 
     public float calcObjSize() {
@@ -69,37 +80,25 @@ public abstract class Astre {
         return 1;
     }
 
+    public abstract Material generateMat();
+
     public void generateAstre(Node rootNode, boolean isSun) {
 
         if (this.type == TYPE.OBJ) {
-            this.model = assetManager.loadModel(TEXTUREPATH + name + ".j3o");
+            this.model = assetManager.loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();
 
         } else {
             Sphere sphere = new Sphere(30, 30, size / 2);
             this.model = new Geometry("Sphere_" + name, sphere);
         }
-        Material mat;
-        String typeMap;
-        if (isSun) {
-            mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            typeMap = "ColorMap";
-        } else {
-            mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-            mat.setBoolean("UseMaterialColors", true);
-            mat.setColor("Diffuse", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-            mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-            mat.setFloat("Shininess", 10f);
-            typeMap = "DiffuseMap";
-        }
 
-        mat.setTexture(typeMap, assetManager.loadTexture(TEXTUREPATH + name + ".jpg"));
-
-        model.setMaterial(mat);
+        model.setMaterial(generateMat());
         model.setShadowMode(ShadowMode.CastAndReceive);
 
         node.attachChild(model);
         rootNode.attachChild(node);
+        createText();
     }
 
     public void rotation(double time) {
@@ -126,9 +125,9 @@ public abstract class Astre {
     }
 
     public void addPlanet(String name, float size, float primaryBodyDistance, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, TYPE type) {
+            float rotationPeriod, TYPE type, ColorRGBA lineColor) {
         Planet planet = new Planet(name, size, primaryBodyDistance, eccentricity, orbitalPeriod, rotationPeriod, this,
-                type);
+                type, lineColor);
         planet.generatePlanet(node);
         planets.put(name, planet);
     }
@@ -147,12 +146,32 @@ public abstract class Astre {
     }
 
     public void update(double time) {
+        // Vector3f position = new Vector3f(0, scaleSize, 0);
+        // text.setLocalTranslation(node.getWorldTranslation().add(position));
+        // text.setLocalTranslation(new Vector3f(50, 200, 0));
+        // text.lookAt(cam.getLocation(), cam.getUp());
         rotation(time);
         planets.values().forEach(planet -> planet.update(time));
+
     }
 
     public void switchDisplayLines() {
         planets.values().forEach(planet -> planet.switchDisplayLine());
+    }
+
+    public List<Astre> getEveryAstres() {
+        List<Astre> astres = new ArrayList<>();
+        astres.add(this);
+        planets.values().forEach(planet -> astres.addAll(planet.getEveryAstres()));
+        return astres;
+    }
+
+    public boolean equals(Astre astre) {
+        return this.name.equals(astre.getName());
+    }
+
+    public void createText() {
+
     }
 
 }

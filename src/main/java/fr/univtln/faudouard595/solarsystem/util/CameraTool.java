@@ -1,10 +1,11 @@
 package fr.univtln.faudouard595.solarsystem.util;
 
-import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
+import java.util.List;
+
+import com.jme3.input.ChaseCamera;
+import com.jme3.math.FastMath;
 
 import fr.univtln.faudouard595.solarsystem.Astre.Astre;
-import fr.univtln.faudouard595.solarsystem.Astre.Planet;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,27 +14,61 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 public class CameraTool {
-    private Camera cam;
-    private Planet planet;
+    private ChaseCamera chaseCam;
+    private Astre astre;
+    private List<Astre> astres;
+    private int currentAstre = 0;
 
-    public CameraTool(Camera cam) {
-        this.cam = cam;
+    public CameraTool(ChaseCamera chaseCam) {
+        this.chaseCam = chaseCam;
     }
 
-    public void update(double time) {
-        if (planet == null) {
+    public void initCam() {
+        float minDist = Math.max(astre.getScaleSize() * 2, 2f);
+        chaseCam.setDefaultDistance(minDist * 3); // Distance initiale
+        chaseCam.setMinDistance(0); // Distance minimale
+        chaseCam.setSpatial(astre.getNode());
+        chaseCam.setZoomSensitivity(FastMath.pow(astre.getScaleSize(), 2f) * 1f);
+    }
+
+    public void setAstre(Astre astre) {
+        this.astre = astre;
+        chaseCam.setMaxDistance(astre.getScaleSize() * 10000);
+
+        astres = astre.getEveryAstres();
+        initCam();
+
+    }
+
+    public void nextAstre() {
+        if (astres == null) {
             return;
         }
-        Vector3f positionCam = planet.calcTrajectory(time + 00000, -planet.getSize() * 5);
-        cam.setLocation(positionCam);
-        Vector3f positionAstre = planet.getModel().getWorldTranslation();
-        // Vector3f positionPrimary =
-        // planet.getPrimary().getModel().getWorldTranslation();
-        // Vector3f add = new Vector3f(70, 0, 0);
-        // positionPrimary = positionPrimary.add(add);
+        if (currentAstre >= astres.size() - 1) {
+            currentAstre = 0;
+        } else {
+            currentAstre++;
+        }
+        astre = astres.get(currentAstre);
+        initCam();
+    }
 
-        cam.lookAt(positionAstre, Vector3f.UNIT_Y);
+    public void prevAstre() {
+        if (astres == null) {
+            return;
+        }
+        if (currentAstre <= 0) {
+            currentAstre = astres.size() - 1;
+        } else {
+            currentAstre--;
+        }
+        astre = astres.get(currentAstre);
+        initCam();
+    }
 
+    public void update(float speed) {
+        // chaseCam.setChasingSensitivity(speed * 10);
+        // chaseCam.setTrailingRotationInertia(speed * 10);
     }
 
 }
