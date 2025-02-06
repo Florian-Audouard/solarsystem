@@ -88,10 +88,10 @@ public abstract class Astre {
             this.objSize = calcObjSize();
 
         } else {
-            Sphere sphere = new Sphere(30, 30, size / 2);
+            Sphere sphere = new Sphere(32, 32, size / 2);
+            sphere.setTextureMode(Sphere.TextureMode.Projected);
             this.model = new Geometry("Sphere_" + name, sphere);
         }
-
         model.setMaterial(generateMat());
         model.setShadowMode(ShadowMode.CastAndReceive);
 

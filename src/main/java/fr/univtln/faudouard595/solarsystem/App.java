@@ -27,7 +27,6 @@ import fr.univtln.faudouard595.solarsystem.Astre.Astre.TYPE;
 import fr.univtln.faudouard595.solarsystem.util.CameraTool;
 import lombok.extern.slf4j.Slf4j;
 
-import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
@@ -38,23 +37,23 @@ import com.jme3.light.AmbientLight;
 @Slf4j
 public class App extends SimpleApplication {
 
-    private static final float sunSize = 100;
+    private static final float sunSize = 50;
     private double time = 0f;
     private float speed = 1f;
-    private float minSpeed = 1f;
+    private float minSpeed = 0f;
     private float timeScaler = 1.1f;
     private float flowOfTime = 1;
     private Star sun;
     private BitmapText helloText;
     private BitmapFont font;
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
-    private CameraTool ct;
 
     public static void main(String[] args) {
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setWidth(1920);
-        settings.setHeight(780);
+        settings.setHeight(1080);
+        // settings.setHeight(700);
         app.setSettings(settings);
         app.start();
 
@@ -100,20 +99,21 @@ public class App extends SimpleApplication {
             }
             if (name.equals("SpeedUp")) {
                 if (flowOfTime == -1) {
-                    speed = Math.max(speed / timeScaler, minSpeed);
                     if (speed == minSpeed) {
                         flowOfTime *= -1;
                     }
+                    speed = Math.max(speed / timeScaler, minSpeed);
                 } else {
                     speed *= timeScaler;
                 }
             }
             if (name.equals("SpeedDown")) {
                 if (flowOfTime == 1) {
-                    speed = Math.max(speed / timeScaler, minSpeed);
                     if (speed == minSpeed) {
                         flowOfTime *= -1;
                     }
+                    speed = Math.max(speed / timeScaler, minSpeed);
+
                 } else {
                     speed *= timeScaler;
                 }
@@ -136,10 +136,10 @@ public class App extends SimpleApplication {
                 sun.switchDisplayLines();
             }
             if (keyPressed && name.equals("nextAstre")) {
-                ct.nextAstre();
+                CameraTool.nextAstre();
             }
             if (keyPressed && name.equals("prevAstre")) {
-                ct.prevAstre();
+                CameraTool.prevAstre();
             }
         }
     };
@@ -167,12 +167,6 @@ public class App extends SimpleApplication {
         flyCam.setEnabled(false);
 
         cam.setFrustumFar(sunSize * 100000);
-
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Objects);
-        bloom.setBloomIntensity(2.0f); // Ajuste l'intensité selon le besoin
-        fpp.addFilter(bloom);
-        viewPort.addProcessor(fpp);
 
     }
 
@@ -204,30 +198,26 @@ public class App extends SimpleApplication {
 
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
-        sun.changeDistancePlanets(0.01f);
+        // sun.changeDistancePlanets(0.01f);
 
-        // Charger la police par défaut
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        // Créer un BitmapText via la factory
         helloText = font.createLabel("Hello, jMonkey!");
-        helloText.setSize(40); // Taille du texte
-        helloText.setColor(ColorRGBA.White); // Couleur du texte
-        helloText.setLocalTranslation(100, settings.getHeight() - 50, 0); // Position à l'écran
+        helloText.setSize(40);
+        helloText.setColor(ColorRGBA.White);
+        helloText.setLocalTranslation(100, settings.getHeight() - 50, 0);
 
-        // Ajouter au GUI (HUD)
         guiNode.attachChild(helloText);
 
-        ct = new CameraTool(cam, rootNode, inputManager);
-        ct.setAstre(sun);
+        CameraTool.init(cam, inputManager);
+        CameraTool.setAstre(sun);
 
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        // speed = 12500000f;
         time += (tpf) * speed * flowOfTime;
         sun.update(time);
-        ct.update(time, speed);
+        CameraTool.update(time, speed);
         Instant instant = Instant.ofEpochSecond((long) (time - startOfUniver));
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");

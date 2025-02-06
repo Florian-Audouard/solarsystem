@@ -57,7 +57,7 @@ public class Planet extends Astre {
         if (!displayLines) {
             return;
         }
-        int numPoints = (int) (sun.getSize() * 10) + 1;
+        int numPoints = (int) (sun.getSize() * 1000) + 1;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints - 1).forEach(i -> {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
@@ -96,7 +96,7 @@ public class Planet extends Astre {
 
     public float getAngle(double time) {
         return (float) ((2 * FastMath.PI / (orbitalPeriod)) * time) % 360;
-
+        // return 0f;
     }
 
     public Vector3f calcTrajectory(double time, float add) {
