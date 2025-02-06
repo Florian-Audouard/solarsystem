@@ -166,16 +166,7 @@ public class App extends SimpleApplication {
 
     private void initSettings() {
         flyCam.setEnabled(false);
-        chaseCam = new ChaseCamera(cam, rootNode, inputManager);
-        chaseCam.setSmoothMotion(true);
-        chaseCam.setLookAtOffset(Vector3f.ZERO);
-        chaseCam.setRotationSpeed(3f); // Vitesse de rotation
-        chaseCam.setMaxVerticalRotation(Float.MAX_VALUE); // Pas de limite maximale sur l'axe vertical
-        chaseCam.setMinVerticalRotation(-Float.MAX_VALUE); // Pas de limite minimale sur l'axe vertical
-        chaseCam.setChasingSensitivity(10f);
-        // chaseCam.setTrailingEnabled(true);
 
-        chaseCam.setUpVector(cam.getUp());
         cam.setFrustumFar(sunSize * 100000);
 
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
@@ -225,7 +216,7 @@ public class App extends SimpleApplication {
         // Ajouter au GUI (HUD)
         guiNode.attachChild(helloText);
 
-        ct = new CameraTool(chaseCam);
+        ct = new CameraTool(cam, rootNode, inputManager);
         ct.setAstre(sun);
 
     }
@@ -234,7 +225,7 @@ public class App extends SimpleApplication {
     public void simpleUpdate(float tpf) {
         time += (tpf) * speed * flowOfTime;
         sun.update(time);
-        ct.update(speed);
+        ct.update(time, speed);
         Instant instant = Instant.ofEpochSecond((long) (time - startOfUniver));
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
