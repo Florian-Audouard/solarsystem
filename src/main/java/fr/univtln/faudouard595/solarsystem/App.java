@@ -24,7 +24,7 @@ import fr.univtln.faudouard595.solarsystem.Astre.Astre;
 import fr.univtln.faudouard595.solarsystem.Astre.Planet;
 import fr.univtln.faudouard595.solarsystem.Astre.Star;
 import fr.univtln.faudouard595.solarsystem.Astre.Astre.TYPE;
-import fr.univtln.faudouard595.solarsystem.util.v1.CameraTool;
+import fr.univtln.faudouard595.solarsystem.util.CameraTool;
 import lombok.extern.slf4j.Slf4j;
 
 import com.jme3.input.ChaseCamera;
@@ -49,13 +49,12 @@ public class App extends SimpleApplication {
     private BitmapFont font;
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
     private CameraTool ct;
-    private ChaseCamera chaseCam;
 
     public static void main(String[] args) {
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setWidth(1920);
-        settings.setHeight(1080);
+        settings.setHeight(780);
         app.setSettings(settings);
         app.start();
 
@@ -205,6 +204,8 @@ public class App extends SimpleApplication {
 
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
+        sun.changeDistancePlanets(0.01f);
+
         // Charger la police par défaut
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         // Créer un BitmapText via la factory
@@ -223,6 +224,7 @@ public class App extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
+        // speed = 12500000f;
         time += (tpf) * speed * flowOfTime;
         sun.update(time);
         ct.update(time, speed);

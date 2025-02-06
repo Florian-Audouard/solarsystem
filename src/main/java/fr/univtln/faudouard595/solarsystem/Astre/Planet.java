@@ -34,6 +34,7 @@ public class Planet extends Astre {
     public static Star sun;
     private Mesh orbitMesh;
     private boolean displayLines;
+    private float currentAngle;
 
     public Planet(String name, float size, float primaireDistance, float eccentricity, float orbitalPeriod,
             float rotationPeriod, Astre primary, TYPE type, ColorRGBA color) {
@@ -93,14 +94,15 @@ public class Planet extends Astre {
         super.rotation(0);
     }
 
+    public float getAngle(double time) {
+        return (float) ((2 * FastMath.PI / (orbitalPeriod)) * time) % 360;
+
+    }
+
     public Vector3f calcTrajectory(double time, float add) {
         float workingDistance = super.getScaleSize() / 2 + primary.getScaleSize() / 2
                 + add + ((primaryBodyDistance) * distanceMultiplier);
-        // float workingDistance = (primaryBodyDistance) * distanceMultiplier;
-        // log.info("name: {} , {} , {}", super.getScaleSize() / 2, primary.getSize(),
-        // workingDistance);
-
-        double angle = (2 * FastMath.PI / (orbitalPeriod)) * time;
+        float angle = getAngle(time);
         double x = Math.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * Math.cos(angle));
         double z = Math.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
@@ -126,6 +128,7 @@ public class Planet extends Astre {
 
     public void trajectory(double time) {
         Vector3f position = calcTrajectory(time);
+        currentAngle = getAngle(time);
         super.getNode().setLocalTranslation(position);
 
     }

@@ -32,7 +32,7 @@ public class CustomMouseControl extends SimpleApplication {
     private boolean isLeftClickPressed = false;
     private Vector2f lastMousePosition = new Vector2f();
     private float angleHorizontal = 0f;
-    private float angleVertical = 0f;
+    private float angleVertical = 10f;
     Star sun;
 
     public static void main(String[] args) {
@@ -109,27 +109,18 @@ public class CustomMouseControl extends SimpleApplication {
         }
     };
 
+
+
     private AnalogListener analogListener = new AnalogListener() {
         @Override
         public void onAnalog(String name, float value, float tpf) {
             if (name.equals("moveMouse") && isLeftClickPressed) {
-                Vector3f lookVector = Vector3f.ZERO;
                 Vector2f cursorPos = inputManager.getCursorPosition();
-                Vector3f camPos = cam.getLocation();
-                float distanceFromLook = camPos.distance(lookVector);
                 Vector2f delta = cursorPos.subtract(lastMousePosition);
                 angleHorizontal -= delta.x * 0.1f; // Ajuster la vitesse avec un facteur
                 angleVertical += delta.y * 0.1f;
                 // angleVertical = FastMath.clamp(angleVertical, -90f, 90f);
 
-                float x = lookVector.x + distanceFromLook * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
-                        * FastMath.sin(FastMath.DEG_TO_RAD * angleHorizontal);
-                float z = lookVector.z + distanceFromLook * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
-                        * FastMath.cos(FastMath.DEG_TO_RAD * angleHorizontal);
-                float y = lookVector.y + distanceFromLook * FastMath.sin(FastMath.DEG_TO_RAD * angleVertical);
-                System.out.println(distanceFromLook);
-
-                cam.setLocation(new Vector3f(x, y, z));
                 lastMousePosition = cursorPos;
             }
         }
