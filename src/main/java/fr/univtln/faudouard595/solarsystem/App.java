@@ -23,8 +23,8 @@ import com.jme3.util.SkyFactory;
 import fr.univtln.faudouard595.solarsystem.Astre.Astre;
 import fr.univtln.faudouard595.solarsystem.Astre.Planet;
 import fr.univtln.faudouard595.solarsystem.Astre.Star;
-import fr.univtln.faudouard595.solarsystem.util.CameraTool;
 import fr.univtln.faudouard595.solarsystem.Astre.Astre.TYPE;
+import fr.univtln.faudouard595.solarsystem.util.v1.CameraTool;
 import lombok.extern.slf4j.Slf4j;
 
 import com.jme3.input.ChaseCamera;

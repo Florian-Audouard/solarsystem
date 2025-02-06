@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.util;
+package fr.univtln.faudouard595.solarsystem.util.v1;
 
 import java.util.List;
 
