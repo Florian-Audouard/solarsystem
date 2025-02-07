@@ -15,9 +15,9 @@ public abstract class CircularHashMap<K, V> {
     protected ListIterator<K> iterator;
     protected List<K> keys;
     protected V current;
+    protected boolean isNext = true; // Direction actuelle
 
     public void put(K key, V value) {
-
         if (!map.containsKey(key)) {
             map.put(key, value);
             resetIterator();
@@ -42,16 +42,27 @@ public abstract class CircularHashMap<K, V> {
     }
 
     public Map.Entry<K, V> next() {
-        if (!iterator.hasNext())
-            resetIterator(); // Si fin, recommencer au début
+        if (!isNext && iterator.hasNext()) {
+            iterator.next(); // Corrige le changement de direction
+        }
+        isNext = true;
+
+        if (!iterator.hasNext()) {
+            resetIterator();
+        }
         K key = iterator.next();
         return new AbstractMap.SimpleEntry<>(key, map.get(key));
     }
 
     public Map.Entry<K, V> prev() {
-        if (!iterator.hasPrevious()) { // Si début, repositionner à la fin
+        if (isNext && iterator.hasPrevious()) {
+            iterator.previous(); // Corrige le changement de direction
+        }
+        isNext = false;
+
+        if (!iterator.hasPrevious()) {
             keys = new ArrayList<>(map.keySet());
-            iterator = keys.listIterator(keys.size()); // Positionné après le dernier
+            iterator = keys.listIterator(keys.size());
         }
         K key = iterator.previous();
         return new AbstractMap.SimpleEntry<>(key, map.get(key));
@@ -81,5 +92,4 @@ public abstract class CircularHashMap<K, V> {
     public K prevKey() {
         return this.prev().getKey();
     }
-
 }

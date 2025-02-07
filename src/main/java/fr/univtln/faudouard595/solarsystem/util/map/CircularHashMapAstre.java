@@ -22,9 +22,11 @@ public class CircularHashMapAstre extends CircularHashMap<String, Astre> {
     @Override
     public void setCurrentValue(Astre newValue) {
         keys = new ArrayList<>(map.keySet());
-        int i = keys.indexOf((Object) newValue.getName());
-        log.info("i : {}", i);
+        int i = keys.indexOf(newValue.getName());
         iterator = keys.listIterator(i);
+        if (iterator.hasNext()) { 
+            iterator.next(); // Avance immédiatement pour éviter le double next()
+        }
         current = newValue;
     }
 

@@ -193,4 +193,23 @@ public abstract class Astre {
         return name;
     }
 
+    public Vector3f getLocalTranslation() {
+        return node.getLocalTranslation();
+    }
+
+    public Vector3f getWorldTranslation() {
+        return node.getWorldTranslation();
+    }
+
+    public boolean collision(Vector3f depart, Vector3f directionProjectile, float multiplierZone) {
+        Vector3f directionProjectileNormalize = directionProjectile.normalize();
+        Vector3f position = getWorldTranslation();
+        Vector3f planetToDepart = position.subtract(depart);
+        float radius = (scaleSize / 2) * multiplierZone;
+        float b = 2 * directionProjectileNormalize.dot(planetToDepart);
+        float c = planetToDepart.dot(planetToDepart) - (radius * radius);
+
+        return b * b - 4 * c >= 0;
+
+    }
 }

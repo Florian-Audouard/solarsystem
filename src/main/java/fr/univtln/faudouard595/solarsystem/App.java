@@ -37,7 +37,7 @@ import com.jme3.light.AmbientLight;
 @Slf4j
 public class App extends SimpleApplication {
 
-    private static final float sunSize = 50;
+    private static final float sunSize = 500;
     private double time = 0f;
     private float speed = 1f;
     private float minSpeed = 1f;
@@ -47,13 +47,14 @@ public class App extends SimpleApplication {
     private BitmapText helloText;
     private BitmapFont font;
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
+    private float maxRenderDistanceMult = 10000000f;
 
     public static void main(String[] args) {
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setWidth(1920);
-        // settings.setHeight(1080);
-        settings.setHeight(500);
+        settings.setHeight(1080);
+        // settings.setHeight(500);
         app.setSettings(settings);
         app.start();
 
@@ -173,7 +174,7 @@ public class App extends SimpleApplication {
     private void initSettings() {
         flyCam.setEnabled(false);
 
-        cam.setFrustumFar(sunSize * 1000000);
+        cam.setFrustumFar(sunSize * maxRenderDistanceMult);
 
     }
 
@@ -205,7 +206,7 @@ public class App extends SimpleApplication {
 
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
-        sun.changeDistancePlanets(0.01f);
+        // sun.changeDistancePlanets(0.01f);
         // sun.scalePlanets(30f);
 
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");

@@ -7,6 +7,7 @@ import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -85,6 +86,8 @@ public class Planet extends Astre {
         lineMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
 
         Geometry orbitGeometry = new Geometry("OrbitLine");
+        orbitGeometry.setQueueBucket(RenderQueue.Bucket.Transparent);
+
         orbitMesh.setMode(Mesh.Mode.LineStrip);
         orbitGeometry.setMesh(orbitMesh);
         orbitGeometry.setMaterial(lineMaterial);
@@ -138,7 +141,7 @@ public class Planet extends Astre {
     }
 
     public void removeLine() {
-        lineMaterial.setColor("Color", new ColorRGBA(1f, 1f, 1f, 0f));
+        lineMaterial.setColor("Color", new ColorRGBA(0f, 0f, 0f, 0f));
         lineMaterial.setTransparent(true);
     }
 
@@ -160,6 +163,9 @@ public class Planet extends Astre {
 
     @Override
     public void modifColorMult(boolean keyPressed) {
+        if (!displayLines) {
+            return;
+        }
         super.modifColorMult(keyPressed);
         lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
         lineMaterial.getAdditionalRenderState().setLineWidth(30f); // Épaisseur de la ligne
