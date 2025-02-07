@@ -18,6 +18,8 @@ import com.jme3.renderer.Camera;
 
 import fr.univtln.faudouard595.solarsystem.Astre.Astre;
 import fr.univtln.faudouard595.solarsystem.Astre.Planet;
+import fr.univtln.faudouard595.solarsystem.util.map.CircularHashMap;
+import fr.univtln.faudouard595.solarsystem.util.map.CircularHashMapAstre;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 public class CameraTool {
     private static Astre astre;
-    private static List<Astre> astres;
-    private static int currentAstre = 0;
+    private static CircularHashMapAstre astres;
     private static Camera cam;
     private static float distanceFromAstre;
     private static int directionZoom = 1;
@@ -67,7 +68,7 @@ public class CameraTool {
     }
 
     public static void initAngle() {
-        if (astre instanceof Planet planet) {
+        if (astres.getCurrentValue() instanceof Planet planet) {
             setAngleHorizontal(0);
             Vector3f newPos = calcCoord();
             newPos.y = 0;
@@ -108,39 +109,26 @@ public class CameraTool {
 
     public static void setAstre(Astre astreReceive) {
         astre = astreReceive;
-        astres = astre.getEveryAstres();
+        astres = new CircularHashMapAstre();
+        astres.createMapFromList(astre.getEveryAstres());
     }
 
     public static void nextAstre() {
-        if (astres == null) {
-            return;
-        }
-        if (currentAstre >= astres.size() - 1) {
-            currentAstre = 0;
-        } else {
-            currentAstre++;
-        }
-        setAstreByObject(astres.get(currentAstre));
+        log.info("next");
+        astres.nextValue();
+        initAngle();
     }
 
     public static void prevAstre() {
-        if (astres == null) {
-            return;
-        }
-        if (currentAstre <= 0) {
-            currentAstre = astres.size() - 1;
-        } else {
-            currentAstre--;
-        }
-        setAstreByObject(astres.get(currentAstre));
-
+        astres.prevValue();
+        initAngle();
     }
 
-    public static void setAstreByObject(Astre astreReceive) {
+    private static void setAstreByObject(Astre astreReceive) {
         if (astres == null) {
             return;
         }
-        astre = astreReceive;
+        astres.setCurrentValue(astreReceive);
         initAngle();
     }
 
@@ -158,10 +146,12 @@ public class CameraTool {
     }
 
     private static Astre setClosestAstre(List<Astre> astresDetecte) {
-        Astre closestAstre = astresDetecte.get(0);
-        float distance = closestAstre.getModel().getWorldTranslation().distance(cam.getLocation());
+        float distance = Float.MAX_VALUE;
+        Astre closestAstre = null;
         for (Astre a : astresDetecte) {
             float newDistance = a.getModel().getWorldTranslation().distance(cam.getLocation());
+            log.info("planet : {} , res : {}", a.getName(), newDistance);
+
             if (newDistance < distance) {
                 distance = newDistance;
                 closestAstre = a;
@@ -171,29 +161,34 @@ public class CameraTool {
     }
 
     private static boolean detectAstre(boolean changeAstre) {
-        int i = 0;
         List<Astre> astresDetecte = new ArrayList<>();
         boolean res = false;
-        for (Astre a : astres) {
+        for (Astre a : astres.getValues()) {
             Vector3f clickDirection = getClickDirection(lastMousePosition);
             Vector3f camPos = cam.getLocation();
             Vector3f camAstreDirection = a.getModel().getWorldTranslation().subtract(camPos).normalize();
-            log.info("name : {} res : {} ", a.getName(), espilonEquals(clickDirection, camAstreDirection, 0.1f));
-            if (espilonEquals(clickDirection, camAstreDirection, 0.1f) && i != currentAstre) {
-
+            boolean tmp = espilonEquals(clickDirection, camAstreDirection, 0.1f);
+            if (tmp && !a.equals(astres.getCurrentValue())) {
                 astresDetecte.add(a);
                 res = true;
             }
-            i++;
         }
-        if(!res){
+        if (!res) {
+            if (!changeAstre) {
+                astres.forEach(a -> a.modifColorMult(false));
+            }
             return res;
         }
+        Astre closest = setClosestAstre(astresDetecte);
+        log.info("closest : {}", closest.getName());
         if (changeAstre) {
-            setAstreByObject(setClosestAstre(astresDetecte));
+            setAstreByObject(closest);
+        } else {
+            for (Astre a : astres.getValues()) {
+                a.modifColorMult(a.equals(closest));
+            }
         }
-        if (setClosestAstre(astresDetecte) instanceof Planet planet) {
-        }
+
         return res;
     }
 
@@ -250,8 +245,8 @@ public class CameraTool {
     }
 
     public static Vector3f calcCoord() {
-        Vector3f astrePos = astre.getModel().getWorldTranslation();
-        float practicalDistance = Math.max(distanceFromAstre * astre.getScaleSize(), 1.5f);
+        Vector3f astrePos = astres.getCurrentValue().getModel().getWorldTranslation();
+        float practicalDistance = Math.max(distanceFromAstre * astres.getCurrentValue().getScaleSize(), 1.5f);
 
         float x = astrePos.x + practicalDistance * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
                 * FastMath.sin(FastMath.DEG_TO_RAD * angleHorizontal);
@@ -264,7 +259,7 @@ public class CameraTool {
 
     public static void calcPos() {
         Vector3f lookAtPos;
-        if (astre instanceof Planet planet) {
+        if (astres.getCurrentValue() instanceof Planet planet) {
             Vector3f primaryPos = planet.getPrimary().getModel().getWorldTranslation();
             float primaryRadius = planet.getPrimary().getScaleSize() / 2;
 
@@ -287,7 +282,7 @@ public class CameraTool {
             lookAtPos = newPrimary.mult(1 - weight).add(newPlanet.mult(weight));
 
         } else {
-            lookAtPos = astre.getModel().getWorldTranslation();
+            lookAtPos = astres.getCurrentValue().getModel().getWorldTranslation();
         }
         Vector3f newPos = calcCoord();
         cam.setLocation(newPos);
@@ -296,7 +291,7 @@ public class CameraTool {
     }
 
     public static void updateLocation(double time, float speed) {
-        if (astre instanceof Planet planet) {
+        if (astres.getCurrentValue() instanceof Planet planet) {
             float newAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
             setAngleHorizontal(angleHorizontal - (newAngle - lastAngle));
             lastAngle = newAngle;

@@ -94,7 +94,7 @@ public class Planet extends Astre {
     }
 
     public float getAngle(double time) {
-        return (float) ((2 * FastMath.PI / (orbitalPeriod)) * time) % 360;
+        return (float) ((FastMath.TWO_PI / (orbitalPeriod)) * time) % FastMath.TWO_PI;
         // return 0f;
     }
 

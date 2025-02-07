@@ -40,7 +40,7 @@ public class App extends SimpleApplication {
     private static final float sunSize = 50;
     private double time = 0f;
     private float speed = 1f;
-    private float minSpeed = 0f;
+    private float minSpeed = 1f;
     private float timeScaler = 1.1f;
     private float flowOfTime = 1;
     private Star sun;
@@ -53,7 +53,7 @@ public class App extends SimpleApplication {
         AppSettings settings = new AppSettings(true);
         settings.setWidth(1920);
         // settings.setHeight(1080);
-        settings.setHeight(700);
+        settings.setHeight(500);
         app.setSettings(settings);
         app.start();
 
@@ -132,7 +132,6 @@ public class App extends SimpleApplication {
                 // sun.getNode().move(rand.nextFloat(sunSize * 2) - sunSize,
                 // rand.nextFloat(sunSize * 2) - sunSize,
                 // rand.nextFloat(sunSize * 2) - sunSize);
-                sun.getPlanet("Earth").modifColorMult(keyPressed);
                 ;
             }
             if (keyPressed && name.equals("removeLines")) {
@@ -164,6 +163,11 @@ public class App extends SimpleApplication {
         AmbientLight al = new AmbientLight();
         al.setColor(ColorRGBA.White.mult(0.1f));
         rootNode.addLight(al);
+
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Scene);
+        fpp.addFilter(bloom);
+        viewPort.addProcessor(fpp);
     }
 
     private void initSettings() {
@@ -201,7 +205,8 @@ public class App extends SimpleApplication {
 
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
-        sun.changeDistancePlanets(0.1f);
+        sun.changeDistancePlanets(0.01f);
+        // sun.scalePlanets(30f);
 
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         helloText = font.createLabel("Hello, jMonkey!");

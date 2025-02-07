@@ -23,18 +23,15 @@ import com.jme3.scene.shape.Sphere;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
-@ToString
 @Slf4j
 public abstract class Astre {
     private String name;
     private float size;
     private float scaleSize;
-    @ToString.Exclude
     private Spatial model;
     private Node node;
     private Map<String, Planet> planets;
@@ -66,7 +63,7 @@ public abstract class Astre {
         this.scaleMultiplier = 1;
         this.objSize = 1;
         this.color = color;
-        this.colorMultiplier = 1;
+        this.colorMultiplier = 0.5f;
     }
 
     public float calcObjSize() {
@@ -166,9 +163,20 @@ public abstract class Astre {
         return astres;
     }
 
-    public boolean equals(Astre astre) {
-        return this.name.equals(astre.getName());
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Astre astre) {
+            return this.name.equals(astre.getName());
+        }
+        return false;
     }
+
+    // public int hashCode(Object o) {
+    // if (o instanceof Astre astre) {
+    // return this.name.hashCode(astre.getName());
+    // }
+    // return "0".hashCode("1");
+    // }
 
     public void modifColorMult(boolean increase) {
         if (increase) {
@@ -176,9 +184,13 @@ public abstract class Astre {
 
             colorMultiplier = 2f;
         } else {
-            colorMultiplier = 1f;
+            colorMultiplier = 0.5f;
 
         }
+    }
+
+    public String toString() {
+        return name;
     }
 
 }
