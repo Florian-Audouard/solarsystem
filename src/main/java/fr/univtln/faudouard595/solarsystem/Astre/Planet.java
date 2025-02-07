@@ -1,7 +1,5 @@
 package fr.univtln.faudouard595.solarsystem.Astre;
 
-import static fr.univtln.faudouard595.solarsystem.Astre.Astre.TEXTUREPATH;
-
 import java.util.stream.IntStream;
 
 import com.jme3.material.Material;
@@ -35,6 +33,7 @@ public class Planet extends Astre {
     private Mesh orbitMesh;
     private boolean displayLines;
     private float currentAngle;
+    private Material lineMaterial;
 
     public Planet(String name, float size, float primaireDistance, float eccentricity, float orbitalPeriod,
             float rotationPeriod, Astre primary, TYPE type, ColorRGBA color) {
@@ -83,8 +82,8 @@ public class Planet extends Astre {
     public void generatePlanet(Node node) {
         generateAstre(node, false);
         generateLine();
-        Material lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        lineMaterial.setColor("Color", super.getColor());
+        lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
         Geometry orbitGeometry = new Geometry("OrbitLine");
         orbitMesh.setMode(Mesh.Mode.LineStrip);
         orbitGeometry.setMesh(orbitMesh);
@@ -103,10 +102,10 @@ public class Planet extends Astre {
         float workingDistance = super.getScaleSize() / 2 + primary.getScaleSize() / 2
                 + add + ((primaryBodyDistance) * distanceMultiplier);
         float angle = getAngle(time);
-        double x = Math.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
-                / (1 + eccentricity * Math.cos(angle));
-        double z = Math.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
-                / (1 + eccentricity * Math.cos(angle));
+        float x = FastMath.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
+                / (1 + eccentricity * FastMath.cos(angle));
+        float z = FastMath.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
+                / (1 + eccentricity * FastMath.cos(angle));
         return new Vector3f((float) x, 0f, (float) z);
     }
 
@@ -151,6 +150,13 @@ public class Planet extends Astre {
         }
         super.switchDisplayLines();
 
+    }
+
+    @Override
+    public void modifColorMult(boolean keyPressed) {
+        super.modifColorMult(keyPressed);
+        lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
+        lineMaterial.getAdditionalRenderState().setLineWidth(30f); // Épaisseur de la ligne
     }
 
 }

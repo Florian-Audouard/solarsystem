@@ -52,8 +52,8 @@ public class App extends SimpleApplication {
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setWidth(1920);
-        settings.setHeight(1080);
-        // settings.setHeight(700);
+        // settings.setHeight(1080);
+        settings.setHeight(700);
         app.setSettings(settings);
         app.start();
 
@@ -66,7 +66,7 @@ public class App extends SimpleApplication {
         inputManager.addMapping("ScaleDown", new KeyTrigger(KeyInput.KEY_F4));
         inputManager.addMapping("DistanceUp", new KeyTrigger(KeyInput.KEY_F5));
         inputManager.addMapping("DistanceDown", new KeyTrigger(KeyInput.KEY_F6));
-        inputManager.addMapping("moveSun", new KeyTrigger(KeyInput.KEY_F7));
+        inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_F7));
         inputManager.addMapping("nextAstre", new KeyTrigger(KeyInput.KEY_RIGHT));
         inputManager.addMapping("prevAstre", new KeyTrigger(KeyInput.KEY_LEFT));
 
@@ -74,7 +74,7 @@ public class App extends SimpleApplication {
 
         // inputManager.addMapping("lockPlanet", new KeyTrigger(KeyInput.KEY_F9));
 
-        inputManager.addListener(actionListener, "moveSun", "removeLines", "nextAstre", "prevAstre");
+        inputManager.addListener(actionListener, "Test", "removeLines", "nextAstre", "prevAstre");
         inputManager.addListener(analogListener, "SpeedUp", "SpeedDown", "ScaleUp", "ScaleDown",
                 "DistanceUp", "DistanceDown");
     }
@@ -127,10 +127,13 @@ public class App extends SimpleApplication {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
 
-            if (name.equals("moveSun") && keyPressed) {
-                Random rand = new Random();
-                sun.getNode().move(rand.nextFloat(sunSize * 2) - sunSize, rand.nextFloat(sunSize * 2) - sunSize,
-                        rand.nextFloat(sunSize * 2) - sunSize);
+            if (name.equals("Test")) {
+                // Random rand = new Random();
+                // sun.getNode().move(rand.nextFloat(sunSize * 2) - sunSize,
+                // rand.nextFloat(sunSize * 2) - sunSize,
+                // rand.nextFloat(sunSize * 2) - sunSize);
+                sun.getPlanet("Earth").modifColorMult(keyPressed);
+                ;
             }
             if (keyPressed && name.equals("removeLines")) {
                 sun.switchDisplayLines();
@@ -166,7 +169,7 @@ public class App extends SimpleApplication {
     private void initSettings() {
         flyCam.setEnabled(false);
 
-        cam.setFrustumFar(sunSize * 100000);
+        cam.setFrustumFar(sunSize * 1000000);
 
     }
 
@@ -198,7 +201,7 @@ public class App extends SimpleApplication {
 
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
-        // sun.changeDistancePlanets(0.01f);
+        sun.changeDistancePlanets(0.1f);
 
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         helloText = font.createLabel("Hello, jMonkey!");
@@ -208,7 +211,7 @@ public class App extends SimpleApplication {
 
         guiNode.attachChild(helloText);
 
-        CameraTool.init(cam, inputManager);
+        CameraTool.init(cam, assetManager, inputManager);
         CameraTool.setAstre(sun);
 
     }

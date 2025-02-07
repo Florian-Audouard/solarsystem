@@ -46,6 +46,7 @@ public abstract class Astre {
     public float scaleMultiplier;
     public float objSize;
     private ColorRGBA color;
+    private float colorMultiplier;
     public static Node guiNode;
     private BitmapText text;
     public static Camera cam;
@@ -65,6 +66,7 @@ public abstract class Astre {
         this.scaleMultiplier = 1;
         this.objSize = 1;
         this.color = color;
+        this.colorMultiplier = 1;
     }
 
     public float calcObjSize() {
@@ -97,7 +99,6 @@ public abstract class Astre {
 
         node.attachChild(model);
         rootNode.attachChild(node);
-        createText();
     }
 
     public void rotation(double time) {
@@ -169,8 +170,15 @@ public abstract class Astre {
         return this.name.equals(astre.getName());
     }
 
-    public void createText() {
+    public void modifColorMult(boolean increase) {
+        if (increase) {
+            // log.info("modifColorMult , name : {}", name);
 
+            colorMultiplier = 2f;
+        } else {
+            colorMultiplier = 1f;
+
+        }
     }
 
 }

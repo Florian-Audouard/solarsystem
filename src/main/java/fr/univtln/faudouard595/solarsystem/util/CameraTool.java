@@ -1,8 +1,10 @@
 package fr.univtln.faudouard595.solarsystem.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.jme3.input.ChaseCamera;
+import com.jme3.asset.AssetManager;
+import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.input.InputManager;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -28,7 +30,7 @@ public class CameraTool {
     private static List<Astre> astres;
     private static int currentAstre = 0;
     private static Camera cam;
-    private static float distance;
+    private static float distanceFromAstre;
     private static int directionZoom = 1;
     private static int lastScrollTime = -1;
     private static int scrollTime = 10;
@@ -41,12 +43,14 @@ public class CameraTool {
     private static float maxDistance = 100f;
     private static float minDistance = 5f;
     private static float lastAngle;
+    private static AssetManager assetManager;
+    private static boolean cursorSave = false;
 
-    public static void init(Camera camReceive, InputManager inputManagerReceive) {
+    public static void init(Camera camReceive, AssetManager assetManagerReceive, InputManager inputManagerReceive) {
         cam = camReceive;
         inputManager = inputManagerReceive;
-
-        distance = 20f;
+        assetManager = assetManagerReceive;
+        distanceFromAstre = 20f;
         inputManager.addMapping("MouseScrollDown", new MouseAxisTrigger(2, true));
         inputManager.addMapping("MouseScrollUp", new MouseAxisTrigger(2, false));
         inputManager.addMapping("leftClick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
@@ -55,7 +59,7 @@ public class CameraTool {
                 new MouseAxisTrigger(0, false), new MouseAxisTrigger(1, false));
         inputManager.addListener(actionListener, "leftClick", "MouseScrollUp", "MouseScrollDown");
         inputManager.addListener(analogListener, "moveMouse");
-
+        setNormalCursor();
     }
 
     public static void setAngleHorizontal(float angleHorizontalReceive) {
@@ -79,6 +83,29 @@ public class CameraTool {
         }
     }
 
+    public static void setNormalCursor() {
+        JmeCursor customCursor = (JmeCursor) assetManager.loadAsset("Textures/Cursor/normal.cur");
+        inputManager.setMouseCursor(customCursor);
+    }
+
+    public static void setClickableCursor() {
+        JmeCursor customCursor = (JmeCursor) assetManager.loadAsset("Textures/Cursor/clickable.cur");
+        inputManager.setMouseCursor(customCursor);
+    }
+
+    public static void switchCursor(boolean clickable) {
+        if (cursorSave == clickable) {
+            return;
+        }
+        if (clickable) {
+            setClickableCursor();
+
+        } else {
+            setNormalCursor();
+        }
+        cursorSave = clickable;
+    }
+
     public static void setAstre(Astre astreReceive) {
         astre = astreReceive;
         astres = astre.getEveryAstres();
@@ -93,8 +120,7 @@ public class CameraTool {
         } else {
             currentAstre++;
         }
-        astre = astres.get(currentAstre);
-        initAngle();
+        setAstreByObject(astres.get(currentAstre));
     }
 
     public static void prevAstre() {
@@ -106,8 +132,69 @@ public class CameraTool {
         } else {
             currentAstre--;
         }
-        astre = astres.get(currentAstre);
+        setAstreByObject(astres.get(currentAstre));
+
+    }
+
+    public static void setAstreByObject(Astre astreReceive) {
+        if (astres == null) {
+            return;
+        }
+        astre = astreReceive;
         initAngle();
+    }
+
+    private static Vector3f getClickDirection(Vector2f screenPos) {
+        Vector3f worldCoords = cam.getWorldCoordinates(screenPos, 0f).clone();
+        Vector3f direction = worldCoords.subtract(cam.getLocation()).normalize();
+        return direction;
+    }
+
+    private static boolean espilonEquals(Vector3f vector1, Vector3f vector2, float epsilon) {
+        float x = vector1.x - vector2.x;
+        float y = vector1.y - vector2.y;
+        float z = vector1.z - vector2.z;
+        return x * x + y * y + z * z < epsilon * epsilon;
+    }
+
+    private static Astre setClosestAstre(List<Astre> astresDetecte) {
+        Astre closestAstre = astresDetecte.get(0);
+        float distance = closestAstre.getModel().getWorldTranslation().distance(cam.getLocation());
+        for (Astre a : astresDetecte) {
+            float newDistance = a.getModel().getWorldTranslation().distance(cam.getLocation());
+            if (newDistance < distance) {
+                distance = newDistance;
+                closestAstre = a;
+            }
+        }
+        return closestAstre;
+    }
+
+    private static boolean detectAstre(boolean changeAstre) {
+        int i = 0;
+        List<Astre> astresDetecte = new ArrayList<>();
+        boolean res = false;
+        for (Astre a : astres) {
+            Vector3f clickDirection = getClickDirection(lastMousePosition);
+            Vector3f camPos = cam.getLocation();
+            Vector3f camAstreDirection = a.getModel().getWorldTranslation().subtract(camPos).normalize();
+            log.info("name : {} res : {} ", a.getName(), espilonEquals(clickDirection, camAstreDirection, 0.1f));
+            if (espilonEquals(clickDirection, camAstreDirection, 0.1f) && i != currentAstre) {
+
+                astresDetecte.add(a);
+                res = true;
+            }
+            i++;
+        }
+        if(!res){
+            return res;
+        }
+        if (changeAstre) {
+            setAstreByObject(setClosestAstre(astresDetecte));
+        }
+        if (setClosestAstre(astresDetecte) instanceof Planet planet) {
+        }
+        return res;
     }
 
     private static ActionListener actionListener = new ActionListener() {
@@ -124,20 +211,23 @@ public class CameraTool {
             if (name.equals("leftClick")) {
                 isLeftClickPressed = isPressed;
                 lastMousePosition = inputManager.getCursorPosition();
+                detectAstre(isPressed);
             }
         }
     };
     private static AnalogListener analogListener = new AnalogListener() {
         @Override
         public void onAnalog(String name, float value, float tpf) {
-            if (name.equals("moveMouse") && isLeftClickPressed) {
-                Vector2f cursorPos = inputManager.getCursorPosition();
-                Vector2f delta = cursorPos.subtract(lastMousePosition);
-                log.info("delta: {}", delta);
-                setAngleHorizontal(angleHorizontal - (delta.x * 0.1f));
-                angleVertical -= delta.y * 0.1f;
-                log.info("angleHorizontal: {} , angleVertical: {}", angleHorizontal, angleVertical);
-                lastMousePosition = cursorPos;
+            if (name.equals("moveMouse")) {
+                if (isLeftClickPressed) {
+                    Vector2f cursorPos = inputManager.getCursorPosition();
+                    Vector2f delta = cursorPos.subtract(lastMousePosition);
+                    setAngleHorizontal(angleHorizontal - (delta.x * 0.1f));
+                    angleVertical -= delta.y * 0.1f;
+                    lastMousePosition = cursorPos;
+                }
+                switchCursor(detectAstre(false));
+
             }
         }
     };
@@ -151,8 +241,8 @@ public class CameraTool {
             double countdownValue = 1 - fractionElapsed;
             float zoom = (float) (directionZoom * zoomSpeed * countdownValue);
 
-            distance += zoom;
-            distance = FastMath.clamp(distance, minDistance, maxDistance);
+            distanceFromAstre += zoom;
+            distanceFromAstre = FastMath.clamp(distanceFromAstre, minDistance, maxDistance);
 
             lastScrollTime++;
         }
@@ -161,7 +251,7 @@ public class CameraTool {
 
     public static Vector3f calcCoord() {
         Vector3f astrePos = astre.getModel().getWorldTranslation();
-        float practicalDistance = Math.max(distance * astre.getScaleSize(), 1.5f);
+        float practicalDistance = Math.max(distanceFromAstre * astre.getScaleSize(), 1.5f);
 
         float x = astrePos.x + practicalDistance * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
                 * FastMath.sin(FastMath.DEG_TO_RAD * angleHorizontal);
@@ -192,7 +282,7 @@ public class CameraTool {
             float minWeight = FastMath.exp((-180f * ratio));
             float maxWeight = 1f;
             float weight = maxWeight
-                    - ((distance - minDistance) / (maxDistance - minDistance)) * (maxWeight - minWeight);
+                    - ((distanceFromAstre - minDistance) / (maxDistance - minDistance)) * (maxWeight - minWeight);
 
             lookAtPos = newPrimary.mult(1 - weight).add(newPlanet.mult(weight));
 
@@ -210,9 +300,6 @@ public class CameraTool {
             float newAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
             setAngleHorizontal(angleHorizontal - (newAngle - lastAngle));
             lastAngle = newAngle;
-            // log.info("anglePlanet: {} , angleHorizontal: {} , orbitalPeriode: {}",
-            // planet.getCurrentAngle(),
-            // angleHorizontal, planet.getOrbitalPeriod());
         }
         calcPos();
     }
