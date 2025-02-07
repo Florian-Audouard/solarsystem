@@ -3,6 +3,7 @@ package fr.univtln.faudouard595.solarsystem.Astre;
 import java.util.stream.IntStream;
 
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -53,9 +54,6 @@ public class Planet extends Astre {
     }
 
     public void generateLine() {
-        if (!displayLines) {
-            return;
-        }
         int numPoints = (int) (sun.getSize() * 1000) + 1;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints - 1).forEach(i -> {
@@ -84,6 +82,8 @@ public class Planet extends Astre {
         generateLine();
         lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
+        lineMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+
         Geometry orbitGeometry = new Geometry("OrbitLine");
         orbitMesh.setMode(Mesh.Mode.LineStrip);
         orbitGeometry.setMesh(orbitMesh);
@@ -138,13 +138,19 @@ public class Planet extends Astre {
     }
 
     public void removeLine() {
-        orbitMesh.clearBuffer(VertexBuffer.Type.Position);
+        lineMaterial.setColor("Color", new ColorRGBA(1f, 1f, 1f, 0f));
+        lineMaterial.setTransparent(true);
+    }
+
+    public void displayLine() {
+        lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
+        lineMaterial.setTransparent(false);
     }
 
     public void switchDisplayLine() {
         displayLines = !displayLines;
         if (displayLines) {
-            generateLine();
+            displayLine();
         } else {
             removeLine();
         }
