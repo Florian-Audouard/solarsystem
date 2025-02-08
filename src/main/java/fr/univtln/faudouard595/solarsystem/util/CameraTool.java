@@ -42,14 +42,16 @@ public class CameraTool {
     private static float angleVertical;
     private static boolean isLeftClickPressed = false;
     private static float maxDistance;
-    private static float minDistance = 1f;
+    private static float minDistance = 1.5f;
     private static float lastAngle;
     private static AssetManager assetManager;
     private static boolean cursorSave = false;
     private static float ratioScreen;
-    private static float zoomSpeed = 1.5f;
+    private static float zoomSpeed = 2.5f;
     private static int lastScrollTime = -1;
-    private static float smoothScrollTime = 100;
+    private static float smoothScrollTime;
+    private static float TRANSITION_SCROLL_TIME = 200f;
+    private static float TRANSITION_ASTRE_TIME = 50f;
     private static float wantedDistanceFromAstre;
     private static float distanceDifference;
     private static float lambdaSmoothZoom;
@@ -60,8 +62,9 @@ public class CameraTool {
         inputManager = inputManagerReceive;
         assetManager = assetManagerReceive;
         maxDistance = minDistance * 100000 * zoomSpeed;
-        distanceFromAstre = minDistance * zoomSpeed * 10;
+        distanceFromAstre = minDistance * zoomSpeed * 2;
         wantedDistanceFromAstre = distanceFromAstre;
+        smoothScrollTime = TRANSITION_SCROLL_TIME;
         initSmoothZoomVar();
         inputManager.addMapping("MouseScrollDown", new MouseAxisTrigger(2, true));
         inputManager.addMapping("MouseScrollUp", new MouseAxisTrigger(2, false));
@@ -95,6 +98,9 @@ public class CameraTool {
             angle = (sign * (angle) * FastMath.RAD_TO_DEG) - 30;
             setAngleHorizontal(angle);
             lastAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
+            wantedDistanceFromAstre = minDistance * zoomSpeed * 2;
+            smoothScrollTime = TRANSITION_ASTRE_TIME;
+            initSmoothZoomVar();
         }
     }
 
@@ -218,15 +224,15 @@ public class CameraTool {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("MouseScrollUp")) {
-                lastScrollTime = 0;
+
                 wantedDistanceFromAstre = Math.max(wantedDistanceFromAstre / zoomSpeed, minDistance);
+                smoothScrollTime = TRANSITION_SCROLL_TIME;
                 initSmoothZoomVar();
             }
             if (name.equals("MouseScrollDown")) {
-                lastScrollTime = 0;
                 wantedDistanceFromAstre = Math.min(wantedDistanceFromAstre * zoomSpeed, maxDistance);
+                smoothScrollTime = TRANSITION_SCROLL_TIME;
                 initSmoothZoomVar();
-
             }
             if (name.equals("leftClick")) {
                 isLeftClickPressed = isPressed;
@@ -253,6 +259,7 @@ public class CameraTool {
     };
 
     public static void initSmoothZoomVar() {
+        lastScrollTime = 0;
         distanceDifference = wantedDistanceFromAstre - distanceFromAstre;
         lambdaSmoothZoom = (float) (Math.log(20) / (smoothScrollTime - 1));
         expSumSmoothZoom = (1 - (float) Math.exp(-lambdaSmoothZoom * smoothScrollTime))

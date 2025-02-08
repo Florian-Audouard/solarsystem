@@ -37,7 +37,7 @@ import com.jme3.light.AmbientLight;
 @Slf4j
 public class App extends SimpleApplication {
 
-    private static final float sunSize = 500;
+    private static final float sunSize = 1000;
     private double time = 0f;
     private float speed = 1f;
     private float minSpeed = 1f;
