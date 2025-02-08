@@ -117,8 +117,6 @@ public abstract class Astre {
         Float newSize = (getSize() / getObjSize()) * this.scaleMultiplier;
         model.setLocalScale(new Vector3f(newSize, newSize, newSize));
 
-        log.info("{}: size: {} ", name, calcObjSize());
-
     }
 
     public void addPlanet(String name, float size, float primaryBodyDistance, float eccentricity, float orbitalPeriod,
@@ -180,7 +178,6 @@ public abstract class Astre {
 
     public void modifColorMult(boolean increase) {
         if (increase) {
-            // log.info("modifColorMult , name : {}", name);
 
             colorMultiplier = 2f;
         } else {

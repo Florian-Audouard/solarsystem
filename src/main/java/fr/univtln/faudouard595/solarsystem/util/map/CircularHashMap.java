@@ -70,7 +70,6 @@ public abstract class CircularHashMap<K, V> {
 
     public V nextValue() {
         current = this.next().getValue();
-        log.info("{}", current);
         return current;
     }
 
