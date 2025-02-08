@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Slf4j
 public abstract class Astre {
-    private String name;
+    protected String name;
     private float size;
     private float scaleSize;
     private Spatial model;

@@ -73,8 +73,21 @@ public class Planet extends Astre {
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.Gray);
         mat.setFloat("Shininess", 12f);
-        mat.setTexture("DiffuseMap", assetManager.loadTexture(Astre.TEXTUREPATH + super.getName() + ".jpg"));
+        mat.setTexture("DiffuseMap", assetManager.loadTexture(Astre.TEXTUREPATH +
+                super.getName() + ".jpg"));
 
+        if (name.equals("Earth")) {
+            // mat.setTexture("NormalMap", assetManager.loadTexture(Astre.TEXTUREPATH +
+            // "Earth_Normal1.jpg"));
+            // mat.setTexture("DetailMap", assetManager.loadTexture(Astre.TEXTUREPATH +
+            // "Earth_Normal2.jpg"));
+
+            // mat.setTexture("SpecularMap", assetManager.loadTexture(Astre.TEXTUREPATH +
+            // "Earth_Specular1.jpg"));
+            // mat.setTexture("SpecularMap", assetManager.loadTexture(Astre.TEXTUREPATH +
+            // "Earth_Specular2.jpg"));
+
+        }
         return mat;
     }
 
