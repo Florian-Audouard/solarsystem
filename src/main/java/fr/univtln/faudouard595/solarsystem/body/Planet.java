@@ -53,7 +53,7 @@ public class Planet extends Body {
     }
 
     public void generateLine() {
-        int numPoints = (int) (reference.getRadius() * 1000) + 1;
+        int numPoints = (int) (reference.getRadius() * 10000) + 1;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints - 1).forEach(i -> {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
@@ -107,7 +107,11 @@ public class Planet extends Body {
                 / (1 + eccentricity * FastMath.cos(angle));
         float z = FastMath.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));
-        return new Vector3f((float) x, 0f, (float) z);
+        float y = 0;
+        float inclinaisonRad = FastMath.DEG_TO_RAD * orbitalInclination;
+        y = FastMath.sin(inclinaisonRad) * z;
+        z = FastMath.cos(inclinaisonRad) * z;
+        return new Vector3f(x, y, z);
     }
 
     public Vector3f calcTrajectory(double time) {
