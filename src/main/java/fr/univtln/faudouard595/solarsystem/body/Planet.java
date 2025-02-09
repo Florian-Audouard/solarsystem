@@ -71,7 +71,7 @@ public class Planet extends Body {
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.Gray);
         mat.setFloat("Shininess", 12f);
-        mat.setTexture("DiffuseMap", assetManager.loadTexture(Body.TEXTUREPATH +
+        mat.setTexture("DiffuseMap", assetManager.loadTexture(Body.TEXTUREPATH + Body.planetTexture + "/" +
                 super.getName() + ".jpg"));
 
         return mat;
@@ -81,9 +81,8 @@ public class Planet extends Body {
         super.generateBody(node);
         generateLine();
         lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
         lineMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-
+        displayLine();
         Geometry orbitGeometry = new Geometry("OrbitLine");
         orbitGeometry.setQueueBucket(RenderQueue.Bucket.Transparent);
 

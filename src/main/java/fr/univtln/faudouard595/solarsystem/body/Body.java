@@ -52,6 +52,22 @@ public abstract class Body {
     private float rotationInclination;
     public static Body reference;
     public static float referenceSize;
+    public static RESOLUTION planetTexture = RESOLUTION.LOW;
+
+    public enum RESOLUTION {
+        LOW {
+            @Override
+            public String toString() {
+                return "Low";
+            }
+        },
+        HIGH {
+            @Override
+            public String toString() {
+                return "High";
+            }
+        }
+    }
 
     public enum TYPE {
         OBJ, SPHERE
@@ -76,6 +92,7 @@ public abstract class Body {
         this.objSize = 1;
         this.color = color;
         this.rotationNode = new Node(name + "_rotation");
+        this.colorMultiplier = 0.5f;
     }
 
     public static float convertion(double value) {
@@ -193,7 +210,6 @@ public abstract class Body {
 
     public void modifColorMult(boolean increase) {
         if (increase) {
-
             colorMultiplier = 2f;
         } else {
             colorMultiplier = 0.5f;

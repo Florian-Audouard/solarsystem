@@ -33,6 +33,8 @@ public class ApiAstreInfo {
     private static String filePath = "src/main/resources/Data/body.json";
     private ObjectMapper mapper;
     File file;
+    List<String> usedId = List.of("id", "englishName", "meanRadius", "sideralRotation", "axialTilt", "bodyType",
+            "semimajorAxis", "eccentricity", "sideralOrbit", "inclination", "aroundPlanet");
 
     public ApiAstreInfo() {
         this.client = HttpClient.newHttpClient();
@@ -48,7 +50,11 @@ public class ApiAstreInfo {
             Optional<JsonNode> optionalJsonNode = createRequest(string);
             if (optionalJsonNode.isPresent()) {
                 JsonNode jsonNode = optionalJsonNode.get();
-                fileNode.set(string, jsonNode);
+                ObjectNode usedNode = mapper.createObjectNode();
+                for (String id : usedId) {
+                    usedNode.set(id, jsonNode.get(id));
+                }
+                fileNode.set(string, usedNode);
             }
         }
         try {
@@ -59,7 +65,8 @@ public class ApiAstreInfo {
     }
 
     public boolean verifyBodyJsonNode(Collection<String> names) {
-        return names.stream().allMatch(name -> bodyJsonNode.has(name));
+        return names.stream().allMatch(
+                name -> bodyJsonNode.has(name) && usedId.stream().allMatch(id -> bodyJsonNode.get(name).has(id)));
     }
 
     public void verifFile(Collection<String> names) {
