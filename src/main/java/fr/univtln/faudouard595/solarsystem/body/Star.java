@@ -31,7 +31,7 @@ public class Star extends Body {
         super.getNode().addLight(sunLight);
         LightControl lightControl = new LightControl(sunLight);
         super.getNode().addControl(lightControl);
-
+        displayLine();
     }
 
 }

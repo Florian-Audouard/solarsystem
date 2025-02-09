@@ -9,7 +9,9 @@ import com.jme3.asset.AssetManager;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.font.BitmapText;
+import com.jme3.input.InputManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -17,9 +19,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.util.BufferUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,8 +43,8 @@ public abstract class Body {
     private Node rotationNode;
     private Map<String, Planet> planets;
     private double rotationPeriod;
-    protected static final String TEXTUREPATH = "Textures/Planet/";
-    protected static final String OBJPATH = "Models/Planet/";
+    protected static final String TEXTUREPATH = "Textures/Body/";
+    protected static final String OBJPATH = "Models/Body/";
     public static AssetManager assetManager;
     public TYPE type;
     public float scaleMultiplier;
@@ -53,6 +58,13 @@ public abstract class Body {
     public static Body reference;
     public static float referenceSize;
     public static RESOLUTION planetTexture = RESOLUTION.LOW;
+    protected Material circleMat;
+    protected Geometry circleGeo;
+    public static InputManager inputManager;
+    public static int circleDistance = 10;
+    public boolean displayCircle = true;
+    public boolean actualDisplayCircle = true;
+    protected boolean displayLines;
 
     public enum RESOLUTION {
         LOW {
@@ -93,6 +105,7 @@ public abstract class Body {
         this.color = color;
         this.rotationNode = new Node(name + "_rotation");
         this.colorMultiplier = 0.5f;
+        this.displayLines = true;
     }
 
     public static float convertion(double value) {
@@ -132,6 +145,9 @@ public abstract class Body {
                         0, 0));
         node.attachChild(rotationNode);
         rootNode.attachChild(node);
+        circleGeo = createCircle();
+        // circleGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
+        guiNode.attachChild(circleGeo);
     }
 
     public void rotation(double time) {
@@ -179,18 +195,35 @@ public abstract class Body {
         planets.values().forEach(planet -> planet.changeDistance(planet.getDistanceMultiplier() * distanceMultiplier));
     }
 
-    public void update(double time) {
-        // Vector3f position = new Vector3f(0, scaleSize, 0);
-        // text.setLocalTranslation(node.getWorldTranslation().add(position));
-        // text.setLocalTranslation(new Vector3f(50, 200, 0));
-        // text.lookAt(cam.getLocation(), cam.getUp());
-        rotation(time);
-        planets.values().forEach(planet -> planet.update(time));
+    public void updateCircle() {
+        if (!displayCircle) {
+            changeDisplayCircle(false);
+            return;
+        }
+
+        changeDisplayCircle(true);
+        circleGeo.setLocalTranslation(cam.getScreenCoordinates(getWorldTranslation()));
 
     }
 
+    public void update(double time) {
+        rotation(time);
+        planets.values().forEach(planet -> planet.update(time));
+        updateCircle();
+    }
+
+    public void switchDisplayLine() {
+        displayLines = !displayLines;
+        if (displayLines) {
+            displayLine();
+        } else {
+            removeLine();
+        }
+    }
+
     public void switchDisplayLines() {
-        planets.values().forEach(planet -> planet.switchDisplayLine());
+        switchDisplayLine();
+        planets.values().forEach(planet -> planet.switchDisplayLines());
     }
 
     public List<Body> getEveryBodies() {
@@ -208,13 +241,63 @@ public abstract class Body {
         return false;
     }
 
+    public void removeCircle() {
+        actualDisplayCircle = false;
+        circleGeo.setCullHint(Spatial.CullHint.Always);
+    }
+
+    public void displayCircle() {
+        actualDisplayCircle = true;
+        circleGeo.setCullHint(Spatial.CullHint.Never);
+    }
+
+    public void changeDisplayCircle(boolean change) {
+        displayCircle = change;
+        if (!displayCircle && !actualDisplayCircle) {
+            return;
+        }
+        boolean hidden = cam.getDirection().dot(getWorldTranslation().subtract(cam.getLocation())) < 0;
+        if (hidden) {
+            removeCircle();
+            return;
+        }
+        boolean isFar = cam.getLocation().distance(getWorldTranslation()) > reference.getRadius() * 50;
+        log.info("name : {} , distance : {} , refRadius : {}", name, cam.getLocation().distance(getWorldTranslation()),
+                reference.getRadius() * 10);
+        if (!isFar) {
+            removeCircle();
+            return;
+        }
+        if (displayCircle == actualDisplayCircle) {
+            return;
+        }
+        if (change) {
+            displayCircle();
+        } else {
+            removeCircle();
+        }
+    }
+
+    public void removeLine() {
+        changeDisplayCircle(false);
+    }
+
+    public void displayLine() {
+        changeDisplayCircle(true);
+    }
+
     public void modifColorMult(boolean increase) {
+        if (!displayLines) {
+            return;
+        }
         if (increase) {
             colorMultiplier = 2f;
         } else {
             colorMultiplier = 0.5f;
 
         }
+        circleMat.setColor("Color", color.mult(colorMultiplier));
+        circleMat.getAdditionalRenderState().setLineWidth(30f);
     }
 
     public String toString() {
@@ -239,5 +322,30 @@ public abstract class Body {
 
         return b * b - 4 * c >= 0;
 
+    }
+
+    private Geometry createCircle() {
+        int samples = circleDistance * 10;
+        Mesh mesh = new Mesh();
+        Vector3f[] vertices = new Vector3f[samples + 1];
+
+        for (int i = 0; i < samples; i++) {
+            float angle = (float) (i * 2 * Math.PI / samples);
+            vertices[i] = new Vector3f(circleDistance * (float) Math.cos(angle),
+                    circleDistance * (float) Math.sin(angle), 0);
+        }
+        vertices[samples] = vertices[0]; // Fermer le cercle
+
+        mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+        mesh.setMode(Mesh.Mode.LineStrip);
+        mesh.updateBound();
+
+        Geometry geom = new Geometry("Circle_" + name, mesh);
+        circleMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        circleMat.setColor("Color", color.mult(colorMultiplier));
+        circleMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        geom.setMaterial(circleMat);
+
+        return geom;
     }
 }

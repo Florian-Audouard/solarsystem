@@ -11,11 +11,16 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.VertexBuffer;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
+import com.jme3.util.BufferUtils;
 import com.jme3.util.SkyFactory;
 
 import fr.univtln.faudouard595.solarsystem.body.Body;
@@ -27,11 +32,6 @@ import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
-import com.jme3.input.controls.KeyTrigger;
 
 import com.jme3.light.AmbientLight;
 
@@ -70,8 +70,8 @@ public class App extends SimpleApplication {
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setWidth(1920);
-        settings.setHeight(1080);
-        // settings.setHeight(500);
+        // settings.setHeight(1080);
+        settings.setHeight(500);
         app.setSettings(settings);
         app.start();
 
@@ -125,6 +125,7 @@ public class App extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        Body.inputManager = inputManager;
         initSettings();
         TriggerControls.init(this);
         createSpace();

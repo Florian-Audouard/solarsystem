@@ -1,9 +1,7 @@
 package fr.univtln.faudouard595.solarsystem.utils.controls.camera;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.cursors.plugins.JmeCursor;
@@ -44,11 +42,10 @@ public class CameraTool {
     private static float lastAngle;
     private static AssetManager assetManager;
     private static boolean cursorSave = false;
-    private static float ratioScreen;
     private static float zoomSpeed = 2.5f;
     private static int lastScrollTime = -1;
     private static float smoothScrollTime;
-    private static float TRANSITION_SCROLL_TIME = 200f;
+    private static float TRANSITION_SCROLL_TIME = 100f;
     private static float TRANSITION_ASTRE_TIME = 50f;
     private static float wantedDistanceFromBody;
     private static float distanceDifference;
@@ -73,7 +70,6 @@ public class CameraTool {
         inputManager.addListener(actionListener, "leftClick", "MouseScrollUp", "MouseScrollDown");
         inputManager.addListener(analogListener, "moveMouse");
         setNormalCursor();
-        ratioScreen = ((float) cam.getWidth() / (float) cam.getHeight()) * 20;
         angleVertical = 10;
 
     }
@@ -96,10 +92,14 @@ public class CameraTool {
             angle = (sign * (angle) * FastMath.RAD_TO_DEG) - 30;
             setAngleHorizontal(angle);
             lastAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
-            wantedDistanceFromBody = minDistance * zoomSpeed * 2;
-            smoothScrollTime = TRANSITION_ASTRE_TIME;
-            initSmoothZoomVar();
+
         }
+        wantedDistanceFromBody = minDistance * zoomSpeed * 2;
+        if (1f + distanceFromBody > wantedDistanceFromBody && wantedDistanceFromBody > distanceFromBody - 1f) {
+            distanceFromBody = wantedDistanceFromBody * 2;
+        }
+        smoothScrollTime = TRANSITION_ASTRE_TIME;
+        initSmoothZoomVar();
     }
 
     public static void setNormalCursor() {
@@ -133,6 +133,7 @@ public class CameraTool {
     public static void nextBody() {
         bodies.nextValue();
         initAngle();
+        log.info("distanceFromBody : {} , wantedDistance : {}", distanceFromBody, wantedDistanceFromBody);
     }
 
     public static void prevBody() {
@@ -182,7 +183,7 @@ public class CameraTool {
             Vector3f bodypos = a.getWorldTranslation();
             Vector3f bodiesScreenPos = cam.getScreenCoordinates(bodypos);
             Vector2f bodiesScreenPos2d = new Vector2f(bodiesScreenPos.x, bodiesScreenPos.y);
-            float ratioPixel = ratioScreen;
+            float ratioPixel = Body.circleDistance;
             if (!a.equals(bodies.getCurrentValue()) &&
                     (espilonEqualsVector2d(mousePos, bodiesScreenPos2d, ratioPixel) ||
                             a.collision(camPos, clickDirection, 1f))) {

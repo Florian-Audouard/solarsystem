@@ -32,7 +32,6 @@ public class Planet extends Body {
     private float distanceMultiplier;
     public static float realSunSize;
     private Mesh orbitMesh;
-    private boolean displayLines;
     private float currentAngle;
     private Material lineMaterial;
     private float orbitalInclination;
@@ -48,7 +47,6 @@ public class Planet extends Body {
         this.orbitalInclination = orbitalInclination;
         this.orbitMesh = new Mesh();
         distanceMultiplier = 1;
-        displayLines = true;
         this.primary = primary;
     }
 
@@ -62,6 +60,7 @@ public class Planet extends Body {
 
         orbitMesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
         orbitMesh.updateBound();
+
     }
 
     public Material generateMat() {
@@ -82,7 +81,6 @@ public class Planet extends Body {
         generateLine();
         lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         lineMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        displayLine();
         Geometry orbitGeometry = new Geometry("OrbitLine");
         orbitGeometry.setQueueBucket(RenderQueue.Bucket.Transparent);
 
@@ -92,6 +90,7 @@ public class Planet extends Body {
         node.attachChild(orbitGeometry);
         trajectory(0);
         super.rotation(0);
+        displayLine();
     }
 
     public float getAngle(double time) {
@@ -142,25 +141,18 @@ public class Planet extends Body {
         trajectory(time);
     }
 
+    @Override
     public void removeLine() {
+        super.removeLine();
         lineMaterial.setColor("Color", new ColorRGBA(0f, 0f, 0f, 0f));
         lineMaterial.setTransparent(true);
     }
 
+    @Override
     public void displayLine() {
+        super.displayLine();
         lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
         lineMaterial.setTransparent(false);
-    }
-
-    public void switchDisplayLine() {
-        displayLines = !displayLines;
-        if (displayLines) {
-            displayLine();
-        } else {
-            removeLine();
-        }
-        super.switchDisplayLines();
-
     }
 
     @Override
