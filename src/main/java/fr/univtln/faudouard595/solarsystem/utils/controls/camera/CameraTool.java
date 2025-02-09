@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.camera;
+package fr.univtln.faudouard595.solarsystem.utils.controls.camera;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 public class CameraTool {
-    private static Body body;
     private static CircularHashMapBody bodies;
     private static Camera cam;
     private static float distanceFromBody;
@@ -56,10 +55,10 @@ public class CameraTool {
     private static float lambdaSmoothZoom;
     private static float expSumSmoothZoom;
 
-    public static void init(Camera camReceive, AssetManager assetManagerReceive, InputManager inputManagerReceive) {
-        cam = camReceive;
-        inputManager = inputManagerReceive;
-        assetManager = assetManagerReceive;
+    public static void init(Camera cam, AssetManager assetManager, InputManager inputManager) {
+        CameraTool.cam = cam;
+        CameraTool.inputManager = inputManager;
+        CameraTool.assetManager = assetManager;
         maxDistance = minDistance * 100000 * zoomSpeed;
         distanceFromBody = minDistance * zoomSpeed * 2;
         wantedDistanceFromBody = distanceFromBody;
@@ -79,8 +78,8 @@ public class CameraTool {
 
     }
 
-    public static void setAngleHorizontal(float angleHorizontalReceive) {
-        angleHorizontal = ((angleHorizontalReceive % 360) + 360) % 360;
+    public static void setAngleHorizontal(float angleHorizontal) {
+        CameraTool.angleHorizontal = ((angleHorizontal % 360) + 360) % 360;
     }
 
     public static void initAngle() {
@@ -126,8 +125,7 @@ public class CameraTool {
         cursorSave = clickable;
     }
 
-    public static void setBody(Body bodyReceive) {
-        body = bodyReceive;
+    public static void setBody(Body body) {
         bodies = new CircularHashMapBody();
         bodies.createMapFromList(body.getEveryBodies());
     }
@@ -142,11 +140,11 @@ public class CameraTool {
         initAngle();
     }
 
-    private static void setBodyByObject(Body bodyReceive) {
+    private static void setBodyByObject(Body body) {
         if (bodies == null) {
             return;
         }
-        bodies.setCurrentValue(bodyReceive);
+        bodies.setCurrentValue(body);
         initAngle();
     }
 
@@ -156,17 +154,8 @@ public class CameraTool {
         return direction;
     }
 
-    private static boolean espilonEqualsVector3d(Vector3f vector1, Vector3f vector2, float epsilon) {
-        float x = vector1.x - vector2.x;
-        float y = vector1.y - vector2.y;
-        float z = vector1.z - vector2.z;
-        return x * x + y * y + z * z < epsilon * epsilon;
-    }
-
     private static boolean espilonEqualsVector2d(Vector2f vector1, Vector2f vector2, float nbPixels) {
-        float x = vector1.x - vector2.x;
-        float y = vector1.y - vector2.y;
-        return x * x + y * y < (nbPixels * nbPixels) * 2;
+        return vector1.distance(vector2) < nbPixels;
     }
 
     private static Body setClosestBody(List<Body> bodiesDetecte) {

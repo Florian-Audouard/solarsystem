@@ -6,30 +6,26 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
-import com.jme3.terrain.noise.Color;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
 import fr.univtln.faudouard595.solarsystem.body.Body;
-import fr.univtln.faudouard595.solarsystem.body.Planet;
 import fr.univtln.faudouard595.solarsystem.body.Star;
 import fr.univtln.faudouard595.solarsystem.body.Body.TYPE;
-import fr.univtln.faudouard595.solarsystem.utils.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.utils.controls.trigger.TriggerControls;
 import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
-
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import com.jme3.input.KeyInput;
@@ -40,8 +36,9 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.AmbientLight;
 
 @Slf4j
+@Getter
 public class App extends SimpleApplication {
-    
+
     private static final float sunSize = 500;
     private double time = 0f;
     private float speed = 1f;
@@ -54,6 +51,21 @@ public class App extends SimpleApplication {
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
     private float maxRenderDistanceMult = 10000000f;
 
+    public void calcFlowOfTime() {
+        if (speed == minSpeed) {
+            flowOfTime *= -1;
+        }
+        speed = Math.max(speed / timeScaler, minSpeed);
+    }
+
+    public void calcSpeed(int direction) {
+        if (flowOfTime == direction) {
+            calcFlowOfTime();
+        } else {
+            speed *= timeScaler;
+        }
+    }
+
     public static void main(String[] args) {
         App app = new App();
         AppSettings settings = new AppSettings(true);
@@ -64,93 +76,6 @@ public class App extends SimpleApplication {
         app.start();
 
     }
-
-    private void initKeys() {
-        inputManager.addMapping("SpeedUp", new KeyTrigger(KeyInput.KEY_F1));
-        inputManager.addMapping("SpeedDown", new KeyTrigger(KeyInput.KEY_F2));
-        inputManager.addMapping("ScaleUp", new KeyTrigger(KeyInput.KEY_F3));
-        inputManager.addMapping("ScaleDown", new KeyTrigger(KeyInput.KEY_F4));
-        inputManager.addMapping("DistanceUp", new KeyTrigger(KeyInput.KEY_F5));
-        inputManager.addMapping("DistanceDown", new KeyTrigger(KeyInput.KEY_F6));
-        inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_F7));
-        inputManager.addMapping("nextAstre", new KeyTrigger(KeyInput.KEY_RIGHT));
-        inputManager.addMapping("prevAstre", new KeyTrigger(KeyInput.KEY_LEFT));
-
-        inputManager.addMapping("removeLines", new KeyTrigger(KeyInput.KEY_F8));
-
-        // inputManager.addMapping("lockPlanet", new KeyTrigger(KeyInput.KEY_F9));
-
-        inputManager.addListener(actionListener, "Test", "removeLines", "nextAstre", "prevAstre");
-        inputManager.addListener(analogListener, "SpeedUp", "SpeedDown", "ScaleUp", "ScaleDown",
-                "DistanceUp", "DistanceDown");
-    }
-
-    final private AnalogListener analogListener = new AnalogListener() {
-        @Override
-        public void onAnalog(String name, float value, float tpf) {
-
-            if (name.equals("ScaleUp")) {
-                sun.scalePlanets(1.01f);
-                // sun.scale(1.01f);
-            }
-            if (name.equals("ScaleDown")) {
-                sun.scalePlanets(0.99f);
-                // sun.scale(0.99f);
-            }
-            if (name.equals("DistanceUp")) {
-                sun.changeDistancePlanets(1.01f);
-            }
-            if (name.equals("DistanceDown")) {
-                sun.changeDistancePlanets(0.99f);
-            }
-            if (name.equals("SpeedUp")) {
-                if (flowOfTime == -1) {
-                    if (speed == minSpeed) {
-                        flowOfTime *= -1;
-                    }
-                    speed = Math.max(speed / timeScaler, minSpeed);
-                } else {
-                    speed *= timeScaler;
-                }
-            }
-            if (name.equals("SpeedDown")) {
-                if (flowOfTime == 1) {
-                    if (speed == minSpeed) {
-                        flowOfTime *= -1;
-                    }
-                    speed = Math.max(speed / timeScaler, minSpeed);
-
-                } else {
-                    speed *= timeScaler;
-                }
-
-            }
-
-        }
-    };
-
-    final private ActionListener actionListener = new ActionListener() {
-        @Override
-        public void onAction(String name, boolean keyPressed, float tpf) {
-
-            if (name.equals("Test")) {
-                // Random rand = new Random();
-                // sun.getNode().move(rand.nextFloat(sunSize * 2) - sunSize,
-                // rand.nextFloat(sunSize * 2) - sunSize,
-                // rand.nextFloat(sunSize * 2) - sunSize);
-                ;
-            }
-            if (keyPressed && name.equals("removeLines")) {
-                sun.switchDisplayLines();
-            }
-            if (keyPressed && name.equals("nextAstre")) {
-                CameraTool.nextBody();
-            }
-            if (keyPressed && name.equals("prevAstre")) {
-                CameraTool.prevBody();
-            }
-        }
-    };
 
     public void createSpace() {
 
@@ -201,7 +126,7 @@ public class App extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         initSettings();
-        initKeys();
+        TriggerControls.init(this);
         createSpace();
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
