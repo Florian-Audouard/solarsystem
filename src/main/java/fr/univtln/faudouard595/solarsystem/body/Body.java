@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.Astre;
+package fr.univtln.faudouard595.solarsystem.body;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,14 +28,16 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @Slf4j
-public abstract class Astre {
+public abstract class Body {
     protected String name;
-    private float size;
+    private float radius;
+    private float realSize;
     private float scaleSize;
     private Spatial model;
     private Node node;
+    private Node rotationNode;
     private Map<String, Planet> planets;
-    private float rotationPeriod;
+    private double rotationPeriod;
     protected static final String TEXTUREPATH = "Textures/Planet/";
     protected static final String OBJPATH = "Models/Planet/";
     public static AssetManager assetManager;
@@ -47,23 +49,37 @@ public abstract class Astre {
     public static Node guiNode;
     private BitmapText text;
     public static Camera cam;
+    private float rotationInclination;
+    public static Body reference;
+    public static float referenceSize;
 
     public enum TYPE {
         OBJ, SPHERE
     }
 
-    public Astre(String name, float size, float rotationPeriod, TYPE type, ColorRGBA color) {
+    public Body(String name, float size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
         this.name = name;
-        this.size = size;
-        this.scaleSize = size;
-        this.rotationPeriod = rotationPeriod * 60 * 60 * 24;
+        this.realSize = size;
+        if (reference == null) {
+            reference = this;
+            this.radius = referenceSize;
+        } else {
+            this.radius = convertion(size);
+        }
+        this.scaleSize = this.radius;
+        this.rotationPeriod = rotationPeriod * 60 * 60;
+        this.rotationInclination = rotationInclination;
         this.planets = new HashMap<>();
         this.node = new Node(name);
         this.type = type;
         this.scaleMultiplier = 1;
         this.objSize = 1;
         this.color = color;
-        this.colorMultiplier = 0.5f;
+        this.rotationNode = new Node(name + "_rotation");
+    }
+
+    public static float convertion(double value) {
+        return (float) (value * reference.getRadius()) / reference.getRealSize();
     }
 
     public float calcObjSize() {
@@ -80,33 +96,37 @@ public abstract class Astre {
 
     public abstract Material generateMat();
 
-    public void generateAstre(Node rootNode, boolean isSun) {
+    public void generateBody(Node rootNode) {
 
         if (this.type == TYPE.OBJ) {
             this.model = assetManager.loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();
-
         } else {
-            Sphere sphere = new Sphere(32, 32, size / 2);
+            Sphere sphere = new Sphere(32, 32, radius);
             sphere.setTextureMode(Sphere.TextureMode.Projected);
             this.model = new Geometry("Sphere_" + name, sphere);
         }
         model.setMaterial(generateMat());
         model.setShadowMode(ShadowMode.CastAndReceive);
 
-        node.attachChild(model);
+        rotationNode.attachChild(model);
+        rotationNode
+                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination - 90f),
+                        0, 0));
+        node.attachChild(rotationNode);
         rootNode.attachChild(node);
     }
 
     public void rotation(double time) {
-        float rotationSpeed = (FastMath.TWO_PI / rotationPeriod);
-        Quaternion q = new Quaternion();
-        float rotationX = 0;
-        if (type == TYPE.SPHERE) {
-            rotationX = -FastMath.HALF_PI;
-        }
-        q.fromAngles(rotationX, (float) ((rotationSpeed * time) % 360), 0f);
-        model.setLocalRotation(q);
+        double rotationSpeed = (rotationPeriod != 0) ? (FastMath.TWO_PI / rotationPeriod) : 0;
+        float rotationZ = (float) ((rotationSpeed * time) % FastMath.TWO_PI);
+        Quaternion rotation = new Quaternion().fromAngles(
+                0,
+                0,
+                rotationZ);
+
+        model.setLocalRotation(rotation);
+
     }
 
     public void scale(float scaleMultiplier) {
@@ -114,17 +134,19 @@ public abstract class Astre {
         this.scaleMultiplier *= scaleMultiplier;
         scalePlanets(scaleMultiplier);
         // model.setLocalScale();
-        Float newSize = (getSize() / getObjSize()) * this.scaleMultiplier;
+        Float newSize = (getRadius() / getObjSize()) * this.scaleMultiplier;
         model.setLocalScale(new Vector3f(newSize, newSize, newSize));
 
     }
 
-    public void addPlanet(String name, float size, float primaryBodyDistance, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, TYPE type, ColorRGBA lineColor) {
-        Planet planet = new Planet(name, size, primaryBodyDistance, eccentricity, orbitalPeriod, rotationPeriod, this,
+    public Planet addPlanet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
+            float rotationPeriod, float orbitalInclination, float rotationInclination, TYPE type, ColorRGBA lineColor) {
+        Planet planet = new Planet(name, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
+                orbitalInclination, rotationInclination, this,
                 type, lineColor);
-        planet.generatePlanet(node);
+        planet.generateBody(node);
         planets.put(name, planet);
+        return planet;
     }
 
     public Planet getPlanet(String name) {
@@ -154,27 +176,20 @@ public abstract class Astre {
         planets.values().forEach(planet -> planet.switchDisplayLine());
     }
 
-    public List<Astre> getEveryAstres() {
-        List<Astre> astres = new ArrayList<>();
-        astres.add(this);
-        planets.values().forEach(planet -> astres.addAll(planet.getEveryAstres()));
-        return astres;
+    public List<Body> getEveryBodies() {
+        List<Body> bodies = new ArrayList<>();
+        bodies.add(this);
+        planets.values().forEach(planet -> bodies.addAll(planet.getEveryBodies()));
+        return bodies;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Astre astre) {
-            return this.name.equals(astre.getName());
+        if (o instanceof Body body) {
+            return this.name.equals(body.getName());
         }
         return false;
     }
-
-    // public int hashCode(Object o) {
-    // if (o instanceof Astre astre) {
-    // return this.name.hashCode(astre.getName());
-    // }
-    // return "0".hashCode("1");
-    // }
 
     public void modifColorMult(boolean increase) {
         if (increase) {
@@ -202,7 +217,7 @@ public abstract class Astre {
         Vector3f directionProjectileNormalize = directionProjectile.normalize();
         Vector3f position = getWorldTranslation();
         Vector3f planetToDepart = position.subtract(depart);
-        float radius = (scaleSize / 2) * multiplierZone;
+        float radius = scaleSize * multiplierZone;
         float b = 2 * directionProjectileNormalize.dot(planetToDepart);
         float c = planetToDepart.dot(planetToDepart) - (radius * radius);
 

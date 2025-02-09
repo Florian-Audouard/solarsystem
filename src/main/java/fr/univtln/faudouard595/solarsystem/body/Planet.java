@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.Astre;
+package fr.univtln.faudouard595.solarsystem.body;
 
 import java.util.stream.IntStream;
 
@@ -24,38 +24,36 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @ToString
 @Slf4j
-public class Planet extends Astre {
+public class Planet extends Body {
     private float eccentricity;
-    private float orbitalPeriod;
-    private float primaryBodyDistance;
-    private Astre primary;
+    private double orbitalPeriod;
+    private float semimajorAxis;
+    private Body primary;
     private float distanceMultiplier;
     public static float realSunSize;
-    public static Star sun;
     private Mesh orbitMesh;
     private boolean displayLines;
     private float currentAngle;
     private Material lineMaterial;
+    private float orbitalInclination;
 
-    public Planet(String name, float size, float primaireDistance, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, Astre primary, TYPE type, ColorRGBA color) {
-        super(name, convertion(size), rotationPeriod, type, color);
+    public Planet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
+            float rotationPeriod, float orbitalInclination, float rotationInclination, Body primary, TYPE type,
+            ColorRGBA color) {
+        super(name, size, rotationPeriod, rotationInclination, type, color);
 
-        this.primaryBodyDistance = convertion(primaireDistance);
+        this.semimajorAxis = convertion(semimajorAxis);
         this.eccentricity = eccentricity;
         this.orbitalPeriod = orbitalPeriod * 60 * 60 * 24;
-        orbitMesh = new Mesh();
+        this.orbitalInclination = orbitalInclination;
+        this.orbitMesh = new Mesh();
         distanceMultiplier = 1;
         displayLines = true;
         this.primary = primary;
     }
 
-    public static float convertion(float value) {
-        return (value * sun.getSize()) / realSunSize;
-    }
-
     public void generateLine() {
-        int numPoints = (int) (sun.getSize() * 1000) + 1;
+        int numPoints = (int) (reference.getRadius() * 1000) + 1;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints - 1).forEach(i -> {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
@@ -73,26 +71,14 @@ public class Planet extends Astre {
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.Gray);
         mat.setFloat("Shininess", 12f);
-        mat.setTexture("DiffuseMap", assetManager.loadTexture(Astre.TEXTUREPATH +
+        mat.setTexture("DiffuseMap", assetManager.loadTexture(Body.TEXTUREPATH +
                 super.getName() + ".jpg"));
 
-        if (name.equals("Earth")) {
-            // mat.setTexture("NormalMap", assetManager.loadTexture(Astre.TEXTUREPATH +
-            // "Earth_Normal1.jpg"));
-            // mat.setTexture("DetailMap", assetManager.loadTexture(Astre.TEXTUREPATH +
-            // "Earth_Normal2.jpg"));
-
-            // mat.setTexture("SpecularMap", assetManager.loadTexture(Astre.TEXTUREPATH +
-            // "Earth_Specular1.jpg"));
-            // mat.setTexture("SpecularMap", assetManager.loadTexture(Astre.TEXTUREPATH +
-            // "Earth_Specular2.jpg"));
-
-        }
         return mat;
     }
 
-    public void generatePlanet(Node node) {
-        generateAstre(node, false);
+    public void generateBody(Node node) {
+        super.generateBody(node);
         generateLine();
         lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
@@ -115,8 +101,8 @@ public class Planet extends Astre {
     }
 
     public Vector3f calcTrajectory(double time, float add) {
-        float workingDistance = super.getScaleSize() / 2 + primary.getScaleSize() / 2
-                + add + ((primaryBodyDistance) * distanceMultiplier);
+        float workingDistance = super.getScaleSize() + primary.getScaleSize()
+                + add + ((semimajorAxis) * distanceMultiplier);
         float angle = getAngle(time);
         float x = FastMath.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));

@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.jme3.app.SimpleApplication;
@@ -20,11 +22,14 @@ import com.jme3.terrain.noise.Color;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
-import fr.univtln.faudouard595.solarsystem.Astre.Astre;
-import fr.univtln.faudouard595.solarsystem.Astre.Planet;
-import fr.univtln.faudouard595.solarsystem.Astre.Star;
-import fr.univtln.faudouard595.solarsystem.Astre.Astre.TYPE;
-import fr.univtln.faudouard595.solarsystem.util.CameraTool;
+import fr.univtln.faudouard595.solarsystem.body.Body;
+import fr.univtln.faudouard595.solarsystem.body.Planet;
+import fr.univtln.faudouard595.solarsystem.body.Star;
+import fr.univtln.faudouard595.solarsystem.body.Body.TYPE;
+import fr.univtln.faudouard595.solarsystem.utils.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
+import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
+
 import lombok.extern.slf4j.Slf4j;
 
 import com.jme3.input.KeyInput;
@@ -37,7 +42,7 @@ import com.jme3.light.AmbientLight;
 @Slf4j
 public class App extends SimpleApplication {
 
-    private static final float sunSize = 1000;
+    private static final float sunSize = 500;
     private double time = 0f;
     private float speed = 1f;
     private float minSpeed = 1f;
@@ -139,10 +144,10 @@ public class App extends SimpleApplication {
                 sun.switchDisplayLines();
             }
             if (keyPressed && name.equals("nextAstre")) {
-                CameraTool.nextAstre();
+                CameraTool.nextBody();
             }
             if (keyPressed && name.equals("prevAstre")) {
-                CameraTool.prevAstre();
+                CameraTool.prevBody();
             }
         }
     };
@@ -152,14 +157,11 @@ public class App extends SimpleApplication {
         Texture starTexture = assetManager.loadTexture("Textures/Sky/StarSky.jpg");
         Spatial sky = SkyFactory.createSky(assetManager, starTexture, SkyFactory.EnvMapType.EquirectMap);
         rootNode.attachChild(sky);
-        Astre.assetManager = assetManager;
-        Astre.guiNode = guiNode;
-        Astre.cam = cam;
-
-        sun = new Star("Sun", sunSize, 25.05f, Astre.TYPE.SPHERE, ColorRGBA.Yellow);
-        sun.generateStar(rootNode, viewPort);
-        Planet.sun = sun;
-        Planet.realSunSize = 1_392_700;
+        Body.assetManager = assetManager;
+        Body.guiNode = guiNode;
+        Body.cam = cam;
+        Body.referenceSize = sunSize;
+        createBodies();
 
         AmbientLight al = new AmbientLight();
         al.setColor(ColorRGBA.White.mult(0.1f));
@@ -178,32 +180,29 @@ public class App extends SimpleApplication {
 
     }
 
+    public void createBodies() {
+        ApiAstreInfo apiAstreInfo = new ApiAstreInfo();
+        List<DataCreationNeeded> bodies = new ArrayList<>();
+        bodies.add(new DataCreationNeeded("soleil", ColorRGBA.Yellow));
+        bodies.add(new DataCreationNeeded("mercure", new ColorRGBA(151f / 255, 104f / 255, 172f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("venus", new ColorRGBA(176f / 255, 121f / 255, 25f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("terre", new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("mars", new ColorRGBA(154f / 255, 78f / 255, 25f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("jupiter", new ColorRGBA(218f / 255, 139f / 255, 114f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("saturne", new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("uranus", new ColorRGBA(104f / 255, 204f / 255, 218f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("neptune", new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f)));
+        bodies.add(new DataCreationNeeded("lune", ColorRGBA.Gray));
+
+        sun = (Star) apiAstreInfo.getBodies(bodies, TYPE.SPHERE);
+        sun.generateBody(rootNode, viewPort);
+    }
+
     @Override
     public void simpleInitApp() {
         initSettings();
         initKeys();
         createSpace();
-
-        sun.addPlanet("Mercury", 4_879.4f, 57_909_227f, 0.206f,
-                88f, 59f, TYPE.SPHERE, new ColorRGBA(151f / 255, 104f / 255, 172f / 255, 1f));
-        sun.addPlanet("Venus", 12_104f, 108_208_930f, 0.007f,
-                225.025f, 243f, TYPE.SPHERE, new ColorRGBA(176f / 255, 121f / 255, 25f / 255, 1f));
-        sun.addPlanet("Earth", 12_756f, 149_597_870f, 0.017f,
-                365.25f, 1f, TYPE.SPHERE, new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f));
-        sun.addPlanet("Mars", 6_779f, 227_939_200f, 0.0963f,
-                686.98f, 1.02f, TYPE.SPHERE, new ColorRGBA(154f / 255, 78f / 255, 25f / 255, 1f));
-        sun.addPlanet("Jupiter", 139_820f, 778_340_821f, 0.048f,
-                4_330.6f, 0.413f, TYPE.SPHERE, new ColorRGBA(218f / 255, 139f / 255, 114f / 255, 1f));
-        sun.addPlanet("Saturn", 116_460f, 1_426_666_422f, 0.056f,
-                10_756f, 0.446f, TYPE.SPHERE, new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f));
-        sun.addPlanet("Uranus", 50_724f, 2_870_658_186f, 0.047f,
-                30_687f, 0.71f, TYPE.SPHERE, new ColorRGBA(104f / 255, 204f / 255, 218f / 255, 1f));
-        sun.addPlanet("Neptune", 49_244f, 4_498_396_441f, 0.248f,
-                60_190f, 0.667f, TYPE.SPHERE, new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f));
-        Planet earth = sun.getPlanet("Earth");
-        earth.addPlanet("Moon", 3_474.8f, 384_400f, 0.0549f,
-                27.3f, 27.3f, TYPE.SPHERE, ColorRGBA.Gray);
-
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
         // sun.changeDistancePlanets(0.01f);
@@ -218,7 +217,7 @@ public class App extends SimpleApplication {
         guiNode.attachChild(helloText);
 
         CameraTool.init(cam, assetManager, inputManager);
-        CameraTool.setAstre(sun);
+        CameraTool.setBody(sun);
 
     }
 
