@@ -149,7 +149,7 @@ public abstract class Body {
 
         rotationNode.attachChild(model);
         rotationNode
-                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination - 90f),
+                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination + 90f),
                         0, 0));
         node.attachChild(rotationNode);
         rootNode.attachChild(node);
@@ -273,7 +273,6 @@ public abstract class Body {
         if (!isOnScreen()) {
             return false;
         }
-
         return true;
     }
 

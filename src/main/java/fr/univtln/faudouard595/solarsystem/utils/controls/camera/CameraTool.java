@@ -294,15 +294,12 @@ public class CameraTool {
             float maxWeight = 1f;
             float distanceNormalized = (distanceFromBody - minDistance) / (maxDistance - minDistance);
 
-            // Facteur d'exponentielle (plus grand = plus prononcé)
-            float expFactor = 5f; // Essaie 10f, 20f pour plus d'effet
+            float expFactor = 5f;
 
-            // Calcul exponentiel inversé et normalisation
             float expDistance = (float) (1 - Math.exp(-expFactor * distanceNormalized));
-            float normalizer = (float) (1 - Math.exp(-expFactor)); // Assure que max = 1
+            float normalizer = (float) (1 - Math.exp(-expFactor));
             expDistance = expDistance / normalizer;
 
-            // **Inversion du poids**
             float weight = 1 - (minWeight + (maxWeight - minWeight) * expDistance);
 
             lookAtPos = primaryPos.mult(1 - weight).add(planetPos.mult(weight));
