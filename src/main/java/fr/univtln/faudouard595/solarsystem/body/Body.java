@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
+import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.material.Material;
@@ -17,6 +19,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
@@ -65,6 +68,9 @@ public abstract class Body {
     public boolean displayCircle = true;
     public boolean actualDisplayCircle = true;
     protected boolean displayLines;
+    public static BitmapFont font;
+    private BitmapText circleText;
+    private int textSize = 10;
 
     public enum RESOLUTION {
         LOW {
@@ -91,6 +97,7 @@ public abstract class Body {
         if (reference == null) {
             reference = this;
             this.radius = referenceSize;
+            font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         } else {
             this.radius = convertion(size);
         }
@@ -106,6 +113,7 @@ public abstract class Body {
         this.rotationNode = new Node(name + "_rotation");
         this.colorMultiplier = 0.5f;
         this.displayLines = true;
+
     }
 
     public static float convertion(double value) {
@@ -146,7 +154,6 @@ public abstract class Body {
         node.attachChild(rotationNode);
         rootNode.attachChild(node);
         circleGeo = createCircle();
-        // circleGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
         guiNode.attachChild(circleGeo);
     }
 
@@ -166,7 +173,6 @@ public abstract class Body {
         objSize = calcObjSize();
         this.scaleMultiplier *= scaleMultiplier;
         scalePlanets(scaleMultiplier);
-        // model.setLocalScale();
         Float newSize = (getRadius() / getObjSize()) * this.scaleMultiplier;
         model.setLocalScale(new Vector3f(newSize, newSize, newSize));
 
@@ -203,7 +209,8 @@ public abstract class Body {
 
         changeDisplayCircle(true);
         circleGeo.setLocalTranslation(cam.getScreenCoordinates(getWorldTranslation()));
-
+        circleText
+                .setLocalTranslation(circleGeo.getLocalTranslation().add(circleDistance, circleDistance + textSize, 0));
     }
 
     public void update(double time) {
@@ -242,13 +249,44 @@ public abstract class Body {
     }
 
     public void removeCircle() {
+        if (!actualDisplayCircle) {
+            return;
+        }
         actualDisplayCircle = false;
         circleGeo.setCullHint(Spatial.CullHint.Always);
+        circleText.setText("");
     }
 
     public void displayCircle() {
+        if (actualDisplayCircle) {
+            return;
+        }
         actualDisplayCircle = true;
         circleGeo.setCullHint(Spatial.CullHint.Never);
+        circleText.setText(name);
+    }
+
+    public boolean isClickable() {
+        if (isPrimaryDisplayed()) {
+            return false;
+        }
+        if (!isOnScreen()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean isPrimaryDisplayed() {
+        return false;
+    }
+
+    public boolean isOnScreen() {
+        return cam.getDirection().dot(getWorldTranslation().subtract(cam.getLocation())) > 0;
+    }
+
+    public boolean isFarFromCam() {
+        return cam.getLocation().distance(getWorldTranslation()) > reference.getRadius() * 50;
     }
 
     public void changeDisplayCircle(boolean change) {
@@ -256,15 +294,12 @@ public abstract class Body {
         if (!displayCircle && !actualDisplayCircle) {
             return;
         }
-        boolean hidden = cam.getDirection().dot(getWorldTranslation().subtract(cam.getLocation())) < 0;
-        if (hidden) {
+        if (!isClickable()) {
             removeCircle();
             return;
         }
-        boolean isFar = cam.getLocation().distance(getWorldTranslation()) > reference.getRadius() * 50;
-        log.info("name : {} , distance : {} , refRadius : {}", name, cam.getLocation().distance(getWorldTranslation()),
-                reference.getRadius() * 10);
-        if (!isFar) {
+
+        if (!isFarFromCam()) {
             removeCircle();
             return;
         }
@@ -292,12 +327,14 @@ public abstract class Body {
         }
         if (increase) {
             colorMultiplier = 2f;
+            color.a = 2f;
         } else {
             colorMultiplier = 0.5f;
+            color.a = 0.5f;
 
         }
-        circleMat.setColor("Color", color.mult(colorMultiplier));
-        circleMat.getAdditionalRenderState().setLineWidth(30f);
+        circleMat.setColor("Color", color);
+        circleText.setColor(color);
     }
 
     public String toString() {
@@ -343,8 +380,13 @@ public abstract class Body {
         Geometry geom = new Geometry("Circle_" + name, mesh);
         circleMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         circleMat.setColor("Color", color.mult(colorMultiplier));
-        circleMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
         geom.setMaterial(circleMat);
+        geom.setQueueBucket(RenderQueue.Bucket.Gui);
+
+        this.circleText = font.createLabel(name);
+        this.circleText.setColor(color.mult(colorMultiplier));
+        this.circleText.setSize(textSize);
+        guiNode.attachChild(this.circleText);
 
         return geom;
     }

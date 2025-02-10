@@ -2,6 +2,7 @@ package fr.univtln.faudouard595.solarsystem.utils.controls.camera;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.cursors.plugins.JmeCursor;
@@ -174,8 +175,7 @@ public class CameraTool {
     }
 
     private static boolean detectBody(boolean changeBody) {
-        List<Body> bodiesDetecte = new ArrayList<>();
-        boolean res = false;
+        Optional<Body> body = Optional.empty();
         Vector2f mousePos = inputManager.getCursorPosition();
         for (Body a : bodies.getValues()) {
             Vector3f camPos = cam.getLocation();
@@ -186,18 +186,18 @@ public class CameraTool {
             float ratioPixel = Body.circleDistance;
             if (!a.equals(bodies.getCurrentValue()) &&
                     (espilonEqualsVector2d(mousePos, bodiesScreenPos2d, ratioPixel) ||
-                            a.collision(camPos, clickDirection, 1f))) {
-                bodiesDetecte.add(a);
-                res = true;
+                            a.collision(camPos, clickDirection, 1f))
+                    && a.isClickable()) {
+                body = Optional.of(a);
             }
         }
-        if (!res) {
+        if (!body.isPresent()) {
             if (!changeBody) {
                 bodies.forEach(a -> a.modifColorMult(false));
             }
-            return res;
+            return false;
         }
-        Body closest = setClosestBody(bodiesDetecte);
+        Body closest = body.get();
         if (changeBody) {
             setBodyByObject(closest);
         } else {
@@ -206,7 +206,7 @@ public class CameraTool {
             }
         }
 
-        return res;
+        return true;
     }
 
     private static ActionListener actionListener = new ActionListener() {

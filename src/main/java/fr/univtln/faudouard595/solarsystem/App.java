@@ -14,8 +14,10 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
+import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.system.AppSettings;
@@ -135,7 +137,7 @@ public class App extends SimpleApplication {
         // sun.scalePlanets(30f);
 
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        helloText = font.createLabel("Hello, jMonkey!");
+        helloText = font.createLabel("");
         helloText.setSize(40);
         helloText.setColor(ColorRGBA.White);
         helloText.setLocalTranslation(100, settings.getHeight() - 50, 0);
