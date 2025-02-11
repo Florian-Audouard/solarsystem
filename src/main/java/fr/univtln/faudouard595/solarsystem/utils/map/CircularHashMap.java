@@ -2,6 +2,7 @@ package fr.univtln.faudouard595.solarsystem.utils.map;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -90,5 +91,9 @@ public abstract class CircularHashMap<K, V> {
 
     public K prevKey() {
         return this.prev().getKey();
+    }
+
+    public Stream<V> stream() {
+        return map.values().stream();
     }
 }

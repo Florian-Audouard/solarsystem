@@ -29,6 +29,7 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.util.BufferUtils;
 
+import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +72,7 @@ public abstract class Body {
     public static BitmapFont font;
     private BitmapText circleText;
     private int textSize = 10;
+    protected boolean isClickable = false;
 
     public enum RESOLUTION {
         LOW {
@@ -201,24 +203,6 @@ public abstract class Body {
         planets.values().forEach(planet -> planet.changeDistance(planet.getDistanceMultiplier() * distanceMultiplier));
     }
 
-    public void updateCircle() {
-        if (!displayCircle) {
-            changeDisplayCircle(false);
-            return;
-        }
-
-        changeDisplayCircle(true);
-        circleGeo.setLocalTranslation(cam.getScreenCoordinates(getWorldTranslation()));
-        circleText
-                .setLocalTranslation(circleGeo.getLocalTranslation().add(circleDistance, circleDistance + textSize, 0));
-    }
-
-    public void update(double time) {
-        rotation(time);
-        planets.values().forEach(planet -> planet.update(time));
-        updateCircle();
-    }
-
     public void switchDisplayLine() {
         displayLines = !displayLines;
         if (displayLines) {
@@ -246,70 +230,6 @@ public abstract class Body {
             return this.name.equals(body.getName());
         }
         return false;
-    }
-
-    public void removeCircle() {
-        if (!actualDisplayCircle) {
-            return;
-        }
-        actualDisplayCircle = false;
-        circleGeo.setCullHint(Spatial.CullHint.Always);
-        circleText.setText("");
-    }
-
-    public void displayCircle() {
-        if (actualDisplayCircle) {
-            return;
-        }
-        actualDisplayCircle = true;
-        circleGeo.setCullHint(Spatial.CullHint.Never);
-        circleText.setText(name);
-    }
-
-    public boolean isClickable() {
-        if (isPrimaryDisplayed()) {
-            return false;
-        }
-        if (!isOnScreen()) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean isPrimaryDisplayed() {
-        return false;
-    }
-
-    public boolean isOnScreen() {
-        return cam.getDirection().dot(getWorldTranslation().subtract(cam.getLocation())) > 0;
-    }
-
-    public boolean isFarFromCam() {
-        return cam.getLocation().distance(getWorldTranslation()) > reference.getRadius() * 50;
-    }
-
-    public void changeDisplayCircle(boolean change) {
-        displayCircle = change;
-        if (!displayCircle && !actualDisplayCircle) {
-            return;
-        }
-        if (!isClickable()) {
-            removeCircle();
-            return;
-        }
-
-        if (!isFarFromCam()) {
-            removeCircle();
-            return;
-        }
-        if (displayCircle == actualDisplayCircle) {
-            return;
-        }
-        if (change) {
-            displayCircle();
-        } else {
-            removeCircle();
-        }
     }
 
     public void removeLine() {
@@ -388,5 +308,103 @@ public abstract class Body {
         guiNode.attachChild(this.circleText);
 
         return geom;
+    }
+
+    public boolean isPrimaryClickable() {
+        return false;
+    }
+
+    public void updateisClickable() {
+        if (CameraTool.bodies.getCurrentValue().equals(this)) {
+            isClickable = false;
+            return;
+        }
+        if (isPrimaryClickable()) {
+            isClickable = false;
+            return;
+        }
+        if (!isOnScreen()) {
+            isClickable = false;
+            return;
+        }
+        isClickable = true;
+    }
+
+    public void removeCircle() {
+        if (!actualDisplayCircle) {
+            return;
+        }
+        actualDisplayCircle = false;
+        circleGeo.setCullHint(Spatial.CullHint.Always);
+        circleText.setText("");
+    }
+
+    public void displayCircle() {
+        if (actualDisplayCircle) {
+            return;
+        }
+        actualDisplayCircle = true;
+        circleGeo.setCullHint(Spatial.CullHint.Never);
+        circleText.setText(name);
+    }
+
+    public boolean isPrimaryDisplayed() {
+        return false;
+    }
+
+    public boolean isOnScreen() {
+        return cam.getDirection().dot(getWorldTranslation().subtract(cam.getLocation())) > 0;
+    }
+
+    public boolean isFarFromCam() {
+        return cam.getLocation().distance(getWorldTranslation()) > reference.getRadius() * 50;
+    }
+
+    public void changeDisplayCircle(boolean change) {
+        displayCircle = change;
+        if (!displayCircle && !actualDisplayCircle) {
+            return;
+        }
+
+        if (isPrimaryDisplayed()) {
+            removeCircle();
+            return;
+        }
+        if (!isOnScreen()) {
+            removeCircle();
+            return;
+        }
+
+        if (!isFarFromCam()) {
+            removeCircle();
+            return;
+        }
+        if (change) {
+            displayCircle();
+        } else {
+            removeCircle();
+        }
+    }
+
+    public void updateCircle() {
+        if (!displayCircle) {
+            changeDisplayCircle(false);
+            return;
+        }
+
+        changeDisplayCircle(true);
+        if (!actualDisplayCircle) {
+            return;
+        }
+        circleGeo.setLocalTranslation(cam.getScreenCoordinates(getWorldTranslation()));
+        circleText
+                .setLocalTranslation(circleGeo.getLocalTranslation().add(circleDistance, circleDistance + textSize, 0));
+    }
+
+    public void update(double time) {
+        rotation(time);
+        updateisClickable();
+        updateCircle();
+        planets.values().forEach(planet -> planet.update(time));
     }
 }

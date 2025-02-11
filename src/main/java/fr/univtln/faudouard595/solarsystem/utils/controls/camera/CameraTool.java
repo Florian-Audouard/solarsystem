@@ -1,6 +1,7 @@
 package fr.univtln.faudouard595.solarsystem.utils.controls.camera;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 public class CameraTool {
-    private static CircularHashMapBody bodies;
+    public static CircularHashMapBody bodies;
     private static Camera cam;
     private static float distanceFromBody;
 
@@ -66,10 +67,7 @@ public class CameraTool {
         inputManager.addMapping("MouseScrollUp", new MouseAxisTrigger(2, false));
         inputManager.addMapping("leftClick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 
-        inputManager.addMapping("moveMouse", new MouseAxisTrigger(0, true), new MouseAxisTrigger(1, true),
-                new MouseAxisTrigger(0, false), new MouseAxisTrigger(1, false));
         inputManager.addListener(actionListener, "leftClick", "MouseScrollUp", "MouseScrollDown");
-        inputManager.addListener(analogListener, "moveMouse");
         setNormalCursor();
         angleVertical = 10;
 
@@ -106,11 +104,14 @@ public class CameraTool {
     public static void setNormalCursor() {
         JmeCursor customCursor = (JmeCursor) assetManager.loadAsset("Textures/Cursor/normal.cur");
         inputManager.setMouseCursor(customCursor);
+        cursorSave = false;
     }
 
     public static void setClickableCursor() {
         JmeCursor customCursor = (JmeCursor) assetManager.loadAsset("Textures/Cursor/clickable.cur");
         inputManager.setMouseCursor(customCursor);
+        cursorSave = true;
+        log.info("cursorSave : {}", cursorSave);
     }
 
     public static void switchCursor(boolean clickable) {
@@ -123,7 +124,6 @@ public class CameraTool {
         } else {
             setNormalCursor();
         }
-        cursorSave = clickable;
     }
 
     public static void setBody(Body body) {
@@ -226,7 +226,7 @@ public class CameraTool {
             if (name.equals("leftClick")) {
                 isLeftClickPressed = isPressed;
                 lastMousePosition = inputManager.getCursorPosition();
-                detectBody(isPressed);
+                // detectBody(isPressed);
             }
         }
     };
@@ -241,7 +241,7 @@ public class CameraTool {
                     angleVertical -= delta.y * 0.1f;
                     lastMousePosition = cursorPos;
                 }
-                switchCursor(detectBody(false));
+                // switchCursor(detectBody(false));
 
             }
         }
@@ -261,7 +261,6 @@ public class CameraTool {
 
         } else if (lastScrollTime != -1) {
 
-            // Calcul du déplacement avec normalisation
             float calc = (float) Math.exp(-lambdaSmoothZoom * lastScrollTime) / expSumSmoothZoom;
 
             distanceFromBody += (distanceDifference * calc);
@@ -326,7 +325,41 @@ public class CameraTool {
         distanceFromBody = zoom;
     }
 
+    public static void updateMousePos() {
+        Vector2f cursorPos = inputManager.getCursorPosition();
+        if (isLeftClickPressed) {
+            Vector2f delta = cursorPos.subtract(lastMousePosition);
+            setAngleHorizontal(angleHorizontal - (delta.x * 0.1f));
+            angleVertical -= delta.y * 0.1f;
+            lastMousePosition = cursorPos;
+
+        }
+        Optional<Body> clickableBodies = bodies.stream().filter(Body::isClickable)
+                .filter(a -> {
+                    Vector3f camPos = cam.getLocation();
+                    Vector3f clickDirection = getClickDirection(cursorPos);
+                    Vector3f bodypos = a.getWorldTranslation();
+                    Vector3f bodiesScreenPos = cam.getScreenCoordinates(bodypos);
+                    Vector2f bodiesScreenPos2d = new Vector2f(bodiesScreenPos.x, bodiesScreenPos.y);
+                    float ratioPixel = Body.circleDistance;
+                    return espilonEqualsVector2d(cursorPos, bodiesScreenPos2d, ratioPixel)
+                            || a.collision(camPos, clickDirection, 1f);
+                }).max(Comparator.comparingDouble(Body::getScaleSize));
+        if (clickableBodies.isPresent()) {
+            clickableBodies.get().modifColorMult(true);
+            bodies.stream().filter(a -> !a.equals(clickableBodies.get())).forEach(a -> a.modifColorMult(false));
+            switchCursor(true);
+            if (isLeftClickPressed) {
+                setBodyByObject(clickableBodies.get());
+            }
+        } else {
+            switchCursor(false);
+            bodies.forEach(a -> a.modifColorMult(false));
+        }
+    }
+
     public static void update(double time, float speed) {
+        updateMousePos();
         updateZoom();
         updateLocation(time, speed);
     }

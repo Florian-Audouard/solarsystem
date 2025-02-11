@@ -15,12 +15,10 @@ import com.jme3.util.BufferUtils;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
-@ToString
 @Slf4j
 public class Planet extends Body {
     private float eccentricity;
@@ -162,6 +160,11 @@ public class Planet extends Body {
     @Override
     public boolean isPrimaryDisplayed() {
         return primary.isActualDisplayCircle() && !primary.equals(reference);
+    }
+
+    @Override
+    public boolean isPrimaryClickable() {
+        return primary.isClickable && !primary.equals(reference);
     }
 
     @Override

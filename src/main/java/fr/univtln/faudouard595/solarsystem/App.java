@@ -71,6 +71,7 @@ public class App extends SimpleApplication {
     public static void main(String[] args) {
         App app = new App();
         AppSettings settings = new AppSettings(true);
+        settings.setFrameRate(60);
         settings.setWidth(1920);
         // settings.setHeight(1080);
         settings.setHeight(500);
@@ -111,9 +112,9 @@ public class App extends SimpleApplication {
         ApiAstreInfo apiAstreInfo = new ApiAstreInfo();
         List<DataCreationNeeded> bodies = new ArrayList<>();
         bodies.add(new DataCreationNeeded("soleil", ColorRGBA.Yellow));
+        bodies.add(new DataCreationNeeded("terre", new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f)));
         bodies.add(new DataCreationNeeded("mercure", new ColorRGBA(151f / 255, 104f / 255, 172f / 255, 1f)));
         bodies.add(new DataCreationNeeded("venus", new ColorRGBA(176f / 255, 121f / 255, 25f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("terre", new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f)));
         bodies.add(new DataCreationNeeded("mars", new ColorRGBA(154f / 255, 78f / 255, 25f / 255, 1f)));
         bodies.add(new DataCreationNeeded("jupiter", new ColorRGBA(218f / 255, 139f / 255, 114f / 255, 1f)));
         bodies.add(new DataCreationNeeded("saturne", new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f)));
@@ -149,15 +150,19 @@ public class App extends SimpleApplication {
 
     }
 
-    @Override
-    public void simpleUpdate(float tpf) {
-        time += (tpf) * speed * flowOfTime;
-        sun.update(time);
-        CameraTool.update(time, speed);
+    public void updateTextDate() {
         Instant instant = Instant.ofEpochSecond((long) (time - startOfUniver));
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         String formattedDate = dateTime.format(formatter);
         helloText.setText(formattedDate);
+    }
+
+    @Override
+    public void simpleUpdate(float tpf) {
+        time += (tpf) * speed * flowOfTime;
+        sun.update(time);
+        CameraTool.update(time, speed);
+        updateTextDate();
     }
 }
