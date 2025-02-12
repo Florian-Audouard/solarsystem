@@ -84,19 +84,9 @@ public class CameraTool {
                 * zoomSpeed;
 
         if (bodies.getCurrentValue() instanceof Planet planet) {
-            setAngleHorizontal(0);
-            Vector3f newPos = calcCoord();
-            newPos.y = 0;
-            Vector3f planetPos = planet.getWorldTranslation();
-            Vector3f directionCamPlanet = newPos.subtract(planetPos).normalize();
-            Vector3f primary = planet.getPrimary().getWorldTranslation();
-            Vector3f directionPrimaryPlanet = planetPos.subtract(primary).normalize();
-            float angle = FastMath.acos(directionCamPlanet.dot(directionPrimaryPlanet));
-            float sign = directionPrimaryPlanet.x > 0 ? 1 : -1;
-            angle = (sign * (angle) * FastMath.RAD_TO_DEG) - 30;
+            float angle = (90 - (planet.getCurrentAngle() * FastMath.RAD_TO_DEG));
             setAngleHorizontal(angle);
             lastAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
-
         }
         wantedDistanceFromBody = minDistance * zoomSpeed * 2;
         if (1f + distanceFromBody > wantedDistanceFromBody && wantedDistanceFromBody > distanceFromBody - 1f) {
@@ -331,7 +321,6 @@ public class CameraTool {
         updateZoom();
         updateLocation(time, speed);
         updateAllCircle();
-
     }
 
 }

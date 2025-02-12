@@ -50,12 +50,11 @@ public class Planet extends Body {
     }
 
     public void generateLine() {
-        int numPoints = (int) Body.reference.getScaleSize() * 5 + 1;
+        int numPoints = (int) Body.reference.getScaleSize() * 5;
         Vector3f[] points = new Vector3f[numPoints];
-        IntStream.range(0, numPoints - 1).forEach(i -> {
+        IntStream.range(0, numPoints).forEach(i -> {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
         });
-        points[numPoints - 1] = points[0];
 
         orbitMesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
         orbitMesh.updateBound();

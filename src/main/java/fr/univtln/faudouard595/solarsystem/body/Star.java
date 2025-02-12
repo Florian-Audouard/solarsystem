@@ -14,6 +14,7 @@ public class Star extends Body {
 
     public Star(String name, float size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
         super(name, size, rotationPeriod, rotationInclination, type, color);
+
     }
 
     public Material generateMat() {

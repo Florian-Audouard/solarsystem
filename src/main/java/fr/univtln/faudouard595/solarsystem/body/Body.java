@@ -153,8 +153,8 @@ public abstract class Body {
 
         rotationNode.attachChild(model);
         rotationNode
-                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination + 90f),
-                        0, 0));
+                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (90f),
+                        rotationInclination, 0));
         node.attachChild(rotationNode);
         rootNode.attachChild(node);
         circleGeo = createCircle();
@@ -290,17 +290,15 @@ public abstract class Body {
     private Geometry createCircle() {
         int samples = circleDistance * 10;
         Mesh mesh = new Mesh();
-        Vector3f[] vertices = new Vector3f[samples + 1];
+        Vector3f[] vertices = new Vector3f[samples];
 
         for (int i = 0; i < samples; i++) {
             float angle = (float) (i * 2 * Math.PI / samples);
             vertices[i] = new Vector3f(circleDistance * (float) Math.cos(angle),
                     circleDistance * (float) Math.sin(angle), 0);
         }
-        vertices[samples] = vertices[0]; // Fermer le cercle
-
         mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
-        mesh.setMode(Mesh.Mode.LineStrip);
+        mesh.setMode(Mesh.Mode.LineLoop);
         mesh.updateBound();
 
         Geometry geom = new Geometry("Circle_" + name, mesh);
