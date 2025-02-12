@@ -1,5 +1,6 @@
 package fr.univtln.faudouard595.solarsystem.body;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 import com.jme3.material.Material;
@@ -9,6 +10,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 
 import com.jme3.util.BufferUtils;
@@ -30,6 +32,7 @@ public class Planet extends Body {
     private Mesh orbitMesh;
     private float currentAngle;
     private Material lineMaterial;
+    private Geometry orbitGeometry;
     private float orbitalInclination;
 
     public Planet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
@@ -47,7 +50,7 @@ public class Planet extends Body {
     }
 
     public void generateLine() {
-        int numPoints = (int) (reference.getRadius() * 10000) + 1;
+        int numPoints = (int) Body.reference.getScaleSize() * 5 + 1;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints - 1).forEach(i -> {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
@@ -76,8 +79,8 @@ public class Planet extends Body {
         super.generateBody(node);
         generateLine();
         lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        Geometry orbitGeometry = new Geometry("OrbitLine");
-        orbitMesh.setMode(Mesh.Mode.LineStrip);
+        orbitGeometry = new Geometry("OrbitLine");
+        orbitMesh.setMode(Mesh.Mode.LineLoop);
         orbitGeometry.setMesh(orbitMesh);
         orbitGeometry.setMaterial(lineMaterial);
         node.attachChild(orbitGeometry);
@@ -88,7 +91,6 @@ public class Planet extends Body {
 
     public float getAngle(double time) {
         return (float) ((FastMath.TWO_PI / (orbitalPeriod)) * time) % FastMath.TWO_PI;
-        // return 0f;
     }
 
     public Vector3f calcTrajectory(double time, float add) {
@@ -137,15 +139,14 @@ public class Planet extends Body {
     @Override
     public void removeLine() {
         super.removeLine();
-        lineMaterial.setColor("Color", new ColorRGBA(0f, 0f, 0f, 0f));
-        lineMaterial.setTransparent(true);
+        orbitGeometry.setCullHint(Spatial.CullHint.Always);
+
     }
 
     @Override
     public void displayLine() {
         super.displayLine();
-        lineMaterial.setColor("Color", super.getColor().mult(super.getColorMultiplier()));
-        lineMaterial.setTransparent(false);
+        orbitGeometry.setCullHint(Spatial.CullHint.Never);
     }
 
     @Override
@@ -171,4 +172,5 @@ public class Planet extends Body {
     public boolean isFarFromCam() {
         return cam.getLocation().distance(getWorldTranslation()) > primary.getRadius() * 5;
     }
+
 }

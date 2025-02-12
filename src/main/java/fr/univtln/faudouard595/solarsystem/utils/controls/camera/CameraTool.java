@@ -1,6 +1,7 @@
 package fr.univtln.faudouard595.solarsystem.utils.controls.camera;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,6 @@ import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.input.InputManager;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.FastMath;
@@ -40,6 +40,7 @@ public class CameraTool {
     private static float angleVertical;
     private static boolean isLeftClickPressed = false;
     private static float maxDistance;
+    private static float refMaxDistance = 8000;
     private static float minDistance = 3f;
     private static float lastAngle;
     private static AssetManager assetManager;
@@ -53,12 +54,13 @@ public class CameraTool {
     private static float distanceDifference;
     private static float lambdaSmoothZoom;
     private static float expSumSmoothZoom;
+    private static Optional<Body> clickableBodies;
 
     public static void init(Camera cam, AssetManager assetManager, InputManager inputManager) {
         CameraTool.cam = cam;
         CameraTool.inputManager = inputManager;
         CameraTool.assetManager = assetManager;
-        maxDistance = minDistance * 100000 * zoomSpeed;
+        maxDistance = refMaxDistance * zoomSpeed;
         distanceFromBody = minDistance * zoomSpeed * 2;
         wantedDistanceFromBody = distanceFromBody;
         smoothScrollTime = TRANSITION_SCROLL_TIME;
@@ -78,6 +80,9 @@ public class CameraTool {
     }
 
     public static void initAngle() {
+        maxDistance = ((refMaxDistance * Body.reference.getScaleSize()) / bodies.getCurrentValue().getScaleSize())
+                * zoomSpeed;
+
         if (bodies.getCurrentValue() instanceof Planet planet) {
             setAngleHorizontal(0);
             Vector3f newPos = calcCoord();
@@ -111,7 +116,6 @@ public class CameraTool {
         JmeCursor customCursor = (JmeCursor) assetManager.loadAsset("Textures/Cursor/clickable.cur");
         inputManager.setMouseCursor(customCursor);
         cursorSave = true;
-        log.info("cursorSave : {}", cursorSave);
     }
 
     public static void switchCursor(boolean clickable) {
@@ -134,7 +138,6 @@ public class CameraTool {
     public static void nextBody() {
         bodies.nextValue();
         initAngle();
-        log.info("distanceFromBody : {} , wantedDistance : {}", distanceFromBody, wantedDistanceFromBody);
     }
 
     public static void prevBody() {
@@ -160,55 +163,6 @@ public class CameraTool {
         return vector1.distance(vector2) < nbPixels;
     }
 
-    private static Body setClosestBody(List<Body> bodiesDetecte) {
-        float distance = Float.MAX_VALUE;
-        Body closestBody = null;
-        for (Body a : bodiesDetecte) {
-            float newDistance = a.getWorldTranslation().distance(cam.getLocation());
-
-            if (newDistance < distance) {
-                distance = newDistance;
-                closestBody = a;
-            }
-        }
-        return closestBody;
-    }
-
-    private static boolean detectBody(boolean changeBody) {
-        Optional<Body> body = Optional.empty();
-        Vector2f mousePos = inputManager.getCursorPosition();
-        for (Body a : bodies.getValues()) {
-            Vector3f camPos = cam.getLocation();
-            Vector3f clickDirection = getClickDirection(mousePos);
-            Vector3f bodypos = a.getWorldTranslation();
-            Vector3f bodiesScreenPos = cam.getScreenCoordinates(bodypos);
-            Vector2f bodiesScreenPos2d = new Vector2f(bodiesScreenPos.x, bodiesScreenPos.y);
-            float ratioPixel = Body.circleDistance;
-            if (!a.equals(bodies.getCurrentValue()) &&
-                    (espilonEqualsVector2d(mousePos, bodiesScreenPos2d, ratioPixel) ||
-                            a.collision(camPos, clickDirection, 1f))
-                    && a.isClickable()) {
-                body = Optional.of(a);
-            }
-        }
-        if (!body.isPresent()) {
-            if (!changeBody) {
-                bodies.forEach(a -> a.modifColorMult(false));
-            }
-            return false;
-        }
-        Body closest = body.get();
-        if (changeBody) {
-            setBodyByObject(closest);
-        } else {
-            for (Body a : bodies.getValues()) {
-                a.modifColorMult(a.equals(closest));
-            }
-        }
-
-        return true;
-    }
-
     private static ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -226,23 +180,9 @@ public class CameraTool {
             if (name.equals("leftClick")) {
                 isLeftClickPressed = isPressed;
                 lastMousePosition = inputManager.getCursorPosition();
-                // detectBody(isPressed);
-            }
-        }
-    };
-    private static AnalogListener analogListener = new AnalogListener() {
-        @Override
-        public void onAnalog(String name, float value, float tpf) {
-            if (name.equals("moveMouse")) {
-                if (isLeftClickPressed) {
-                    Vector2f cursorPos = inputManager.getCursorPosition();
-                    Vector2f delta = cursorPos.subtract(lastMousePosition);
-                    setAngleHorizontal(angleHorizontal - (delta.x * 0.1f));
-                    angleVertical -= delta.y * 0.1f;
-                    lastMousePosition = cursorPos;
+                if (clickableBodies.isPresent() && !isPressed) {
+                    setBodyByObject(clickableBodies.get());
                 }
-                // switchCursor(detectBody(false));
-
             }
         }
     };
@@ -334,7 +274,7 @@ public class CameraTool {
             lastMousePosition = cursorPos;
 
         }
-        Optional<Body> clickableBodies = bodies.stream().filter(Body::isClickable)
+        clickableBodies = bodies.stream().filter(Body::isClickable)
                 .filter(a -> {
                     Vector3f camPos = cam.getLocation();
                     Vector3f clickDirection = getClickDirection(cursorPos);
@@ -344,24 +284,54 @@ public class CameraTool {
                     float ratioPixel = Body.circleDistance;
                     return espilonEqualsVector2d(cursorPos, bodiesScreenPos2d, ratioPixel)
                             || a.collision(camPos, clickDirection, 1f);
-                }).max(Comparator.comparingDouble(Body::getScaleSize));
+                })
+                .max(Comparator.comparingDouble(Body::getScaleSize));
         if (clickableBodies.isPresent()) {
             clickableBodies.get().modifColorMult(true);
-            bodies.stream().filter(a -> !a.equals(clickableBodies.get())).forEach(a -> a.modifColorMult(false));
+            bodies.stream()
+                    .filter(a -> !a.equals(clickableBodies.get()))
+                    .forEach(a -> a.modifColorMult(false));
             switchCursor(true);
-            if (isLeftClickPressed) {
-                setBodyByObject(clickableBodies.get());
-            }
         } else {
             switchCursor(false);
             bodies.forEach(a -> a.modifColorMult(false));
         }
     }
 
+    public static void updateCircle(Body testedBody, Collection<Body> primaryList) {
+        if (testedBody.isShouldBeDisplayed()) {
+            testedBody.updateCircle(false);
+        }
+        boolean res = false;
+        Optional<Body> optionalPlanet = primaryList.stream()
+                .filter(Body::isActualDisplayCircle)
+                .filter(a -> a.collisionCircle(testedBody))
+                .max(Comparator.comparingDouble(Body::getScaleSize));
+        if (optionalPlanet.isPresent()) {
+            if (testedBody.getScaleSize() > optionalPlanet.get().getScaleSize()) {
+                res = true;
+            }
+        } else {
+            res = true;
+        }
+        testedBody.updateCircle(res);
+    }
+
+    public static void updateAllCircle() {
+        Body primary = Body.reference;
+        List<Body> primaryList = new ArrayList<>(primary.getEveryBodies());
+        primaryList.add(primary);
+        primaryList.sort(Comparator.comparingDouble(Body::getScaleSize));
+        primaryList.forEach(a -> updateCircle(a, primaryList));
+
+    }
+
     public static void update(double time, float speed) {
         updateMousePos();
         updateZoom();
         updateLocation(time, speed);
+        updateAllCircle();
+
     }
 
 }

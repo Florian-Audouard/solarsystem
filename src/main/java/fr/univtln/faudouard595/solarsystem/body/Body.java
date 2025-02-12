@@ -17,6 +17,7 @@ import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.RenderQueue;
@@ -73,6 +74,7 @@ public abstract class Body {
     private BitmapText circleText;
     private int textSize = 10;
     protected boolean isClickable = false;
+    protected boolean shouldBeDisplayed = true;
 
     public enum RESOLUTION {
         LOW {
@@ -268,6 +270,11 @@ public abstract class Body {
         return node.getWorldTranslation();
     }
 
+    public Vector2f getScreenCoordinates() {
+        Vector3f v = cam.getScreenCoordinates(getWorldTranslation());
+        return new Vector2f(v.x, v.y);
+    }
+
     public boolean collision(Vector3f depart, Vector3f directionProjectile, float multiplierZone) {
         Vector3f directionProjectileNormalize = directionProjectile.normalize();
         Vector3f position = getWorldTranslation();
@@ -310,15 +317,21 @@ public abstract class Body {
         return geom;
     }
 
+    public boolean collisionCircle(Body b) {
+        Vector2f screenPos2d = b.getScreenCoordinates();
+        Vector2f screenPos2dThis = getScreenCoordinates();
+        return screenPos2d.distance(screenPos2dThis) < circleDistance * 2.5;
+    }
+
     public boolean isPrimaryClickable() {
         return false;
     }
 
     public void updateisClickable() {
-        if (CameraTool.bodies.getCurrentValue().equals(this)) {
-            isClickable = false;
-            return;
-        }
+        // if (CameraTool.bodies.getCurrentValue().equals(this)) {
+        // isClickable = false;
+        // return;
+        // }
         if (isPrimaryClickable()) {
             isClickable = false;
             return;
@@ -340,6 +353,9 @@ public abstract class Body {
     }
 
     public void displayCircle() {
+        circleGeo.setLocalTranslation(cam.getScreenCoordinates(getWorldTranslation()));
+        circleText
+                .setLocalTranslation(circleGeo.getLocalTranslation().add(circleDistance, circleDistance + textSize, 0));
         if (actualDisplayCircle) {
             return;
         }
@@ -367,44 +383,49 @@ public abstract class Body {
         }
 
         if (isPrimaryDisplayed()) {
-            removeCircle();
+            shouldBeDisplayed = false;
             return;
         }
         if (!isOnScreen()) {
-            removeCircle();
+            shouldBeDisplayed = false;
             return;
         }
 
         if (!isFarFromCam()) {
-            removeCircle();
+            shouldBeDisplayed = false;
             return;
         }
         if (change) {
+            shouldBeDisplayed = true;
+        } else {
+            shouldBeDisplayed = false;
+        }
+    }
+
+    public void shouldDisplayCircle() {
+        if (!displayCircle) {
+            changeDisplayCircle(false);
+            return;
+        }
+        changeDisplayCircle(true);
+        if (!actualDisplayCircle) {
+            return;
+        }
+
+    }
+
+    public void updateCircle(boolean reel) {
+        if (shouldBeDisplayed && reel) {
             displayCircle();
         } else {
             removeCircle();
         }
     }
 
-    public void updateCircle() {
-        if (!displayCircle) {
-            changeDisplayCircle(false);
-            return;
-        }
-
-        changeDisplayCircle(true);
-        if (!actualDisplayCircle) {
-            return;
-        }
-        circleGeo.setLocalTranslation(cam.getScreenCoordinates(getWorldTranslation()));
-        circleText
-                .setLocalTranslation(circleGeo.getLocalTranslation().add(circleDistance, circleDistance + textSize, 0));
-    }
-
     public void update(double time) {
         rotation(time);
         updateisClickable();
-        updateCircle();
+        shouldDisplayCircle();
         planets.values().forEach(planet -> planet.update(time));
     }
 }

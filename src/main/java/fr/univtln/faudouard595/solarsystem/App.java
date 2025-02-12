@@ -73,8 +73,8 @@ public class App extends SimpleApplication {
         AppSettings settings = new AppSettings(true);
         settings.setFrameRate(60);
         settings.setWidth(1920);
-        // settings.setHeight(1080);
-        settings.setHeight(500);
+        settings.setHeight(1080);
+        // settings.setHeight(500);
         app.setSettings(settings);
         app.start();
 
