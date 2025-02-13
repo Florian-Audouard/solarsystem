@@ -153,8 +153,8 @@ public abstract class Body {
 
         rotationNode.attachChild(model);
         rotationNode
-                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (90f),
-                        rotationInclination, 0));
+                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination - 90f),
+                        0, 0));
         node.attachChild(rotationNode);
         rootNode.attachChild(node);
         circleGeo = createCircle();
