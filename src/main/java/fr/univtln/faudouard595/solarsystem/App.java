@@ -28,6 +28,9 @@ import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 
 import com.jme3.light.AmbientLight;
 
@@ -38,13 +41,15 @@ public class App extends SimpleApplication {
     private static final float sunSize = 500;
     private double time = 0f;
     private float speed = 1f;
+    private float maxSpeed = 31557600 * 10; // 10 years per second
     private float minSpeed = 1f;
     private float timeScaler = 2f;
     private float flowOfTime = 1;
     public boolean isPause = false;
+    public boolean actualPauseTimeText = false;
     private Star sun;
-    private BitmapText helloText;
-    private BitmapFont font;
+    private BitmapText timeText;
+    public BitmapFont font;
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
     private float maxRenderDistanceMult = 10000000f;
 
@@ -59,17 +64,26 @@ public class App extends SimpleApplication {
         if (flowOfTime == direction) {
             calcFlowOfTime();
         } else {
-            speed *= timeScaler;
+            speed = Math.min(speed * timeScaler, maxSpeed);
         }
     }
 
     public static void main(String[] args) {
+        boolean test = true;
+
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setFrameRate(60);
-        settings.setWidth(1920);
-        settings.setHeight(1080);
-        // settings.setHeight(500);
+        if (!test) {
+            GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            DisplayMode dm = gd.getDisplayMode();
+            int screenWidth = dm.getWidth();
+            int screenHeight = dm.getHeight();
+            settings.setResolution(screenWidth, screenHeight);
+            settings.setFullscreen(true);
+        } else {
+            settings.setResolution(1920, 980);
+        }
         app.setSettings(settings);
         app.start();
 
@@ -80,7 +94,7 @@ public class App extends SimpleApplication {
         Texture starTexture = assetManager.loadTexture("Textures/Sky/StarSky.jpg");
         Spatial sky = SkyFactory.createSky(assetManager, starTexture, SkyFactory.EnvMapType.EquirectMap);
         rootNode.attachChild(sky);
-        Body.assetManager = assetManager;
+        Body.app = this;
         Body.guiNode = guiNode;
         Body.cam = cam;
         Body.referenceSize = sunSize;
@@ -98,7 +112,8 @@ public class App extends SimpleApplication {
 
     private void initSettings() {
         flyCam.setEnabled(false);
-
+        setDisplayStatView(false);
+        setDisplayFps(false);
         cam.setFrustumFar(sunSize * maxRenderDistanceMult);
 
     }
@@ -123,23 +138,20 @@ public class App extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        Body.inputManager = inputManager;
+        font = assetManager.loadFont("Fonts/Segoe.fnt");
+        // font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         initSettings();
         TriggerControls.init(this);
         ButtonControl.init(this);
         createSpace();
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
-        // sun.changeDistancePlanets(0.01f);
-        // sun.scalePlanets(30f);
+        timeText = font.createLabel("");
+        timeText.setSize(40);
+        timeText.setColor(ColorRGBA.White);
+        timeText.setLocalTranslation(100, settings.getHeight() - 50, 0);
 
-        font = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        helloText = font.createLabel("");
-        helloText.setSize(40);
-        helloText.setColor(ColorRGBA.White);
-        helloText.setLocalTranslation(100, settings.getHeight() - 50, 0);
-
-        guiNode.attachChild(helloText);
+        guiNode.attachChild(timeText);
 
         CameraTool.init(cam, assetManager, inputManager);
         CameraTool.setBody(sun);
@@ -147,11 +159,57 @@ public class App extends SimpleApplication {
     }
 
     public void updateTextDate() {
+
+        if (actualPauseTimeText && isPause) {
+            return;
+        }
+        if (actualPauseTimeText != isPause) {
+            if (isPause) {
+                timeText.setColor(ColorRGBA.Orange);
+            } else {
+                timeText.setColor(ColorRGBA.White);
+
+            }
+        }
         Instant instant = Instant.ofEpochSecond((long) (time - startOfUniver));
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         String formattedDate = dateTime.format(formatter);
-        helloText.setText(formattedDate);
+        timeText.setText(formattedDate);
+        actualPauseTimeText = isPause;
+    }
+
+    public String getFormatedSpeed() {
+        int res;
+        String unit;
+        if (speed < 60) {
+            res = (int) speed;
+            unit = "second";
+        } else if (speed < 3600) {
+            res = (int) (speed / 60);
+            unit = "minute";
+        } else if (speed < 86400) {
+            res = (int) (speed / 3600);
+            unit = "hour";
+        } else if (speed < 604800) {
+            res = (int) (speed / 86400);
+            unit = "day";
+        } else if (speed < 2629800) {
+            res = (int) (speed / 604800);
+            unit = "week";
+        } else if (speed < 31557600) {
+            res = (int) (speed / 2629800);
+            unit = "month";
+        } else {
+            res = (int) (speed / 31557600);
+            unit = "year";
+        }
+        res = (int) Math.ceil(res) * (int) flowOfTime;
+        unit += res > 1 ? "s" : "";
+        if (res == 1 && unit.equals("second")) {
+            return "real time";
+        }
+        return res + " " + unit + "/s";
     }
 
     @Override
@@ -162,5 +220,6 @@ public class App extends SimpleApplication {
         sun.update(time);
         CameraTool.update(time, speed);
         updateTextDate();
+        ButtonControl.update();
     }
 }

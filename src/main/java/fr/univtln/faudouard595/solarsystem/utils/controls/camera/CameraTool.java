@@ -44,7 +44,9 @@ public class CameraTool {
     private static float minDistance = 3f;
     private static float lastAngle;
     private static AssetManager assetManager;
-    private static boolean cursorSave = false;
+    private static boolean cursorSavePlanet = false;
+    public static boolean cursorSaveButton = false;
+    private static boolean actualCursor = false;
     private static float zoomSpeed = 2.5f;
     private static int lastScrollTime = -1;
     private static float smoothScrollTime;
@@ -99,22 +101,21 @@ public class CameraTool {
     public static void setNormalCursor() {
         JmeCursor customCursor = (JmeCursor) assetManager.loadAsset("Textures/Cursor/normal.cur");
         inputManager.setMouseCursor(customCursor);
-        cursorSave = false;
+        actualCursor = false;
     }
 
     public static void setClickableCursor() {
         JmeCursor customCursor = (JmeCursor) assetManager.loadAsset("Textures/Cursor/clickable.cur");
         inputManager.setMouseCursor(customCursor);
-        cursorSave = true;
+        actualCursor = true;
     }
 
     public static void switchCursor(boolean clickable) {
-        if (cursorSave == clickable) {
+        if (actualCursor == clickable) {
             return;
         }
         if (clickable) {
             setClickableCursor();
-
         } else {
             setNormalCursor();
         }
@@ -281,9 +282,9 @@ public class CameraTool {
             bodies.stream()
                     .filter(a -> !a.equals(clickableBodies.get()))
                     .forEach(a -> a.modifColorMult(false));
-            switchCursor(true);
+            cursorSavePlanet = true;
         } else {
-            switchCursor(false);
+            cursorSavePlanet = false;
             bodies.forEach(a -> a.modifColorMult(false));
         }
     }
@@ -316,11 +317,16 @@ public class CameraTool {
 
     }
 
+    public static void updateCursor() {
+        switchCursor(cursorSavePlanet || cursorSaveButton);
+    }
+
     public static void update(double time, float speed) {
         updateMousePos();
         updateZoom();
         updateLocation(time, speed);
         updateAllCircle();
+        updateCursor();
     }
 
 }

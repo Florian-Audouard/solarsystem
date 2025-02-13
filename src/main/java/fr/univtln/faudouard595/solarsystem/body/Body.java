@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.input.InputManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
@@ -30,6 +28,7 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.util.BufferUtils;
 
+import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,7 +49,6 @@ public abstract class Body {
     private double rotationPeriod;
     protected static final String TEXTUREPATH = "Textures/Body/";
     protected static final String OBJPATH = "Models/Body/";
-    public static AssetManager assetManager;
     public TYPE type;
     public float scaleMultiplier;
     public float objSize;
@@ -65,12 +63,11 @@ public abstract class Body {
     public static RESOLUTION planetTexture = RESOLUTION.LOW;
     protected Material circleMat;
     protected Geometry circleGeo;
-    public static InputManager inputManager;
+    public static App app;
     public static int circleDistance = 10;
     public boolean displayCircle = false;
     public boolean actualDisplayCircle = false;
     protected boolean displayLines;
-    public static BitmapFont font;
     private BitmapText circleText;
     private int textSize = 10;
     protected boolean isClickable = false;
@@ -101,7 +98,6 @@ public abstract class Body {
         if (reference == null) {
             reference = this;
             this.radius = referenceSize;
-            font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         } else {
             this.radius = convertion(size);
         }
@@ -141,7 +137,7 @@ public abstract class Body {
     public void generateBody(Node rootNode) {
 
         if (this.type == TYPE.OBJ) {
-            this.model = assetManager.loadModel(OBJPATH + name + ".j3o");
+            this.model = app.getAssetManager().loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();
         } else {
             Sphere sphere = new Sphere(32, 32, radius);
@@ -162,7 +158,10 @@ public abstract class Body {
     }
 
     public void rotation(double time) {
-        double rotationSpeed = (rotationPeriod != 0) ? (FastMath.TWO_PI / rotationPeriod) : 0;
+        if (rotationPeriod == 0) {
+            return;
+        }
+        double rotationSpeed = FastMath.TWO_PI / rotationPeriod;
         float rotationZ = (float) ((rotationSpeed * time) % FastMath.TWO_PI);
         Quaternion rotation = new Quaternion().fromAngles(
                 0,
@@ -302,12 +301,12 @@ public abstract class Body {
         mesh.updateBound();
 
         Geometry geom = new Geometry("Circle_" + name, mesh);
-        circleMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        circleMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         circleMat.setColor("Color", color.mult(colorMultiplier));
         geom.setMaterial(circleMat);
         geom.setQueueBucket(RenderQueue.Bucket.Gui);
 
-        this.circleText = font.createLabel(name);
+        this.circleText = app.font.createLabel(name);
         this.circleText.setColor(color.mult(colorMultiplier));
         this.circleText.setSize(textSize);
         guiNode.attachChild(this.circleText);

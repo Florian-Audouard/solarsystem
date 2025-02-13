@@ -62,13 +62,13 @@ public class Planet extends Body {
     }
 
     public Material generateMat() {
-        Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
         mat.setBoolean("UseMaterialColors", true);
         mat.setColor("Diffuse", ColorRGBA.White);
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.Gray);
         mat.setFloat("Shininess", 12f);
-        mat.setTexture("DiffuseMap", assetManager.loadTexture(Body.TEXTUREPATH + Body.planetTexture + "/" +
+        mat.setTexture("DiffuseMap", app.getAssetManager().loadTexture(Body.TEXTUREPATH + Body.planetTexture + "/" +
                 super.getName() + ".jpg"));
 
         return mat;
@@ -77,7 +77,7 @@ public class Planet extends Body {
     public void generateBody(Node node) {
         super.generateBody(node);
         generateLine();
-        lineMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        lineMaterial = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         orbitGeometry = new Geometry("OrbitLine");
         orbitMesh.setMode(Mesh.Mode.LineLoop);
         orbitGeometry.setMesh(orbitMesh);
