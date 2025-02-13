@@ -67,8 +67,8 @@ public abstract class Body {
     protected Geometry circleGeo;
     public static InputManager inputManager;
     public static int circleDistance = 10;
-    public boolean displayCircle = true;
-    public boolean actualDisplayCircle = true;
+    public boolean displayCircle = false;
+    public boolean actualDisplayCircle = false;
     protected boolean displayLines;
     public static BitmapFont font;
     private BitmapText circleText;

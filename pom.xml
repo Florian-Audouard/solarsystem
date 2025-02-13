@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -14,9 +15,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
-    		<!-- JMonkeyEngine -->
-		<jme3_g>org.jmonkeyengine</jme3_g>
-		<jme3_v>3.6.1-stable</jme3_v>
+    <!-- JMonkeyEngine -->
+    <jme3_g>org.jmonkeyengine</jme3_g>
+    <jme3_v>3.6.1-stable</jme3_v>
   </properties>
 
   <dependencyManagement>
@@ -56,96 +57,112 @@
       <version>1.4.11</version>
     </dependency>
 
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-core</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-desktop</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-effects</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-jbullet</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-jogg</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-lwjgl3</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-networking</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-niftygui</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-plugins</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-terrain</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-vr</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
     <dependency>
-			<groupId>${jme3_g}</groupId>
-			<artifactId>jme3-testdata</artifactId>
-			<version>${jme3_v}</version>
-		</dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-core</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-desktop</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-effects</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-jbullet</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-jogg</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-lwjgl3</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-networking</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-niftygui</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-plugins</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-terrain</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-vr</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
+    <dependency>
+      <groupId>${jme3_g}</groupId>
+      <artifactId>jme3-testdata</artifactId>
+      <version>${jme3_v}</version>
+    </dependency>
 
 
-<dependency>
-    <groupId>com.fasterxml.jackson.core</groupId>
-    <artifactId>jackson-databind</artifactId>
-    <version>2.15.2</version>
-</dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.15.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.simsilica</groupId>
+      <artifactId>lemur</artifactId>
+      <version>1.16.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>3.0.23</version>
+      <type>pom</type>
+    </dependency>
 
 
   </dependencies>
 
   <build>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to
+      parent pom) -->
       <plugins>
-        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+        <!-- clean lifecycle, see
+        https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.4.0</version>
         </plugin>
-        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+        <!-- default lifecycle, jar packaging: see
+        https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.3.1</version>
@@ -170,7 +187,8 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.1.2</version>
         </plugin>
-        <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+        <!-- site lifecycle, see
+        https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.12.1</version>

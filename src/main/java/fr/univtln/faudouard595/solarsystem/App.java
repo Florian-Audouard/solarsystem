@@ -11,23 +11,17 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
-import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.VertexBuffer;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
-import com.jme3.util.BufferUtils;
 import com.jme3.util.SkyFactory;
 
 import fr.univtln.faudouard595.solarsystem.body.Body;
 import fr.univtln.faudouard595.solarsystem.body.Star;
 import fr.univtln.faudouard595.solarsystem.body.Body.TYPE;
+import fr.univtln.faudouard595.solarsystem.utils.controls.button.ButtonControl;
 import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.utils.controls.trigger.TriggerControls;
 import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
@@ -45,8 +39,9 @@ public class App extends SimpleApplication {
     private double time = 0f;
     private float speed = 1f;
     private float minSpeed = 1f;
-    private float timeScaler = 1.1f;
+    private float timeScaler = 2f;
     private float flowOfTime = 1;
+    public boolean isPause = false;
     private Star sun;
     private BitmapText helloText;
     private BitmapFont font;
@@ -131,6 +126,7 @@ public class App extends SimpleApplication {
         Body.inputManager = inputManager;
         initSettings();
         TriggerControls.init(this);
+        ButtonControl.init(this);
         createSpace();
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
@@ -160,7 +156,9 @@ public class App extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
-        time += (tpf) * speed * flowOfTime;
+        if (!isPause) {
+            time += (tpf) * speed * flowOfTime;
+        }
         sun.update(time);
         CameraTool.update(time, speed);
         updateTextDate();
