@@ -46,10 +46,10 @@ public class TriggerControls {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("SpeedUp")) {
-                app.calcSpeed(-1);
+                app.speedList.increaseSpeed();
             }
             if (name.equals("SpeedDown")) {
-                app.calcSpeed(1);
+                app.speedList.decreaseSpeed();
             }
             if (name.equals("Test")) {
             }

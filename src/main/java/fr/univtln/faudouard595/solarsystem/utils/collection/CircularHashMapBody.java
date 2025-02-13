@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.map;
+package fr.univtln.faudouard595.solarsystem.utils.collection;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

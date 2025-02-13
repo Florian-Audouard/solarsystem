@@ -52,7 +52,7 @@ public class ButtonControl {
                 .y(positionYFlowButton)
                 .preferedSizeWidth(45)
                 .preferedSizeHeight(heightFlowButton)
-                .command(e -> app.calcSpeed(-1))
+                .command(e -> app.speedList.increaseSpeed())
                 .build()
                 .init();
 
@@ -63,14 +63,14 @@ public class ButtonControl {
                 .y(positionYFlowButton)
                 .preferedSizeWidth(45)
                 .preferedSizeHeight(heightFlowButton)
-                .command(e -> app.calcSpeed(1))
+                .command(e -> app.speedList.decreaseSpeed())
                 .build()
                 .init();
 
     }
 
     public static void updateSpeedText() {
-        String text = app.isPause ? "Paused" : app.getFormatedSpeed();
+        String text = app.isPause ? "Paused" : app.speedList.getFormatedSpeed();
         speedText.setText(text);
         speedText.setLocalTranslation(app.getCamera().getWidth() / 2 - speedText.getLineWidth() / 2,
                 positionYFlowButton + heightFlowButton + speedText.getLineHeight(), 0);

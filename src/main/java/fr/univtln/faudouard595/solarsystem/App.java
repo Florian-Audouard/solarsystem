@@ -26,6 +26,7 @@ import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.utils.controls.trigger.TriggerControls;
 import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
+import fr.univtln.faudouard595.solarsystem.utils.collection.SpeedList;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import java.awt.DisplayMode;
@@ -40,11 +41,6 @@ public class App extends SimpleApplication {
 
     private static final float sunSize = 500;
     private double time = 0f;
-    private float speed = 1f;
-    private float maxSpeed = 31557600 * 10; // 10 years per second
-    private float minSpeed = 1f;
-    private float timeScaler = 2f;
-    private float flowOfTime = 1;
     public boolean isPause = false;
     public boolean actualPauseTimeText = false;
     private Star sun;
@@ -52,21 +48,7 @@ public class App extends SimpleApplication {
     public BitmapFont font;
     private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
     private float maxRenderDistanceMult = 10000000f;
-
-    public void calcFlowOfTime() {
-        if (speed == minSpeed) {
-            flowOfTime *= -1;
-        }
-        speed = Math.max(speed / timeScaler, minSpeed);
-    }
-
-    public void calcSpeed(int direction) {
-        if (flowOfTime == direction) {
-            calcFlowOfTime();
-        } else {
-            speed = Math.min(speed * timeScaler, maxSpeed);
-        }
-    }
+    public SpeedList speedList = new SpeedList();
 
     public static void main(String[] args) {
         boolean test = true;
@@ -82,7 +64,7 @@ public class App extends SimpleApplication {
             settings.setResolution(screenWidth, screenHeight);
             settings.setFullscreen(true);
         } else {
-            settings.setResolution(1920, 980);
+            settings.setResolution(1920, 780);
         }
         app.setSettings(settings);
         app.start();
@@ -179,43 +161,10 @@ public class App extends SimpleApplication {
         actualPauseTimeText = isPause;
     }
 
-    public String getFormatedSpeed() {
-        int res;
-        String unit;
-        if (speed < 60) {
-            res = (int) speed;
-            unit = "second";
-        } else if (speed < 3600) {
-            res = (int) (speed / 60);
-            unit = "minute";
-        } else if (speed < 86400) {
-            res = (int) (speed / 3600);
-            unit = "hour";
-        } else if (speed < 604800) {
-            res = (int) (speed / 86400);
-            unit = "day";
-        } else if (speed < 2629800) {
-            res = (int) (speed / 604800);
-            unit = "week";
-        } else if (speed < 31557600) {
-            res = (int) (speed / 2629800);
-            unit = "month";
-        } else {
-            res = (int) (speed / 31557600);
-            unit = "year";
-        }
-        res = (int) Math.ceil(res) * (int) flowOfTime;
-        unit += res > 1 ? "s" : "";
-        if (res == 1 && unit.equals("second")) {
-            return "real time";
-        }
-        return res + " " + unit + "/s";
-    }
-
     @Override
     public void simpleUpdate(float tpf) {
         if (!isPause) {
-            time += (tpf) * speed * flowOfTime;
+            time += (tpf) * speedList.getCurrentSpeed();
         }
         sun.update(time);
         CameraTool.update(time, speed);
