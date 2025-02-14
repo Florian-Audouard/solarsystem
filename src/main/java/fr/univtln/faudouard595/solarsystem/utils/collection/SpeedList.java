@@ -75,9 +75,7 @@ public class SpeedList {
             unit = "year";
         }
         unit += res > 1 ? "s" : "";
-        if (res == 1 && unit.equals("second")) {
-            return "real time";
-        }
-        return res * flowOfTime + " " + unit + "/s";
+        res = res * flowOfTime;
+        return res + " " + unit + "/s";
     }
 }

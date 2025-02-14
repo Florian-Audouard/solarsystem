@@ -224,7 +224,7 @@ public class CameraTool {
             float maxWeight = 1f;
             float distanceNormalized = (distanceFromBody - minDistance) / (maxDistance - minDistance);
 
-            float expFactor = 5f;
+            float expFactor = 0.5f;
 
             float expDistance = (float) (1 - Math.exp(-expFactor * distanceNormalized));
             float normalizer = (float) (1 - Math.exp(-expFactor));

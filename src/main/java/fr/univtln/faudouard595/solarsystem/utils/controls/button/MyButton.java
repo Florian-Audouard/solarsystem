@@ -1,5 +1,7 @@
 package fr.univtln.faudouard595.solarsystem.utils.controls.button;
 
+import java.util.function.Function;
+
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.input.event.MouseMotionEvent;
 import com.jme3.math.ColorRGBA;
@@ -39,10 +41,20 @@ public class MyButton {
     @Builder.Default
     private ColorRGBA clickColor = ColorRGBA.Blue;
     @Builder.Default
-    private Command<Button> command = b -> {
+    private Command<Button> actionFunction = b -> {
+    };
+    @Builder.Default
+    private Runnable analogFunction = () -> {
     };
     @Builder.Default
     private int fontSize = 20;
+
+    @Builder.Default
+    private int analogSpeed = 6;
+
+    @Builder.Default
+    private int currentSpeed = 0;
+
     public static App app;
 
     public MyButton init() {
@@ -56,7 +68,7 @@ public class MyButton {
         button.setTextHAlignment(HAlignment.Center);
         button.setTextVAlignment(VAlignment.Center);
         button.setColor(defaultColor);
-        button.addClickCommands(command);
+        button.addClickCommands(actionFunction);
         button.setLocalTranslation(x - (width / 2), y + height / 2, 0);
 
         MouseEventControl.addListenersToSpatial(button, new MouseListener() {
@@ -64,7 +76,7 @@ public class MyButton {
             public void mouseButtonEvent(MouseButtonEvent event, Spatial target, Spatial capture) {
                 if (event.isPressed()) {
                     button.setColor(clickColor);
-
+                    currentSpeed = analogSpeed;
                 } else {
                     button.setColor(hoverColor);
                 }
@@ -90,7 +102,7 @@ public class MyButton {
         return this;
     }
 
-    public void addCommand(Command<Button> command) {
+    public void setActionFunction(Command<Button> command) {
         button.addClickCommands(command);
     }
 
@@ -100,6 +112,16 @@ public class MyButton {
 
     public Vector3f getSize() {
         return button.getPreferredSize();
+    }
+
+    public void update() {
+        if (button.isPressed()) {
+            if (currentSpeed >= analogSpeed) {
+                currentSpeed = 0;
+                analogFunction.run();
+            }
+            currentSpeed++;
+        }
     }
 
 }

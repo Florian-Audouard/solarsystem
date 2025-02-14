@@ -1,5 +1,5 @@
 info face="Segoe UI Symbol" size=64 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
-common lineHeight=62 base=50 scaleW=1024 scaleH=1024 pages=9 packed=0 alphaChnl=1 redChnl=4 greenChnl=4 blueChnl=4
+common lineHeight=62 base=50 scaleW=1024 scaleH=1024 pages=9 packed=0 alphaChnl=2 redChnl=4 greenChnl=4 blueChnl=4
 page id=0 file="Segoe_0.png"
 page id=1 file="Segoe_1.png"
 page id=2 file="Segoe_2.png"

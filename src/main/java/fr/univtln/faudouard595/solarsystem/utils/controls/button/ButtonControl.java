@@ -1,5 +1,8 @@
 package fr.univtln.faudouard595.solarsystem.utils.controls.button;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.jme3.font.BitmapText;
 import com.jme3.font.BitmapFont.Align;
 import com.jme3.math.ColorRGBA;
@@ -11,10 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ButtonControl {
-    private static float heightFlowButton = 30;
-    private static float positionYFlowButton = 30;
+    private static float heightFlowButton = 45;
+    private static float widthFlowButton = 50;
+    private static float positionYFlowButton = 50;
+    private static int controlButtonTextSize = 30;
     private static BitmapText speedText;
     private static App app;
+    private static List<MyButton> buttons = new ArrayList<>();
 
     public static void init(App app) {
         ButtonControl.app = app;
@@ -27,45 +33,45 @@ public class ButtonControl {
         speedText.setSize(32);
         speedText.setColor(ColorRGBA.White);
 
-        log.info("size of text : {}", speedText.getLineWidth());
-
         app.getGuiNode().attachChild(speedText);
 
         MyButton pause = MyButton.builder()
-                .text("Pause")
+                .text("⏸")
                 .guiNode(app.getGuiNode())
                 .x(app.getCamera().getWidth() / 2)
                 .y(positionYFlowButton)
-                .preferedSizeWidth(80)
+                .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
+                .fontSize(controlButtonTextSize)
                 .build()
                 .init();
-        pause.addCommand(b -> {
+        pause.setActionFunction(b -> {
             app.isPause = !app.isPause;
-            pause.setText(app.isPause ? "Play" : "⏵");
+            pause.setText(app.isPause ? "⏵" : "⏸");
         });
-
-        MyButton.builder()
-                .text(">>")
+        buttons.add(pause);
+        buttons.add(MyButton.builder()
+                .text("⏩")
                 .guiNode(app.getGuiNode())
                 .x(app.getCamera().getWidth() / 2 + pause.getSize().x / 2 + 30)
                 .y(positionYFlowButton)
-                .preferedSizeWidth(45)
+                .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
-                .command(e -> app.speedList.increaseSpeed())
+                .fontSize(controlButtonTextSize)
+                .analogFunction(() -> app.speedList.increaseSpeed())
                 .build()
-                .init();
-
-        MyButton.builder()
-                .text("<<")
+                .init());
+        buttons.add(MyButton.builder()
+                .text("⏪")
                 .guiNode(app.getGuiNode())
                 .x(app.getCamera().getWidth() / 2 - pause.getSize().x / 2 - 30)
                 .y(positionYFlowButton)
-                .preferedSizeWidth(45)
+                .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
-                .command(e -> app.speedList.decreaseSpeed())
+                .fontSize(controlButtonTextSize)
+                .analogFunction(() -> app.speedList.decreaseSpeed())
                 .build()
-                .init();
+                .init());
 
     }
 
@@ -76,7 +82,12 @@ public class ButtonControl {
                 positionYFlowButton + heightFlowButton + speedText.getLineHeight(), 0);
     }
 
+    public static void updateButtons() {
+        buttons.forEach(MyButton::update);
+    }
+
     public static void update() {
         updateSpeedText();
+        updateButtons();
     }
 }
