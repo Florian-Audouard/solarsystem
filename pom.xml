@@ -140,6 +140,13 @@
       <artifactId>lemur</artifactId>
       <version>1.16.0</version>
     </dependency>
+<!-- https://mvnrepository.com/artifact/com.simsilica/lemur-proto -->
+<dependency>
+    <groupId>com.simsilica</groupId>
+    <artifactId>lemur-proto</artifactId>
+    <version>1.13.0</version>
+</dependency>
+
     <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>

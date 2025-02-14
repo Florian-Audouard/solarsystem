@@ -15,6 +15,7 @@ import com.jme3.scene.VertexBuffer;
 
 import com.jme3.util.BufferUtils;
 
+import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +87,8 @@ public class Planet extends Body {
         trajectory(0);
         super.rotation(0);
         displayLine();
+        circleGeo.setCullHint(Spatial.CullHint.Always);
+        circleText.setText("");
     }
 
     public float getAngle(double time) {
@@ -164,7 +167,8 @@ public class Planet extends Body {
 
     @Override
     public boolean isPrimaryClickable() {
-        return primary.isClickable && !primary.equals(reference);
+        return primary.isClickable && !CameraTool.bodies.getCurrentValue().equals(primary)
+                && !primary.equals(reference);
     }
 
     @Override

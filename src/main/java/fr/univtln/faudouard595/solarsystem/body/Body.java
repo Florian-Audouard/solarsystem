@@ -68,8 +68,8 @@ public abstract class Body {
     public boolean displayCircle = false;
     public boolean actualDisplayCircle = false;
     protected boolean displayLines;
-    private BitmapText circleText;
-    private int textSize = 10;
+    protected BitmapText circleText;
+    private int textSize = 20;
     protected boolean isClickable = false;
     protected boolean shouldBeDisplayed = true;
 
@@ -424,5 +424,14 @@ public abstract class Body {
         updateisClickable();
         shouldDisplayCircle();
         planets.values().forEach(planet -> planet.update(time));
+    }
+
+    public String displayInformation() {
+        String res = String.format("""
+                Name: %s
+                Size : %s
+                Rotation Period: %s
+                Rotation Inclination: %s""", name, realSize, rotationPeriod, rotationInclination);
+        return res;
     }
 }

@@ -1,9 +1,7 @@
 package fr.univtln.faudouard595.solarsystem;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +15,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
+import com.simsilica.lemur.GuiGlobals;
+import com.simsilica.lemur.style.BaseStyles;
 
 import fr.univtln.faudouard595.solarsystem.body.Body;
 import fr.univtln.faudouard595.solarsystem.body.Star;
@@ -24,6 +24,7 @@ import fr.univtln.faudouard595.solarsystem.body.Body.TYPE;
 import fr.univtln.faudouard595.solarsystem.utils.controls.button.ButtonControl;
 import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.utils.controls.trigger.TriggerControls;
+import fr.univtln.faudouard595.solarsystem.utils.information.DisplayInformation;
 import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
 import fr.univtln.faudouard595.solarsystem.utils.collection.SpeedList;
@@ -40,13 +41,12 @@ import com.jme3.light.AmbientLight;
 public class App extends SimpleApplication {
 
     private static final float sunSize = 500;
-    private double time = 0f;
+    public double time = 0f;
     public boolean isPause = false;
-    public boolean actualPauseTimeText = false;
     private Star sun;
     private BitmapText timeText;
     public BitmapFont font;
-    private float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
+    public float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
     private float maxRenderDistanceMult = 10000000f;
     public SpeedList speedList = new SpeedList();
 
@@ -97,7 +97,9 @@ public class App extends SimpleApplication {
         setDisplayStatView(false);
         setDisplayFps(false);
         cam.setFrustumFar(sunSize * maxRenderDistanceMult);
-
+        GuiGlobals.initialize(this);
+        BaseStyles.loadGlassStyle();
+        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
     }
 
     public void createBodies() {
@@ -128,37 +130,10 @@ public class App extends SimpleApplication {
         createSpace();
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
-        timeText = font.createLabel("");
-        timeText.setSize(40);
-        timeText.setColor(ColorRGBA.White);
-        timeText.setLocalTranslation(100, settings.getHeight() - 50, 0);
-
-        guiNode.attachChild(timeText);
-
         CameraTool.init(cam, assetManager, inputManager);
         CameraTool.setBody(sun);
-
-    }
-
-    public void updateTextDate() {
-
-        if (actualPauseTimeText && isPause) {
-            return;
-        }
-        if (actualPauseTimeText != isPause) {
-            if (isPause) {
-                timeText.setColor(ColorRGBA.Orange);
-            } else {
-                timeText.setColor(ColorRGBA.White);
-
-            }
-        }
-        Instant instant = Instant.ofEpochSecond((long) (time - startOfUniver));
-        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        String formattedDate = dateTime.format(formatter);
-        timeText.setText(formattedDate);
-        actualPauseTimeText = isPause;
+        DisplayInformation.app = this;
+        DisplayInformation.init();
     }
 
     @Override
@@ -168,7 +143,7 @@ public class App extends SimpleApplication {
         }
         sun.update(time);
         CameraTool.update(time, speed);
-        updateTextDate();
         ButtonControl.update();
+        DisplayInformation.update();
     }
 }

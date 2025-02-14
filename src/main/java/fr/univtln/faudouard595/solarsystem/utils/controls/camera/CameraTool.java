@@ -273,7 +273,7 @@ public class CameraTool {
                     Vector3f bodiesScreenPos = cam.getScreenCoordinates(bodypos);
                     Vector2f bodiesScreenPos2d = new Vector2f(bodiesScreenPos.x, bodiesScreenPos.y);
                     float ratioPixel = Body.circleDistance;
-                    return espilonEqualsVector2d(cursorPos, bodiesScreenPos2d, ratioPixel)
+                    return espilonEqualsVector2d(cursorPos, bodiesScreenPos2d, ratioPixel * 1.1f)
                             || a.collision(camPos, clickDirection, 1f);
                 })
                 .max(Comparator.comparingDouble(Body::getScaleSize));
@@ -294,12 +294,12 @@ public class CameraTool {
             testedBody.updateCircle(false);
         }
         boolean res = false;
-        Optional<Body> optionalPlanet = primaryList.stream()
+        Optional<Body> optionalBody = primaryList.stream()
                 .filter(Body::isActualDisplayCircle)
                 .filter(a -> a.collisionCircle(testedBody))
                 .max(Comparator.comparingDouble(Body::getScaleSize));
-        if (optionalPlanet.isPresent()) {
-            if (testedBody.getScaleSize() > optionalPlanet.get().getScaleSize()) {
+        if (optionalBody.isPresent()) {
+            if (testedBody.getScaleSize() > optionalBody.get().getScaleSize()) {
                 res = true;
             }
         } else {

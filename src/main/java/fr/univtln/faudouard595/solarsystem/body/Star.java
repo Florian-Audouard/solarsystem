@@ -5,6 +5,7 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.control.LightControl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,8 @@ public class Star extends Body {
         LightControl lightControl = new LightControl(sunLight);
         super.getNode().addControl(lightControl);
         displayLine();
+        circleGeo.setCullHint(Spatial.CullHint.Always);
+        circleText.setText("");
     }
 
 }

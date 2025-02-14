@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Builder
 @AllArgsConstructor
-public class MyButton {
+public class MyButton implements Updatable {
     private Button button;
     private String text;
     private Node guiNode;
@@ -53,6 +53,12 @@ public class MyButton {
     private int analogSpeed = 6;
 
     @Builder.Default
+    private int waitTimeBeforeAnalog = 18;
+
+    @Builder.Default
+    private boolean isAnalog = false;
+
+    @Builder.Default
     private int currentSpeed = 0;
 
     public static App app;
@@ -76,7 +82,8 @@ public class MyButton {
             public void mouseButtonEvent(MouseButtonEvent event, Spatial target, Spatial capture) {
                 if (event.isPressed()) {
                     button.setColor(clickColor);
-                    currentSpeed = analogSpeed;
+                    currentSpeed = 0;
+                    isAnalog = false;
                 } else {
                     button.setColor(hoverColor);
                 }
@@ -116,9 +123,13 @@ public class MyButton {
 
     public void update() {
         if (button.isPressed()) {
-            if (currentSpeed >= analogSpeed) {
+            if (!isAnalog && currentSpeed == 0) {
+                analogFunction.run();
+            }
+            if (currentSpeed >= analogSpeed && (isAnalog || currentSpeed >= waitTimeBeforeAnalog)) {
                 currentSpeed = 0;
                 analogFunction.run();
+                isAnalog = true;
             }
             currentSpeed++;
         }
