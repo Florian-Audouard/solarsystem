@@ -1,5 +1,6 @@
 package fr.univtln.faudouard595.solarsystem.body;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -69,10 +70,15 @@ public class Planet extends Body {
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.Gray);
         mat.setFloat("Shininess", 12f);
-        mat.setTexture("DiffuseMap", app.getAssetManager().loadTexture(Body.TEXTUREPATH + Body.planetTexture + "/" +
-                super.getName() + ".jpg"));
+        String texturePath = Body.TEXTUREPATH + Body.planetTexture + "/" + super.getName() + ".jpg";
+        File f = new File("src/main/resources/" + texturePath);
+        if (!f.exists()) {
+            texturePath = Body.TEXTUREPATH + Body.planetTexture + "/Eris.jpg";
+        }
+        mat.setTexture("DiffuseMap", app.getAssetManager().loadTexture(texturePath));
 
         return mat;
+
     }
 
     public void generateBody(Node node) {

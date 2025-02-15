@@ -273,7 +273,7 @@ public class CameraTool {
                     Vector3f bodiesScreenPos = cam.getScreenCoordinates(bodypos);
                     Vector2f bodiesScreenPos2d = new Vector2f(bodiesScreenPos.x, bodiesScreenPos.y);
                     float ratioPixel = Body.circleDistance;
-                    return espilonEqualsVector2d(cursorPos, bodiesScreenPos2d, ratioPixel * 1.1f)
+                    return espilonEqualsVector2d(cursorPos, bodiesScreenPos2d, ratioPixel * 2f)
                             || a.collision(camPos, clickDirection, 1f);
                 })
                 .max(Comparator.comparingDouble(Body::getScaleSize));

@@ -1,8 +1,11 @@
 package fr.univtln.faudouard595.solarsystem.body;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -72,6 +75,7 @@ public abstract class Body {
     private int textSize = 20;
     protected boolean isClickable = false;
     protected boolean shouldBeDisplayed = true;
+    private static final NumberFormat formatter = NumberFormat.getInstance(Locale.FRENCH);
 
     public enum RESOLUTION {
         LOW {
@@ -246,15 +250,12 @@ public abstract class Body {
             return;
         }
         if (increase) {
-            colorMultiplier = 2f;
-            color.a = 2f;
+            colorMultiplier = 1f;
         } else {
             colorMultiplier = 0.5f;
-            color.a = 0.5f;
-
         }
-        circleMat.setColor("Color", color);
-        circleText.setColor(color);
+        circleMat.setColor("Color", color.mult(colorMultiplier));
+        circleText.setColor(color.mult(colorMultiplier));
     }
 
     public String toString() {
@@ -427,11 +428,9 @@ public abstract class Body {
     }
 
     public String displayInformation() {
+        String realSizeFormat = formatter.format(Math.round(realSize));
         String res = String.format("""
-                Name: %s
-                Size : %s
-                Rotation Period: %s
-                Rotation Inclination: %s""", name, realSize, rotationPeriod, rotationInclination);
+                Radius : %s km""", realSizeFormat);
         return res;
     }
 }

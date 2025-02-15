@@ -12,7 +12,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class DataCreationNeeded {
-    String name;
-    ColorRGBA color;
+    private String name;
+    private ColorRGBA color;
 
 }
