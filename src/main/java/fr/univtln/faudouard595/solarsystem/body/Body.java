@@ -370,8 +370,16 @@ public abstract class Body {
         return cam.getDirection().dot(getWorldTranslation().subtract(cam.getLocation())) > 0;
     }
 
+    public float get2dRadius() {
+
+        Vector2f screenPos2d = getScreenCoordinates();
+        Vector3f radiusPos = cam.getScreenCoordinates(getWorldTranslation().add(cam.getLeft().mult(-radius)));
+        Vector2f screenPos2dRadius = new Vector2f(radiusPos.x, radiusPos.y);
+        return screenPos2d.distance(screenPos2dRadius);
+    }
+
     public boolean isFarFromCam() {
-        return cam.getLocation().distance(getWorldTranslation()) > reference.getRadius() * 50;
+        return get2dRadius() * 4 < circleDistance;
     }
 
     public void changeDisplayCircle(boolean change) {
@@ -433,4 +441,5 @@ public abstract class Body {
                 Radius : %s km""", realSizeFormat);
         return res;
     }
+
 }

@@ -14,5 +14,6 @@ import lombok.Setter;
 public class DataCreationNeeded {
     private String name;
     private ColorRGBA color;
+    private int numberOfMoons;
 
 }

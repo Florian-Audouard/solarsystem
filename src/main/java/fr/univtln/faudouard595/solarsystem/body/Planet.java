@@ -177,9 +177,4 @@ public class Planet extends Body {
                 && !primary.equals(reference);
     }
 
-    @Override
-    public boolean isFarFromCam() {
-        return cam.getLocation().distance(getWorldTranslation()) > primary.getRadius() * 5;
-    }
-
 }

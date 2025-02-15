@@ -6,7 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -24,39 +24,64 @@ import fr.univtln.faudouard595.solarsystem.body.Star;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ApiAstreInfo {
+public class ApiBodyInfo {
 
-    private static String URL = "https://api.le-systeme-solaire.net/rest.php/bodies/";
     private HttpClient client;
     private Map<String, Body> astres;;
     private JsonNode bodyJsonNode;
     private static String filePath = "src/main/resources/Data/body.json";
     private ObjectMapper mapper;
+    private ObjectNode fileNode;
     File file;
     List<String> usedId = List.of("id", "englishName", "meanRadius", "sideralRotation", "axialTilt", "bodyType",
-            "semimajorAxis", "eccentricity", "sideralOrbit", "inclination", "aroundPlanet");
+            "semimajorAxis", "eccentricity", "sideralOrbit", "inclination", "orbitAround");
 
-    public ApiAstreInfo() {
+    public ApiBodyInfo() {
         this.client = HttpClient.newHttpClient();
         this.astres = new HashMap<>();
         this.mapper = new ObjectMapper();
         this.file = new File(filePath);
     }
 
-    public void createFile(Collection<String> names) {
-        log.info("Creating File");
-        ObjectNode fileNode = mapper.createObjectNode();
-        for (String string : names) {
-            Optional<JsonNode> optionalJsonNode = createRequest(string);
+    public void fillFileNodeList(Collection<ApiData> urls) {
+        for (ApiData url : urls) {
+            Optional<JsonNode> optionalJsonNode = createRequest(url.getUrl());
             if (optionalJsonNode.isPresent()) {
                 JsonNode jsonNode = optionalJsonNode.get();
                 ObjectNode usedNode = mapper.createObjectNode();
                 for (String id : usedId) {
                     usedNode.set(id, jsonNode.get(id));
                 }
-                fileNode.set(string, usedNode);
+                fileNode.set(jsonNode.get("id").asText(), usedNode);
+                JsonNode moons = jsonNode.get("moons");
+                if (!moons.isNull()) {
+                    Collection<ApiData> moonNames = moons.findValuesAsText("rel").stream().limit(url.getNumberOfMoons())
+                            .map(
+                                    name -> new ApiData(name, 0))
+                            .toList();
+                    fillFileNodeList(moonNames);
+                }
+                JsonNode aroundPlanet = jsonNode.get("aroundPlanet");
+                String ref = "soleil";
+                if (!aroundPlanet.isNull()) {
+                    ref = aroundPlanet.get("planet").asText();
+                }
+                if (jsonNode.get("id").asText().equals("soleil")) {
+                    ref = null;
+                }
+                usedNode.put("orbitAround", ref);
             }
         }
+
+    }
+
+    public void createFile(Collection<DataCreationNeeded> data) {
+        log.info("Creating File");
+        fileNode = mapper.createObjectNode();
+        Collection<ApiData> urlName = data.stream()
+                .map(ApiData::convert)
+                .toList();
+        fillFileNodeList(urlName);
         try {
             mapper.writeValue(file, fileNode);
         } catch (IOException e) {
@@ -69,17 +94,18 @@ public class ApiAstreInfo {
                 name -> bodyJsonNode.has(name) && usedId.stream().allMatch(id -> bodyJsonNode.get(name).has(id)));
     }
 
-    public void verifFile(Collection<String> names) {
+    public void verifFile(Collection<DataCreationNeeded> data) {
         try {
             if (!file.exists()) {
                 log.info("File not found");
-                createFile(names);
+                createFile(data);
             }
             bodyJsonNode = mapper.readTree(file);
-            if (!verifyBodyJsonNode(names)) {
+            List<String> namesList = data.stream().map(DataCreationNeeded::getName).toList();
+            if (!verifyBodyJsonNode(namesList)) {
                 log.info("File not up to date, deleting it");
                 file.delete();
-                createFile(names);
+                createFile(data);
             }
             bodyJsonNode = mapper.readTree(file);
         } catch (IOException e) {
@@ -88,21 +114,24 @@ public class ApiAstreInfo {
     }
 
     public Body getBodies(List<DataCreationNeeded> data, TYPE type) {
-        List<String> names = data.stream().map(DataCreationNeeded::getName).toList();
-        verifFile(names);
+        verifFile(data);
         for (DataCreationNeeded entry : data) {
             String name = entry.getName();
             ColorRGBA color = entry.getColor();
             createBody(name, TYPE.SPHERE, color);
         }
-        return astres.get(names.get(0));
+        List<String> remaining = bodyJsonNode.findValuesAsText("id").stream()
+                .filter(id -> !astres.containsKey(id))
+                .toList();
+        remaining.forEach(id -> createBody(id, type, null));
+        return astres.get(data.get(0).getName());
     }
 
-    private Optional<JsonNode> createRequest(String name) {
-        log.info("fetching data for {}", name);
+    private Optional<JsonNode> createRequest(String url) {
+        log.info("fetching data for {}", url);
         Optional<JsonNode> jsonNode = Optional.empty();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(URL + name))
+                .uri(URI.create(url))
                 .GET()
                 .build();
         try {
@@ -133,18 +162,13 @@ public class ApiAstreInfo {
             float eccentricity = JsonNode.get("eccentricity").floatValue();
             float orbitalPeriod = JsonNode.get("sideralOrbit").floatValue();
             float orbitalInclination = JsonNode.get("inclination").floatValue();
-            JsonNode around = JsonNode.get("aroundPlanet");
-            Body ref;
-            if (around.isNull()) {
-                ref = astres.get("soleil");
-            } else {
-                ref = astres.get(around.get("planet").asText());
+            Body ref = astres.get(JsonNode.get("orbitAround").asText());
+            if (color == null) {
+                color = ref.getColor();
             }
-
             body = ref.addPlanet(nameBody, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
                     orbitalInclination,
                     rotationInclination, type, color);
-
         }
         astres.put(id, body);
         return body;

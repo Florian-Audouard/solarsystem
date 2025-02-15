@@ -25,7 +25,7 @@ import fr.univtln.faudouard595.solarsystem.utils.controls.button.ButtonControl;
 import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.utils.controls.trigger.TriggerControls;
 import fr.univtln.faudouard595.solarsystem.utils.information.DisplayInformation;
-import fr.univtln.faudouard595.solarsystem.utils.api.ApiAstreInfo;
+import fr.univtln.faudouard595.solarsystem.utils.api.ApiBodyInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
 import fr.univtln.faudouard595.solarsystem.utils.collection.SpeedList;
 import lombok.Getter;
@@ -103,18 +103,17 @@ public class App extends SimpleApplication {
     }
 
     public void createBodies() {
-        ApiAstreInfo apiAstreInfo = new ApiAstreInfo();
+        ApiBodyInfo apiAstreInfo = new ApiBodyInfo();
         List<DataCreationNeeded> bodies = new ArrayList<>();
-        bodies.add(new DataCreationNeeded("soleil", ColorRGBA.Yellow));
-        bodies.add(new DataCreationNeeded("terre", new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("mercure", new ColorRGBA(151f / 255, 104f / 255, 172f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("venus", new ColorRGBA(176f / 255, 121f / 255, 25f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("mars", new ColorRGBA(154f / 255, 78f / 255, 25f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("jupiter", new ColorRGBA(218f / 255, 139f / 255, 114f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("saturne", new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("uranus", new ColorRGBA(104f / 255, 204f / 255, 218f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("neptune", new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f)));
-        bodies.add(new DataCreationNeeded("lune", ColorRGBA.Gray));
+        bodies.add(new DataCreationNeeded("soleil", ColorRGBA.Yellow, 0));
+        bodies.add(new DataCreationNeeded("terre", new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f), 1));
+        bodies.add(new DataCreationNeeded("mercure", new ColorRGBA(151f / 255, 104f / 255, 172f / 255, 1f), 0));
+        bodies.add(new DataCreationNeeded("venus", new ColorRGBA(176f / 255, 121f / 255, 25f / 255, 1f), 0));
+        bodies.add(new DataCreationNeeded("mars", new ColorRGBA(154f / 255, 78f / 255, 25f / 255, 1f), 2));
+        bodies.add(new DataCreationNeeded("jupiter", new ColorRGBA(218f / 255, 139f / 255, 114f / 255, 1f), 4));
+        bodies.add(new DataCreationNeeded("saturne", new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f), 7));
+        bodies.add(new DataCreationNeeded("uranus", new ColorRGBA(104f / 255, 204f / 255, 218f / 255, 1f), 5));
+        bodies.add(new DataCreationNeeded("neptune", new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f), 1));
 
         sun = (Star) apiAstreInfo.getBodies(bodies, TYPE.SPHERE);
         sun.generateBody(rootNode, viewPort);
