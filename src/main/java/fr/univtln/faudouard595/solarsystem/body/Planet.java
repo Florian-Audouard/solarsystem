@@ -5,15 +5,18 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
-
+import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
 
 import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
@@ -36,10 +39,11 @@ public class Planet extends Body {
     private Material lineMaterial;
     private Geometry orbitGeometry;
     private float orbitalInclination;
+    private boolean ring;
 
     public Planet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
             float rotationPeriod, float orbitalInclination, float rotationInclination, Body primary, TYPE type,
-            ColorRGBA color) {
+            ColorRGBA color, boolean ring) {
         super(name, size, rotationPeriod, rotationInclination, type, color);
 
         this.semimajorAxis = convertion(semimajorAxis);
@@ -49,6 +53,7 @@ public class Planet extends Body {
         this.orbitMesh = new Mesh();
         distanceMultiplier = 1;
         this.primary = primary;
+        this.ring = ring;
     }
 
     public void generateLine() {
@@ -81,6 +86,69 @@ public class Planet extends Body {
 
     }
 
+    private Geometry createPlanetRings() {
+        int segments = 64;
+        float innerRadius = super.getRadius() * 1.236145f;
+        float outerRadius = super.getRadius() * 2.27318f;
+
+        Mesh ringMesh = new Mesh();
+        Vector3f[] vertices = new Vector3f[segments * 2];
+        Vector2f[] texCoords = new Vector2f[segments * 2];
+        int[] indices = new int[segments * 6];
+
+        for (int i = 0; i < segments; i++) {
+            float angle = (float) (i * Math.PI * 2 / segments);
+            float cos = (float) Math.cos(angle);
+            float sin = (float) Math.sin(angle);
+
+            // Positions des sommets
+            vertices[i * 2] = new Vector3f(innerRadius * cos, 0, innerRadius * sin);
+            vertices[i * 2 + 1] = new Vector3f(outerRadius * cos, 0, outerRadius * sin);
+
+            // Mapping UV correct :
+            texCoords[i * 2] = new Vector2f(0, i / (float) segments); // Intérieur (gauche de l’image)
+            texCoords[i * 2 + 1] = new Vector2f(1, i / (float) segments); // Extérieur (droite de l’image)
+
+            int next = (i + 1) % segments;
+
+            // Triangles pour le disque
+            indices[i * 6] = i * 2;
+            indices[i * 6 + 1] = next * 2;
+            indices[i * 6 + 2] = i * 2 + 1;
+
+            indices[i * 6 + 3] = i * 2 + 1;
+            indices[i * 6 + 4] = next * 2;
+            indices[i * 6 + 5] = next * 2 + 1;
+        }
+
+        ringMesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+        ringMesh.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoords));
+        ringMesh.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indices));
+        ringMesh.updateBound();
+
+        Geometry ringGeo = new Geometry("SaturnRing", ringMesh);
+        Material ringMat = new Material(Body.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        Texture ringTexture = Body.app.getAssetManager().loadTexture(TEXTUREPATH + Body.planetTexture + "/Ring.png");
+        ringTexture.setWrap(Texture.WrapMode.EdgeClamp); // Empêche la répétition
+
+        ringMat.setTexture("ColorMap", ringTexture);
+        ringMat.getAdditionalRenderState().setBlendMode(com.jme3.material.RenderState.BlendMode.Alpha);
+        ringMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+        ringGeo.setMaterial(ringMat);
+        ringGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
+
+        return ringGeo;
+    }
+
+    public void generateRing() {
+        if (!ring) {
+            return;
+        }
+        Geometry ringGeo = createPlanetRings();
+        super.getRotationNode().attachChild(ringGeo);
+    }
+
     public void generateBody(Node node) {
         super.generateBody(node);
         generateLine();
@@ -95,6 +163,7 @@ public class Planet extends Body {
         displayLine();
         circleGeo.setCullHint(Spatial.CullHint.Always);
         circleText.setText("");
+        generateRing();
     }
 
     public float getAngle(double time) {
@@ -119,6 +188,11 @@ public class Planet extends Body {
     public Vector3f calcTrajectory(double time) {
         return calcTrajectory(time, 0);
     }
+
+    // public void calcTrajectoryNew(double time) {
+    // float M = M0 + (FastMath.TWO_PI / T) * t;
+    // M = M % FastMath.TWO_PI;
+    // }
 
     @Override
     public void scale(float scaleMultiplier) {

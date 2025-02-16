@@ -202,7 +202,7 @@ public class CameraTool {
 
     public static Vector3f calcCoord() {
         Vector3f bodyPos = bodies.getCurrentValue().getWorldTranslation();
-        float practicalDistance = Math.max(distanceFromBody * bodies.getCurrentValue().getScaleSize(), 1.5f);
+        float practicalDistance = distanceFromBody * bodies.getCurrentValue().getScaleSize();
 
         float x = bodyPos.x + practicalDistance * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
                 * FastMath.sin(FastMath.DEG_TO_RAD * angleHorizontal);
@@ -243,7 +243,7 @@ public class CameraTool {
                 Vector3f.UNIT_Y);
     }
 
-    public static void updateLocation(double time, float speed) {
+    public static void updateLocation() {
         if (bodies.getCurrentValue() instanceof Planet planet) {
             float newAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
             setAngleHorizontal(angleHorizontal - (newAngle - lastAngle));
@@ -321,10 +321,10 @@ public class CameraTool {
         switchCursor(cursorSavePlanet || cursorSaveButton);
     }
 
-    public static void update(double time, float speed) {
+    public static void update() {
         updateMousePos();
         updateZoom();
-        updateLocation(time, speed);
+        updateLocation();
         updateAllCircle();
         updateCursor();
     }

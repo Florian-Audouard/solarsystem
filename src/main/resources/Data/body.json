@@ -272,6 +272,19 @@
         "inclination": 0.43,
         "orbitAround": "saturne"
     },
+    "japet": {
+        "id": "japet",
+        "englishName": "Iapetus",
+        "meanRadius": 1471.2,
+        "sideralRotation": 1735.92,
+        "axialTilt": 0,
+        "bodyType": "Moon",
+        "semimajorAxis": 3560854,
+        "eccentricity": 0.0283,
+        "sideralOrbit": 79.33,
+        "inclination": 14.72,
+        "orbitAround": "saturne"
+    },
     "uranus": {
         "id": "uranus",
         "englishName": "Uranus",

@@ -76,6 +76,7 @@ public abstract class Body {
     protected boolean isClickable = false;
     protected boolean shouldBeDisplayed = true;
     private static final NumberFormat formatter = NumberFormat.getInstance(Locale.FRENCH);
+    private Node planetNode;
 
     public enum RESOLUTION {
         LOW {
@@ -115,6 +116,7 @@ public abstract class Body {
         this.objSize = 1;
         this.color = color;
         this.rotationNode = new Node(name + "_rotation");
+        this.planetNode = new Node(name + "_planet");
         this.colorMultiplier = 0.5f;
         this.displayLines = true;
 
@@ -151,11 +153,19 @@ public abstract class Body {
         model.setMaterial(generateMat());
         model.setShadowMode(ShadowMode.CastAndReceive);
 
-        rotationNode.attachChild(model);
-        rotationNode
-                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination - 90f),
+        planetNode.attachChild(model);
+        planetNode
+                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (-90f),
                         0, 0));
+        node.attachChild(planetNode);
+        // rotationNode
+        // .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD *
+        // (rotationInclination),
+        // 0, 0));
         node.attachChild(rotationNode);
+        node
+                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination),
+                        0, 0));
         rootNode.attachChild(node);
         circleGeo = createCircle();
         guiNode.attachChild(circleGeo);
@@ -186,10 +196,11 @@ public abstract class Body {
     }
 
     public Planet addPlanet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, float orbitalInclination, float rotationInclination, TYPE type, ColorRGBA lineColor) {
+            float rotationPeriod, float orbitalInclination, float rotationInclination, TYPE type, ColorRGBA lineColor,
+            boolean ring) {
         Planet planet = new Planet(name, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
                 orbitalInclination, rotationInclination, this,
-                type, lineColor);
+                type, lineColor, ring);
         planet.generateBody(node);
         planets.put(name, planet);
         return planet;

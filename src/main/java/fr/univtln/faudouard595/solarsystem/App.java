@@ -111,7 +111,7 @@ public class App extends SimpleApplication {
         bodies.add(new DataCreationNeeded("venus", new ColorRGBA(176f / 255, 121f / 255, 25f / 255, 1f), 0));
         bodies.add(new DataCreationNeeded("mars", new ColorRGBA(154f / 255, 78f / 255, 25f / 255, 1f), 2));
         bodies.add(new DataCreationNeeded("jupiter", new ColorRGBA(218f / 255, 139f / 255, 114f / 255, 1f), 4));
-        bodies.add(new DataCreationNeeded("saturne", new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f), 7));
+        bodies.add(new DataCreationNeeded("saturne", new ColorRGBA(213f / 255, 193f / 255, 135f / 255, 1f), 8, true));
         bodies.add(new DataCreationNeeded("uranus", new ColorRGBA(104f / 255, 204f / 255, 218f / 255, 1f), 5));
         bodies.add(new DataCreationNeeded("neptune", new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f), 1));
 
@@ -138,10 +138,10 @@ public class App extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         if (!isPause) {
-            time += (tpf) * speedList.getCurrentSpeed();
+            time += tpf * speedList.getCurrentSpeed();
         }
         sun.update(time);
-        CameraTool.update(time, speed);
+        CameraTool.update();
         ButtonControl.update();
         DisplayInformation.update();
     }
