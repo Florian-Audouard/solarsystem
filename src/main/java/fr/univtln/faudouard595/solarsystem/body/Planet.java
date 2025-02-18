@@ -1,5 +1,7 @@
 package fr.univtln.faudouard595.solarsystem.body;
 
+import static fr.univtln.faudouard595.solarsystem.body.Body.formatter;
+
 import java.io.File;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -8,6 +10,7 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
@@ -31,6 +34,7 @@ public class Planet extends Body {
     private float eccentricity;
     private double orbitalPeriod;
     private float semimajorAxis;
+    private int realSemimajorAxis;
     private Body primary;
     private float distanceMultiplier;
     public static float realSunSize;
@@ -40,20 +44,37 @@ public class Planet extends Body {
     private Geometry orbitGeometry;
     private float orbitalInclination;
     private boolean ring;
+    private float longAscNode;
+    private float argPeriapsis;
+    private float meanAnomaly;
 
-    public Planet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, float orbitalInclination, float rotationInclination, Body primary, TYPE type,
+    public Planet(String name, double size, double semimajorAxis, float eccentricity, float orbitalPeriod,
+            float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
+            float argPeriapsis, float mainAnomaly, Body primary, TYPE type,
             ColorRGBA color, boolean ring) {
         super(name, size, rotationPeriod, rotationInclination, type, color);
 
         this.semimajorAxis = convertion(semimajorAxis);
+        this.realSemimajorAxis = (int) semimajorAxis;
         this.eccentricity = eccentricity;
         this.orbitalPeriod = orbitalPeriod * 60 * 60 * 24;
-        this.orbitalInclination = orbitalInclination;
+        this.orbitalInclination = orbitalInclination * FastMath.DEG_TO_RAD;
         this.orbitMesh = new Mesh();
         distanceMultiplier = 1;
         this.primary = primary;
         this.ring = ring;
+        this.longAscNode = longAscNode * FastMath.DEG_TO_RAD;
+        this.argPeriapsis = argPeriapsis * FastMath.DEG_TO_RAD;
+        this.meanAnomaly = mainAnomaly * FastMath.DEG_TO_RAD;
+        if (orbitalInclination != 0) {
+            super.getNode().setLocalRotation(new Quaternion().fromAngles(
+                    (super.getRotationInclination()),
+                    0, 0));
+        } else {
+            super.getRotationNode()
+                    .setLocalRotation(new Quaternion().fromAngles((super.getRotationInclination()),
+                            0, 0));
+        }
     }
 
     public void generateLine() {
@@ -126,7 +147,7 @@ public class Planet extends Body {
         ringMesh.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indices));
         ringMesh.updateBound();
 
-        Geometry ringGeo = new Geometry("SaturnRing", ringMesh);
+        Geometry ringGeo = new Geometry(name + "_Ring", ringMesh);
         Material ringMat = new Material(Body.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         Texture ringTexture = Body.app.getAssetManager().loadTexture(TEXTUREPATH + Body.planetTexture + "/Ring.png");
         ringTexture.setWrap(Texture.WrapMode.EdgeClamp); // Empêche la répétition
@@ -146,7 +167,7 @@ public class Planet extends Body {
             return;
         }
         Geometry ringGeo = createPlanetRings();
-        super.getRotationNode().attachChild(ringGeo);
+        super.getNode().attachChild(ringGeo);
     }
 
     public void generateBody(Node node) {
@@ -179,20 +200,14 @@ public class Planet extends Body {
         float z = FastMath.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));
         float y = 0;
-        float inclinaisonRad = FastMath.DEG_TO_RAD * orbitalInclination;
-        y = FastMath.sin(inclinaisonRad) * z;
-        z = FastMath.cos(inclinaisonRad) * z;
+        y = FastMath.sin(orbitalInclination) * z;
+        z = FastMath.cos(orbitalInclination) * z;
         return new Vector3f(x, y, z);
     }
 
     public Vector3f calcTrajectory(double time) {
         return calcTrajectory(time, 0);
     }
-
-    // public void calcTrajectoryNew(double time) {
-    // float M = M0 + (FastMath.TWO_PI / T) * t;
-    // M = M % FastMath.TWO_PI;
-    // }
 
     @Override
     public void scale(float scaleMultiplier) {
@@ -249,6 +264,21 @@ public class Planet extends Body {
     public boolean isPrimaryClickable() {
         return primary.isClickable && !CameraTool.bodies.getCurrentValue().equals(primary)
                 && !primary.equals(reference);
+    }
+
+    public long getActualDistanceFromPrimary() {
+        float distance = primary.getWorldTranslation().distance(super.getWorldTranslation());
+        return (long) inverseConvertion(distance);
+    }
+
+    @Override
+    public String displayInformation() {
+        String stringRealSemimajorAxis = formatter.format(getActualDistanceFromPrimary());
+        String res = String.format("""
+                %s
+                Distance from %s : %s km
+                """, super.displayInformation(), primary.getName(), stringRealSemimajorAxis);
+        return res;
     }
 
 }

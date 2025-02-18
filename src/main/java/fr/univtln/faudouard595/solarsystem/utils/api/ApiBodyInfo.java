@@ -34,7 +34,8 @@ public class ApiBodyInfo {
     private ObjectNode fileNode;
     File file;
     List<String> usedId = List.of("id", "englishName", "meanRadius", "sideralRotation", "axialTilt", "bodyType",
-            "semimajorAxis", "eccentricity", "sideralOrbit", "inclination", "orbitAround");
+            "semimajorAxis", "eccentricity", "sideralOrbit", "inclination", "orbitAround", "longAscNode",
+            "argPeriapsis", "mainAnomaly", "perihelion");
 
     public ApiBodyInfo() {
         this.client = HttpClient.newHttpClient();
@@ -162,13 +163,16 @@ public class ApiBodyInfo {
             float eccentricity = JsonNode.get("eccentricity").floatValue();
             float orbitalPeriod = JsonNode.get("sideralOrbit").floatValue();
             float orbitalInclination = JsonNode.get("inclination").floatValue();
+            float longAscNode = JsonNode.get("longAscNode").floatValue();
+            float argPeriapsis = JsonNode.get("argPeriapsis").floatValue();
+            float mainAnomaly = JsonNode.get("mainAnomaly").floatValue();
             Body ref = astres.get(JsonNode.get("orbitAround").asText());
             if (color == null) {
                 color = ref.getColor();
             }
             body = ref.addPlanet(nameBody, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
                     orbitalInclination,
-                    rotationInclination, type, color, ring);
+                    rotationInclination, longAscNode, argPeriapsis, mainAnomaly, type, color, ring);
         }
         astres.put(id, body);
         return body;

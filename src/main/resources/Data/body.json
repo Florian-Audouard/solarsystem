@@ -10,7 +10,11 @@
         "eccentricity": 0,
         "sideralOrbit": 0,
         "inclination": 0,
-        "orbitAround": null
+        "orbitAround": null,
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 0
     },
     "terre": {
         "id": "terre",
@@ -23,7 +27,11 @@
         "eccentricity": 0.0167,
         "sideralOrbit": 365.256,
         "inclination": 0,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 18.272,
+        "argPeriapsis": 85.901,
+        "mainAnomaly": 358.617,
+        "perihelion": 147095000
     },
     "lune": {
         "id": "lune",
@@ -36,7 +44,11 @@
         "eccentricity": 0.0549,
         "sideralOrbit": 27.3217,
         "inclination": 5.145,
-        "orbitAround": "terre"
+        "orbitAround": "terre",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 363300
     },
     "mercure": {
         "id": "mercure",
@@ -49,7 +61,11 @@
         "eccentricity": 0.2056,
         "sideralOrbit": 87.969,
         "inclination": 7.0,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 48.378,
+        "argPeriapsis": 29.022,
+        "mainAnomaly": 174.796,
+        "perihelion": 46001200
     },
     "venus": {
         "id": "venus",
@@ -62,7 +78,11 @@
         "eccentricity": 0.0067,
         "sideralOrbit": 224.701,
         "inclination": 3.39,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 76.785,
+        "argPeriapsis": 54.78,
+        "mainAnomaly": 50.115,
+        "perihelion": 107477000
     },
     "mars": {
         "id": "mars",
@@ -75,7 +95,11 @@
         "eccentricity": 0.0935,
         "sideralOrbit": 686.98,
         "inclination": 1.85,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 49.667,
+        "argPeriapsis": 286.231,
+        "mainAnomaly": 19.412,
+        "perihelion": 206700000
     },
     "phobos": {
         "id": "phobos",
@@ -88,7 +112,11 @@
         "eccentricity": 0.0151,
         "sideralOrbit": 0.31891,
         "inclination": 1.075,
-        "orbitAround": "mars"
+        "orbitAround": "mars",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 9234
     },
     "deimos": {
         "id": "deimos",
@@ -101,7 +129,11 @@
         "eccentricity": 2.0E-4,
         "sideralOrbit": 1.26244,
         "inclination": 1.075,
-        "orbitAround": "mars"
+        "orbitAround": "mars",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 23456
     },
     "jupiter": {
         "id": "jupiter",
@@ -114,7 +146,11 @@
         "eccentricity": 0.0489,
         "sideralOrbit": 4332.589,
         "inclination": 1.304,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 100.398,
+        "argPeriapsis": 273.442,
+        "mainAnomaly": 20.02,
+        "perihelion": 740379835
     },
     "io": {
         "id": "io",
@@ -127,7 +163,11 @@
         "eccentricity": 0.004,
         "sideralOrbit": 1.76914,
         "inclination": 0.036,
-        "orbitAround": "jupiter"
+        "orbitAround": "jupiter",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 420071
     },
     "europe": {
         "id": "europe",
@@ -140,7 +180,11 @@
         "eccentricity": 0.009,
         "sideralOrbit": 3.55118,
         "inclination": 0.466,
-        "orbitAround": "jupiter"
+        "orbitAround": "jupiter",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 0
     },
     "ganymede": {
         "id": "ganymede",
@@ -153,7 +197,11 @@
         "eccentricity": 0.001,
         "sideralOrbit": 7.15455,
         "inclination": 0.177,
-        "orbitAround": "jupiter"
+        "orbitAround": "jupiter",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 0
     },
     "callisto": {
         "id": "callisto",
@@ -166,7 +214,11 @@
         "eccentricity": 0.007,
         "sideralOrbit": 16.68902,
         "inclination": 0.192,
-        "orbitAround": "jupiter"
+        "orbitAround": "jupiter",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 0
     },
     "saturne": {
         "id": "saturne",
@@ -179,7 +231,11 @@
         "eccentricity": 0.0565,
         "sideralOrbit": 10759.22,
         "inclination": 2.485,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 113.759,
+        "argPeriapsis": 336.178,
+        "mainAnomaly": 317.02,
+        "perihelion": 1349823615
     },
     "mimas": {
         "id": "mimas",
@@ -192,7 +248,11 @@
         "eccentricity": 0.0202,
         "sideralOrbit": 0.94,
         "inclination": 1.53,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 181770
     },
     "encelade": {
         "id": "encelade",
@@ -205,7 +265,11 @@
         "eccentricity": 0.0045,
         "sideralOrbit": 1.37,
         "inclination": 0,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 236830
     },
     "tethys": {
         "id": "tethys",
@@ -218,7 +282,11 @@
         "eccentricity": 1.0E-4,
         "sideralOrbit": 1.89,
         "inclination": 1.86,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 294589
     },
     "dione": {
         "id": "dione",
@@ -231,7 +299,11 @@
         "eccentricity": 0.0022,
         "sideralOrbit": 2.737,
         "inclination": 0.002,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 376580
     },
     "rhea": {
         "id": "rhea",
@@ -244,7 +316,11 @@
         "eccentricity": 0.001,
         "sideralOrbit": 4.518,
         "inclination": 0.35,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 526543
     },
     "titan": {
         "id": "titan",
@@ -257,7 +333,11 @@
         "eccentricity": 0.0292,
         "sideralOrbit": 15.95,
         "inclination": 0.33,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 1186680
     },
     "hyperion": {
         "id": "hyperion",
@@ -270,7 +350,11 @@
         "eccentricity": 0.123,
         "sideralOrbit": 21.28,
         "inclination": 0.43,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 1466112
     },
     "japet": {
         "id": "japet",
@@ -283,7 +367,11 @@
         "eccentricity": 0.0283,
         "sideralOrbit": 79.33,
         "inclination": 14.72,
-        "orbitAround": "saturne"
+        "orbitAround": "saturne",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 3460068
     },
     "uranus": {
         "id": "uranus",
@@ -296,7 +384,11 @@
         "eccentricity": 0.0457,
         "sideralOrbit": 30685.4,
         "inclination": 0.772,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 73.967,
+        "argPeriapsis": 98.862,
+        "mainAnomaly": 142.2386,
+        "perihelion": 2734998229
     },
     "ariel": {
         "id": "ariel",
@@ -309,7 +401,11 @@
         "eccentricity": 0.0012,
         "sideralOrbit": 2.52038,
         "inclination": 0.04,
-        "orbitAround": "uranus"
+        "orbitAround": "uranus",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 190670
     },
     "umbriel": {
         "id": "umbriel",
@@ -322,7 +418,11 @@
         "eccentricity": 0.0039,
         "sideralOrbit": 4.14418,
         "inclination": 0.13,
-        "orbitAround": "uranus"
+        "orbitAround": "uranus",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 265100
     },
     "titania": {
         "id": "titania",
@@ -335,7 +435,11 @@
         "eccentricity": 0.0011,
         "sideralOrbit": 8.70587,
         "inclination": 0.08,
-        "orbitAround": "uranus"
+        "orbitAround": "uranus",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 435800
     },
     "oberon": {
         "id": "oberon",
@@ -348,7 +452,11 @@
         "eccentricity": 0.0014,
         "sideralOrbit": 13.46323,
         "inclination": 0.07,
-        "orbitAround": "uranus"
+        "orbitAround": "uranus",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 582702
     },
     "miranda": {
         "id": "miranda",
@@ -361,7 +469,11 @@
         "eccentricity": 0.0013,
         "sideralOrbit": 1.41348,
         "inclination": 4.34,
-        "orbitAround": "uranus"
+        "orbitAround": "uranus",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 129703
     },
     "neptune": {
         "id": "neptune",
@@ -374,7 +486,11 @@
         "eccentricity": 0.0113,
         "sideralOrbit": 60189.0,
         "inclination": 1.769,
-        "orbitAround": "soleil"
+        "orbitAround": "soleil",
+        "longAscNode": 131.823,
+        "argPeriapsis": 256.932,
+        "mainAnomaly": 256.228,
+        "perihelion": 4459753056
     },
     "triton": {
         "id": "triton",
@@ -387,6 +503,10 @@
         "eccentricity": 2.0E-5,
         "sideralOrbit": 5.87685,
         "inclination": 157.345,
-        "orbitAround": "neptune"
+        "orbitAround": "neptune",
+        "longAscNode": 0,
+        "argPeriapsis": 0,
+        "mainAnomaly": 0,
+        "perihelion": 354753
     }
 }

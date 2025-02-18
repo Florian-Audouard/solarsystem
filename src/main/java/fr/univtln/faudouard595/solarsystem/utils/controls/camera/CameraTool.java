@@ -124,15 +124,18 @@ public class CameraTool {
     public static void setBody(Body body) {
         bodies = new CircularHashMapBody();
         bodies.createMapFromList(body.getEveryBodies());
+        List<Body> mainBodies = new ArrayList<>(body.getPlanets().values());
+        mainBodies.add(body);
+        bodies.setMainBodies(mainBodies);
     }
 
     public static void nextBody() {
-        bodies.nextValue();
+        bodies.nextMainBody();
         initAngle();
     }
 
     public static void prevBody() {
-        bodies.prevValue();
+        bodies.previousMainBody();
         initAngle();
     }
 

@@ -43,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class Body {
     protected String name;
     private float radius;
-    private float realSize;
+    private double realSize;
     private float scaleSize;
     private Spatial model;
     private Node node;
@@ -75,7 +75,7 @@ public abstract class Body {
     private int textSize = 20;
     protected boolean isClickable = false;
     protected boolean shouldBeDisplayed = true;
-    private static final NumberFormat formatter = NumberFormat.getInstance(Locale.FRENCH);
+    protected static final NumberFormat formatter = NumberFormat.getInstance(Locale.FRENCH);
     private Node planetNode;
 
     public enum RESOLUTION {
@@ -97,7 +97,7 @@ public abstract class Body {
         OBJ, SPHERE
     }
 
-    public Body(String name, float size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
+    public Body(String name, double size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
         this.name = name;
         this.realSize = size;
         if (reference == null) {
@@ -108,7 +108,7 @@ public abstract class Body {
         }
         this.scaleSize = this.radius;
         this.rotationPeriod = rotationPeriod * 60 * 60;
-        this.rotationInclination = rotationInclination;
+        this.rotationInclination = rotationInclination * FastMath.DEG_TO_RAD;
         this.planets = new HashMap<>();
         this.node = new Node(name);
         this.type = type;
@@ -123,7 +123,11 @@ public abstract class Body {
     }
 
     public static float convertion(double value) {
-        return (float) (value * reference.getRadius()) / reference.getRealSize();
+        return (float) ((value * reference.getRadius()) / reference.getRealSize());
+    }
+
+    public static long inverseConvertion(float value) {
+        return (long) ((long) (value * reference.getRealSize()) / reference.getRadius());
     }
 
     public float calcObjSize() {
@@ -157,15 +161,9 @@ public abstract class Body {
         planetNode
                 .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (-90f),
                         0, 0));
-        node.attachChild(planetNode);
-        // rotationNode
-        // .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD *
-        // (rotationInclination),
-        // 0, 0));
+        rotationNode.attachChild(planetNode);
+
         node.attachChild(rotationNode);
-        node
-                .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (rotationInclination),
-                        0, 0));
         rootNode.attachChild(node);
         circleGeo = createCircle();
         guiNode.attachChild(circleGeo);
@@ -196,10 +194,12 @@ public abstract class Body {
     }
 
     public Planet addPlanet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, float orbitalInclination, float rotationInclination, TYPE type, ColorRGBA lineColor,
+            float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
+            float argPeriapsis, float mainAnomaly, TYPE type, ColorRGBA lineColor,
             boolean ring) {
         Planet planet = new Planet(name, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
-                orbitalInclination, rotationInclination, this,
+                orbitalInclination, rotationInclination, longAscNode,
+                argPeriapsis, mainAnomaly, this,
                 type, lineColor, ring);
         planet.generateBody(node);
         planets.put(name, planet);
@@ -236,7 +236,9 @@ public abstract class Body {
     public List<Body> getEveryBodies() {
         List<Body> bodies = new ArrayList<>();
         bodies.add(this);
-        planets.values().forEach(planet -> bodies.addAll(planet.getEveryBodies()));
+
+        planets.values().stream().sorted((p1, p2) -> p1.getRealSemimajorAxis() - p2.getRealSemimajorAxis())
+                .forEach(planet -> bodies.addAll(planet.getEveryBodies()));
         return bodies;
     }
 
