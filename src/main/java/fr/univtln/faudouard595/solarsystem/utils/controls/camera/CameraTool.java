@@ -84,7 +84,7 @@ public class CameraTool {
     public static void initAngle() {
         maxDistance = ((refMaxDistance * Body.reference.getScaleSize()) / bodies.getCurrentValue().getScaleSize())
                 * zoomSpeed;
-
+        minDistance = Math.max(3, 1.1f / bodies.getCurrentValue().getScaleSize());
         if (bodies.getCurrentValue() instanceof Planet planet) {
             float angle = (90 - (planet.getCurrentAngle() * FastMath.RAD_TO_DEG));
             setAngleHorizontal(angle);
@@ -182,6 +182,7 @@ public class CameraTool {
     };
 
     public static void initSmoothZoomVar() {
+
         lastScrollTime = 0;
         distanceDifference = wantedDistanceFromBody - distanceFromBody;
         lambdaSmoothZoom = (float) (Math.log(20) / (smoothScrollTime - 1));

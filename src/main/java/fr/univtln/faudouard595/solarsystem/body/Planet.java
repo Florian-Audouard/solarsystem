@@ -262,7 +262,11 @@ public class Planet extends Body {
 
     @Override
     public boolean isPrimaryClickable() {
-        return primary.isClickable && !CameraTool.bodies.getCurrentValue().equals(primary)
+        if (CameraTool.bodies.getCurrentValue() instanceof Planet focusPlanet) {
+            return !focusPlanet.getPrimary().equals(primary) && !focusPlanet.equals(primary)
+                    && !primary.equals(reference);
+        }
+        return (!CameraTool.bodies.getCurrentValue().equals(primary))
                 && !primary.equals(reference);
     }
 

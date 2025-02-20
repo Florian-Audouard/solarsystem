@@ -40,7 +40,7 @@ import com.jme3.light.AmbientLight;
 @Getter
 public class App extends SimpleApplication {
 
-    private static final float sunSize = 500;
+    private static final float sunSize = 1000;
     public double time = 0f;
     public boolean isPause = false;
     private Star sun;

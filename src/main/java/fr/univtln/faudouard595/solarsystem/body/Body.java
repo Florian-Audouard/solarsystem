@@ -339,10 +339,6 @@ public abstract class Body {
     }
 
     public void updateisClickable() {
-        // if (CameraTool.bodies.getCurrentValue().equals(this)) {
-        // isClickable = false;
-        // return;
-        // }
         if (isPrimaryClickable()) {
             isClickable = false;
             return;
