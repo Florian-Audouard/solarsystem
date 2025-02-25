@@ -80,16 +80,19 @@ public class ButtonControl {
                 .build()
                 .init());
         MyButton lineDisplay = MyButton.builder()
-                .text("🔲")
+                .text("✦")
                 .guiNode(app.getGuiNode())
                 .x(app.getCamera().getWidth() - 50)
-                .y(positionYFlowButton)
+                .y(app.getCamera().getHeight() - 50)
                 .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
                 .fontSize(controlButtonTextSize)
                 .build()
                 .init();
-        lineDisplay.setActionFunction(b -> app.getSun().switchDisplayLines());
+        lineDisplay.setActionFunction(b -> {
+            app.getSun().switchDisplayLines();
+            lineDisplay.setText(app.getSun().isDisplayLines() ? "✦" : "✧");
+        });
         timeText = app.font.createLabel("");
         timeText.setSize(40);
         timeText.setColor(ColorRGBA.White);

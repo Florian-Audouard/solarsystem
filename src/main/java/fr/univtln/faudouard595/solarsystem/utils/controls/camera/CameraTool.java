@@ -148,7 +148,7 @@ public class CameraTool {
     }
 
     private static Vector3f getClickDirection(Vector2f screenPos) {
-        Vector3f worldCoords = cam.getWorldCoordinates(screenPos, 0f).clone();
+        Vector3f worldCoords = cam.getWorldCoordinates(screenPos, 0f);
         Vector3f direction = worldCoords.subtract(cam.getLocation()).normalize();
         return direction;
     }
@@ -243,8 +243,7 @@ public class CameraTool {
         }
         Vector3f newPos = calcCoord();
         cam.setLocation(newPos);
-        cam.lookAt(lookAtPos,
-                Vector3f.UNIT_Y);
+        cam.lookAt(lookAtPos, Vector3f.UNIT_Y);
     }
 
     public static void updateLocation() {
@@ -262,6 +261,8 @@ public class CameraTool {
 
     public static void updateMousePos() {
         Vector2f cursorPos = inputManager.getCursorPosition();
+        Vector3f clickDirection = getClickDirection(cursorPos);
+
         if (isLeftClickPressed) {
             Vector2f delta = cursorPos.subtract(lastMousePosition);
             setAngleHorizontal(angleHorizontal - (delta.x * 0.1f));
@@ -272,7 +273,6 @@ public class CameraTool {
         clickableBodies = bodies.stream().filter(Body::isClickable)
                 .filter(a -> {
                     Vector3f camPos = cam.getLocation();
-                    Vector3f clickDirection = getClickDirection(cursorPos);
                     Vector3f bodypos = a.getWorldTranslation();
                     Vector3f bodiesScreenPos = cam.getScreenCoordinates(bodypos);
                     Vector2f bodiesScreenPos2d = new Vector2f(bodiesScreenPos.x, bodiesScreenPos.y);

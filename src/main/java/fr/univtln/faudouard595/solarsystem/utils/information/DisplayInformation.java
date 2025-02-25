@@ -32,7 +32,7 @@ public class DisplayInformation {
         label.setFont(app.font);
         labelBackground = new Panel();
         QuadBackgroundComponent background = new QuadBackgroundComponent();
-        background.setColor(new ColorRGBA(27f / 255, 25f / 255, 27f / 255, 0.2f)); // Set background color
+        background.setColor(new ColorRGBA(27f / 255, 25f / 255, 27f / 255, 0.15f));
         labelBackground.setBackground(background);
         float paddingBackground = 50f;
         labelBackground.setPreferredSize(
