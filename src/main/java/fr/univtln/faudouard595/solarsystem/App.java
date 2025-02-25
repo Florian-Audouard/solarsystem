@@ -56,15 +56,15 @@ public class App extends SimpleApplication {
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setFrameRate(60);
-        if (!test) {
+        if (test) {
+            settings.setResolution(1920, 780);
+        } else {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
             DisplayMode dm = gd.getDisplayMode();
             int screenWidth = dm.getWidth();
             int screenHeight = dm.getHeight();
             settings.setResolution(screenWidth, screenHeight);
             settings.setFullscreen(true);
-        } else {
-            settings.setResolution(1920, 780);
         }
         app.setSettings(settings);
         app.start();

@@ -86,7 +86,6 @@ public class Planet extends Body {
 
         orbitMesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
         orbitMesh.updateBound();
-
     }
 
     public Material generateMat() {
