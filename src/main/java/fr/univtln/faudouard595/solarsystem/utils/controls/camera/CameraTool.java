@@ -86,7 +86,7 @@ public class CameraTool {
                 * zoomSpeed;
         minDistance = Math.max(3, 1.1f / bodies.getCurrentValue().getScaleSize());
         if (bodies.getCurrentValue() instanceof Planet planet) {
-            float angle = (90 - (planet.getCurrentAngle() * FastMath.RAD_TO_DEG));
+            float angle = (90 + (planet.getCurrentAngle() * FastMath.RAD_TO_DEG));
             setAngleHorizontal(angle);
             lastAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
         }
@@ -250,7 +250,7 @@ public class CameraTool {
     public static void updateLocation() {
         if (bodies.getCurrentValue() instanceof Planet planet) {
             float newAngle = planet.getCurrentAngle() * FastMath.RAD_TO_DEG;
-            setAngleHorizontal(angleHorizontal - (newAngle - lastAngle));
+            setAngleHorizontal(angleHorizontal + (newAngle - lastAngle));
             lastAngle = newAngle;
         }
         calcPos();

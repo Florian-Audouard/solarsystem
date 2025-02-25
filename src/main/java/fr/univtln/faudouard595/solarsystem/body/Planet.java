@@ -194,7 +194,7 @@ public class Planet extends Body {
     public Vector3f calcTrajectory(double time, float add) {
         float workingDistance = super.getScaleSize() + primary.getScaleSize()
                 + add + ((semimajorAxis) * distanceMultiplier);
-        float angle = getAngle(time);
+        float angle = -getAngle(time);
         float x = FastMath.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));
         float z = FastMath.sin(angle) * workingDistance * (1 - eccentricity * eccentricity)

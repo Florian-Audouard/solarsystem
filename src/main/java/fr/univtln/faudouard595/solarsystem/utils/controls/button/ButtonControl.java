@@ -79,6 +79,17 @@ public class ButtonControl {
                 .analogFunction(() -> app.speedList.decreaseSpeed())
                 .build()
                 .init());
+        MyButton lineDisplay = MyButton.builder()
+                .text("🔲")
+                .guiNode(app.getGuiNode())
+                .x(app.getCamera().getWidth() - 50)
+                .y(positionYFlowButton)
+                .preferedSizeWidth(widthFlowButton)
+                .preferedSizeHeight(heightFlowButton)
+                .fontSize(controlButtonTextSize)
+                .build()
+                .init();
+        lineDisplay.setActionFunction(b -> app.getSun().switchDisplayLines());
         timeText = app.font.createLabel("");
         timeText.setSize(40);
         timeText.setColor(ColorRGBA.White);
@@ -129,7 +140,6 @@ public class ButtonControl {
                 timeTextY + timeText.getLineHeight(), 0);
         actualPauseTimeText = app.isPause;
     }
-
 
     public static void update() {
         updateSpeedText();

@@ -32,7 +32,6 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.util.BufferUtils;
 
 import fr.univtln.faudouard595.solarsystem.App;
-import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
