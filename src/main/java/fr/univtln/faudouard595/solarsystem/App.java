@@ -3,6 +3,7 @@ package fr.univtln.faudouard595.solarsystem;
 import java.time.Instant;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -51,6 +52,8 @@ import com.jme3.material.Material;
 @Getter
 public class App extends SimpleApplication {
     double AU = 149_597_870.7;
+    public final List<String> ASTEROID_MODELS = Arrays.asList("Ceres", "Haumea", "Eris");
+    public List<Material> materialsAsteroid = new ArrayList<>();
 
     private static final float sunSize = 500;
     public double time = 0f;
@@ -61,6 +64,7 @@ public class App extends SimpleApplication {
     public float startOfUniver = 9624787761l; // timeStamp before 1970 (01/01/1665)
     private float maxRenderDistanceMult = 10000000f;
     public SpeedList speedList = new SpeedList();
+    public Random random = new Random();
 
     public static void main(String[] args) {
         boolean test = true;
@@ -95,14 +99,28 @@ public class App extends SimpleApplication {
         return 1;
     }
 
+    public Material getRandomMaterial() {
+        return materialsAsteroid.get(random.nextInt(materialsAsteroid.size()));
+    }
+
+    private int randomIntBetween(int min, int max) {
+        return min + random.nextInt(max - min);
+    }
+
+    private float randomFloatBetween(float min, float max) {
+        return min + (max - min) * (float) Math.random();
+    }
+
     private Geometry createIrregularAsteroid(Vector3f position, Material material, Random random,
             float sizeOfAsteroid) {
         float min = sizeOfAsteroid / 2;
         float max = sizeOfAsteroid;
-        float randomSize = min + (max - min) * (float) Math.random();
-        Sphere sphere = new Sphere(12, 12, randomSize);
+        float randomSize = randomFloatBetween(min, max);
+        Sphere sphere = new Sphere(randomIntBetween(3, 15), randomIntBetween(3, 15), randomSize);
         Geometry geom = new Geometry("Asteroid", sphere);
-        geom.setLocalScale(1f, 1.5f, 1f);
+        min = 0.5f;
+        max = 3f;
+        geom.setLocalScale(randomFloatBetween(min, max), randomFloatBetween(min, max), randomFloatBetween(min, max));
         geom.setMaterial(material);
         geom.setLocalTranslation(position);
         Quaternion randomRotation = new Quaternion();
@@ -116,13 +134,6 @@ public class App extends SimpleApplication {
             float sizeOfAsteroid,
             int numObjects) {
         Node beltNode = new Node("AsteroidBelt_" + name);
-        Random random = new Random();
-        Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        material.setBoolean("UseMaterialColors", true);
-        material.setColor("Diffuse", new ColorRGBA(new Vector3f(192 / 255, 184 / 255, 171 / 255)).mult(0.5f));
-        material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-        material.setColor("Ambient", ColorRGBA.Gray);
-        material.setFloat("Shininess", 12f);
 
         for (int i = 0; i < numObjects; i++) {
             float radius = innerRadius + random.nextFloat() * (outerRadius - innerRadius);
@@ -132,10 +143,11 @@ public class App extends SimpleApplication {
             float z = radius * FastMath.sin(angle);
 
             Vector3f position = new Vector3f(x, y, z);
-            Geometry asteroid = createIrregularAsteroid(position, material, random, sizeOfAsteroid);
+
+            Geometry asteroid = createIrregularAsteroid(position, getRandomMaterial(), random, sizeOfAsteroid);
             beltNode.attachChild(asteroid);
         }
-        rootNode.attachChild(beltNode);
+        sun.getNode().attachChild(beltNode);
     }
 
     public void createSpace() {
@@ -147,6 +159,7 @@ public class App extends SimpleApplication {
         Body.guiNode = guiNode;
         Body.cam = cam;
         Body.referenceSize = sunSize;
+
         createBodies();
 
         AmbientLight al = new AmbientLight();
@@ -157,10 +170,22 @@ public class App extends SimpleApplication {
         BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Scene);
         fpp.addFilter(bloom);
         viewPort.addProcessor(fpp);
+
+        for (String model : ASTEROID_MODELS) {
+            Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+            material.setBoolean("UseMaterialColors", true);
+            material.setColor("Diffuse", ColorRGBA.White.mult(0.5f));
+            material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+            material.setColor("Ambient", ColorRGBA.Gray);
+            material.setFloat("Shininess", 2f);
+            material.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Body/Low/" + model + ".jpg"));
+            materialsAsteroid.add(material);
+        }
+
         double INNER_RADIUS_KUIPER = 30 * AU;
         double OUTER_RADIUS_KUIPER = 50 * AU;
         double THICKNESS_KUIPER = 10 * AU;
-        double SIZE_OF_ASTEROID_KUIPER = 15_000_000;
+        double SIZE_OF_ASTEROID_KUIPER = 10_000_000;
         int NUM_OBJECTS_KUIPER = 7_000;
         generateAsteroidBelt("Kuiper", Body.convertion(INNER_RADIUS_KUIPER), Body.convertion(OUTER_RADIUS_KUIPER),
                 Body.convertion(THICKNESS_KUIPER), Body.convertion(SIZE_OF_ASTEROID_KUIPER), NUM_OBJECTS_KUIPER);
@@ -168,7 +193,7 @@ public class App extends SimpleApplication {
         double INNER_RADIUS_MAIN = 2.2 * AU;
         double OUTER_RADIUS_MAIN = 4.2 * AU;
         double THICKNESS_ASTEROID_MAIN = 1 * AU;
-        double SIZE_OF_ASTEROID_MAIN = 3_000_000;
+        double SIZE_OF_ASTEROID_MAIN = 1_000_000;
         int NUM_OBJECTS_ASTEROID_MAIN = 3_000;
         generateAsteroidBelt("Main", Body.convertion(INNER_RADIUS_MAIN),
                 Body.convertion(OUTER_RADIUS_MAIN),

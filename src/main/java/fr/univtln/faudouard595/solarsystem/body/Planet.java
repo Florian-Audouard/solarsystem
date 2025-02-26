@@ -98,7 +98,8 @@ public class Planet extends Body {
         String texturePath = Body.TEXTUREPATH + Body.planetTexture + "/" + super.getName() + ".jpg";
         File f = new File("src/main/resources/" + texturePath);
         if (!f.exists()) {
-            texturePath = Body.TEXTUREPATH + Body.planetTexture + "/Eris.jpg";
+            String randomTexture = app.ASTEROID_MODELS.get(app.random.nextInt(app.ASTEROID_MODELS.size()));
+            texturePath = Body.TEXTUREPATH + "Low/" + randomTexture + ".jpg";
         }
         mat.setTexture("DiffuseMap", app.getAssetManager().loadTexture(texturePath));
 

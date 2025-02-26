@@ -13,14 +13,16 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.nio.FloatBuffer;
+
 import java.util.Random;
 
 public class KuiperBelt extends SimpleApplication {
-    private static final int NUM_OBJECTS = 10000;
-    private static final float INNER_RADIUS = 500f;
-    private static final float OUTER_RADIUS = 1000f;
-    private static final float HEIGHT_VARIATION = 30f;
+    private static final String[] ASTEROID_MODELS = { "Ceres", "Haumea", "Eris" };
 
     public static void main(String[] args) {
         KuiperBelt app = new KuiperBelt();
@@ -29,12 +31,16 @@ public class KuiperBelt extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        int NUM_OBJECTS = 10000;
+        float INNER_RADIUS = 500f;
+        float OUTER_RADIUS = 1000f;
+        float HEIGHT_VARIATION = 30f;
         Node belt = generateAsteroidBelt(INNER_RADIUS, OUTER_RADIUS, HEIGHT_VARIATION, NUM_OBJECTS);
         rootNode.attachChild(belt);
         flyCam.setMoveSpeed(100);
         PointLight pl = new PointLight();
         pl.setPosition(new Vector3f(0, 0, 0));
-        pl.setColor(com.jme3.math.ColorRGBA.White);
+        pl.setColor(ColorRGBA.White);
         rootNode.addLight(pl);
 
         AmbientLight al = new AmbientLight();
@@ -46,21 +52,27 @@ public class KuiperBelt extends SimpleApplication {
     private Node generateAsteroidBelt(float innerRadius, float outerRadius, float heightVariation, int numObjects) {
         Node beltNode = new Node("KuiperBelt");
         Random random = new Random();
-        Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        material.setBoolean("UseMaterialColors", true);
-        material.setColor("Diffuse", new ColorRGBA(new Vector3f(192 / 255, 184 / 255, 171 / 255)).mult(0.5f));
-        material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-        material.setColor("Ambient", ColorRGBA.Gray);
-        material.setFloat("Shininess", 12f);
+        List<Material> materials = new ArrayList<>();
+        for (String model : ASTEROID_MODELS) {
+            Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+            material.setBoolean("UseMaterialColors", true);
+            material.setColor("Diffuse", ColorRGBA.White);
+            material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+            material.setColor("Ambient", ColorRGBA.Gray);
+            material.setFloat("Shininess", 12f);
+            material.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Body/Low/" + model + ".jpg"));
+            materials.add(material);
+        }
 
-        for (int i = 0; i < NUM_OBJECTS; i++) {
-            float radius = INNER_RADIUS + random.nextFloat() * (OUTER_RADIUS - INNER_RADIUS);
+        for (int i = 0; i < numObjects; i++) {
+            float radius = innerRadius + random.nextFloat() * (outerRadius - innerRadius);
             float angle = random.nextFloat() * FastMath.TWO_PI;
             float x = radius * FastMath.cos(angle);
-            float y = (random.nextFloat() - 0.5f) * HEIGHT_VARIATION; // Some vertical displacement
+            float y = (random.nextFloat() - 0.5f) * heightVariation; // Some vertical displacement
             float z = radius * FastMath.sin(angle);
 
             Vector3f position = new Vector3f(x, y, z);
+            Material material = materials.get(random.nextInt(materials.size()));
             Geometry asteroid = createIrregularAsteroid(position, material, random);
             beltNode.attachChild(asteroid);
         }
@@ -68,6 +80,7 @@ public class KuiperBelt extends SimpleApplication {
     }
 
     private Geometry createIrregularAsteroid(Vector3f position, Material material, Random random) {
+
         Sphere sphere = new Sphere(12, 12, 1f);
         Geometry geom = new Geometry("Asteroid", sphere);
         geom.setLocalScale(1f, 1.5f, 1f);
