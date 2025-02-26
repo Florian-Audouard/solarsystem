@@ -185,7 +185,7 @@ public class App extends SimpleApplication {
         double INNER_RADIUS_KUIPER = 30 * AU;
         double OUTER_RADIUS_KUIPER = 50 * AU;
         double THICKNESS_KUIPER = 10 * AU;
-        double SIZE_OF_ASTEROID_KUIPER = 10_000_000;
+        double SIZE_OF_ASTEROID_KUIPER = 5_000_000;
         int NUM_OBJECTS_KUIPER = 7_000;
         generateAsteroidBelt("Kuiper", Body.convertion(INNER_RADIUS_KUIPER), Body.convertion(OUTER_RADIUS_KUIPER),
                 Body.convertion(THICKNESS_KUIPER), Body.convertion(SIZE_OF_ASTEROID_KUIPER), NUM_OBJECTS_KUIPER);
@@ -193,7 +193,7 @@ public class App extends SimpleApplication {
         double INNER_RADIUS_MAIN = 2.2 * AU;
         double OUTER_RADIUS_MAIN = 4.2 * AU;
         double THICKNESS_ASTEROID_MAIN = 1 * AU;
-        double SIZE_OF_ASTEROID_MAIN = 1_000_000;
+        double SIZE_OF_ASTEROID_MAIN = 500_000;
         int NUM_OBJECTS_ASTEROID_MAIN = 3_000;
         generateAsteroidBelt("Main", Body.convertion(INNER_RADIUS_MAIN),
                 Body.convertion(OUTER_RADIUS_MAIN),
