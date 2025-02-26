@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.controls.camera;
+package fr.univtln.faudouard595.solarsystem.ui.controls.camera;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.cursors.plugins.JmeCursor;
+import com.jme3.input.FlyByCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -18,6 +19,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
+import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.body.Body;
 import fr.univtln.faudouard595.solarsystem.body.Planet;
 import fr.univtln.faudouard595.solarsystem.utils.collection.CircularHashMapBody;
@@ -57,6 +59,7 @@ public class CameraTool {
     private static float lambdaSmoothZoom;
     private static float expSumSmoothZoom;
     private static Optional<Body> clickableBodies;
+    public static App app;
 
     public static void init(Camera cam, AssetManager assetManager, InputManager inputManager) {
         CameraTool.cam = cam;
@@ -318,19 +321,28 @@ public class CameraTool {
         primaryList.add(primary);
         primaryList.sort(Comparator.comparingDouble(Body::getScaleSize));
         primaryList.forEach(a -> updateCircle(a, primaryList));
-
     }
 
     public static void updateCursor() {
         switchCursor(cursorSavePlanet || cursorSaveButton);
     }
 
+    public static void switchFlyCam() {
+        FlyByCamera flyCam = app.getFlyByCamera();
+        flyCam.setEnabled(!flyCam.isEnabled());
+        flyCam.setMoveSpeed(10);
+        inputManager.setCursorVisible(!flyCam.isEnabled());
+    }
+
     public static void update() {
-        updateMousePos();
-        updateZoom();
-        updateLocation();
+        if (!app.getFlyByCamera().isEnabled()) {
+            updateMousePos();
+            updateZoom();
+            updateLocation();
+            updateCursor();
+        }
         updateAllCircle();
-        updateCursor();
+
     }
 
 }

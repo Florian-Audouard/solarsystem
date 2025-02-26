@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.controls.button;
+package fr.univtln.faudouard595.solarsystem.ui.controls.button;
 
 import java.util.function.Function;
 
@@ -16,7 +16,7 @@ import com.simsilica.lemur.event.MouseEventControl;
 import com.simsilica.lemur.event.MouseListener;
 
 import fr.univtln.faudouard595.solarsystem.App;
-import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;

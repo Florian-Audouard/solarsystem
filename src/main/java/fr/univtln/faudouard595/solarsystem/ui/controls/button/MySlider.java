@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.controls.button;
+package fr.univtln.faudouard595.solarsystem.ui.controls.button;
 
 import com.jme3.math.Vector3f;
 import com.simsilica.lemur.Axis;

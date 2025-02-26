@@ -126,7 +126,7 @@ public abstract class Body {
     }
 
     public static long inverseConvertion(float value) {
-        return (long) ((long) (value * reference.getRealSize()) / reference.getRadius());
+        return ((long) (value / reference.getRadius()) * (long) reference.getRealSize());
     }
 
     public float calcObjSize() {
@@ -337,12 +337,25 @@ public abstract class Body {
         return false;
     }
 
+    public boolean isTooSmall() {
+        return getRadius() < 1;
+    }
+
     public void updateisClickable() {
-        if (isPrimaryClickable()) {
+        boolean primaryClickable = isPrimaryClickable();
+        if (primaryClickable) {
             isClickable = false;
             return;
         }
         if (!isOnScreen()) {
+            isClickable = false;
+            return;
+        }
+        // if (isTooSmall()) {
+        // isClickable = false;
+        // return;
+        // }
+        if (!primaryClickable && !isFarFromCam()) {
             isClickable = false;
             return;
         }

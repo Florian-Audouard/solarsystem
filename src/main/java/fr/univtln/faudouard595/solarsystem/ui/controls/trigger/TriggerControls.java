@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.controls.trigger;
+package fr.univtln.faudouard595.solarsystem.ui.controls.trigger;
 
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -7,7 +7,7 @@ import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 
 import fr.univtln.faudouard595.solarsystem.App;
-import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 
 public class TriggerControls {
     private static App app;
@@ -29,9 +29,11 @@ public class TriggerControls {
         inputManager.addMapping("removeLines", new KeyTrigger(KeyInput.KEY_F8));
 
         inputManager.addMapping("Pause", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addMapping("Sprint", new KeyTrigger(KeyInput.KEY_LSHIFT));
+        inputManager.addMapping("UltraSprint", new KeyTrigger(KeyInput.KEY_LCONTROL));
 
         inputManager.addListener(actionListener, "Test", "removeLines", "nextAstre", "prevAstre", "Pause", "SpeedUp",
-                "SpeedDown");
+                "SpeedDown", "Sprint", "UltraSprint");
         inputManager.addListener(analogListener, "");
     }
 
@@ -51,7 +53,8 @@ public class TriggerControls {
             if (name.equals("SpeedDown")) {
                 app.speedList.decreaseSpeed();
             }
-            if (name.equals("Test")) {
+            if (name.equals("Test") && keyPressed) {
+                CameraTool.switchFlyCam();
             }
             if (keyPressed && name.equals("removeLines")) {
                 app.getSun().switchDisplayLines();
@@ -64,6 +67,25 @@ public class TriggerControls {
             }
             if (keyPressed && name.equals("Pause")) {
                 app.isPause = !app.isPause;
+            }
+            if (name.equals("Sprint")) {
+                if (keyPressed) {
+                    app.getFlyByCamera().setMoveSpeed(5_000);
+
+                } else {
+                    app.getFlyByCamera().setMoveSpeed(10);
+
+                }
+            }
+
+            if (name.equals("UltraSprint")) {
+                if (keyPressed) {
+                    app.getFlyByCamera().setMoveSpeed(500_000);
+
+                } else {
+                    app.getFlyByCamera().setMoveSpeed(10);
+
+                }
             }
         }
     };

@@ -22,7 +22,7 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
 
-import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -187,7 +187,7 @@ public class Planet extends Body {
     }
 
     public float getAngle(double time) {
-        return (float) ((FastMath.TWO_PI / (orbitalPeriod)) * time) % FastMath.TWO_PI;
+        return (float) (((FastMath.TWO_PI / (orbitalPeriod)) * time) % FastMath.TWO_PI);
     }
 
     public Vector3f calcTrajectory(double time, float add) {
@@ -269,9 +269,12 @@ public class Planet extends Body {
                 && !primary.equals(reference);
     }
 
+    public float getDistanceFromPrimary() {
+        return primary.getWorldTranslation().distance(super.getWorldTranslation());
+    }
+
     public long getActualDistanceFromPrimary() {
-        float distance = primary.getWorldTranslation().distance(super.getWorldTranslation());
-        return (long) inverseConvertion(distance);
+        return (long) inverseConvertion(getDistanceFromPrimary());
     }
 
     @Override

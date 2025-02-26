@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.controls.button;
+package fr.univtln.faudouard595.solarsystem.ui.controls.button;
 
 import java.time.Instant;
 import java.time.ZoneId;

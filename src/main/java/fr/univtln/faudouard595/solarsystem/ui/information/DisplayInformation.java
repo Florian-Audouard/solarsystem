@@ -1,4 +1,4 @@
-package fr.univtln.faudouard595.solarsystem.utils.information;
+package fr.univtln.faudouard595.solarsystem.ui.information;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -8,8 +8,8 @@ import com.simsilica.lemur.component.QuadBackgroundComponent;
 
 import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.body.Body;
-import fr.univtln.faudouard595.solarsystem.utils.controls.button.MyButton;
-import fr.univtln.faudouard595.solarsystem.utils.controls.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.ui.controls.button.MyButton;
+import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
