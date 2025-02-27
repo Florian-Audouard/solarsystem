@@ -31,7 +31,6 @@ import com.simsilica.lemur.style.BaseStyles;
 import fr.univtln.faudouard595.solarsystem.body.Body;
 import fr.univtln.faudouard595.solarsystem.body.Star;
 import fr.univtln.faudouard595.solarsystem.body.Body.TYPE;
-import fr.univtln.faudouard595.solarsystem.body.Planet;
 import fr.univtln.faudouard595.solarsystem.ui.controls.button.ButtonControl;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.ui.controls.trigger.TriggerControls;
