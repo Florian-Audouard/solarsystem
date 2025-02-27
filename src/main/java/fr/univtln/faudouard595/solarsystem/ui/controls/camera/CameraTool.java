@@ -20,8 +20,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
 import fr.univtln.faudouard595.solarsystem.App;
-import fr.univtln.faudouard595.solarsystem.body.Body;
-import fr.univtln.faudouard595.solarsystem.body.Planet;
+import fr.univtln.faudouard595.solarsystem.space.Body;
+import fr.univtln.faudouard595.solarsystem.space.Planet;
 import fr.univtln.faudouard595.solarsystem.utils.collection.CircularHashMapBody;
 import lombok.Getter;
 import lombok.Setter;

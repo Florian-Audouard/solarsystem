@@ -18,9 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jme3.math.ColorRGBA;
 
-import fr.univtln.faudouard595.solarsystem.body.Body;
-import fr.univtln.faudouard595.solarsystem.body.Body.TYPE;
-import fr.univtln.faudouard595.solarsystem.body.Star;
+import fr.univtln.faudouard595.solarsystem.space.Body;
+import fr.univtln.faudouard595.solarsystem.space.Star;
+import fr.univtln.faudouard595.solarsystem.space.Body.TYPE;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

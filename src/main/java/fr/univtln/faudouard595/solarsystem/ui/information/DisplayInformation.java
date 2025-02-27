@@ -7,7 +7,7 @@ import com.simsilica.lemur.Panel;
 import com.simsilica.lemur.component.QuadBackgroundComponent;
 
 import fr.univtln.faudouard595.solarsystem.App;
-import fr.univtln.faudouard595.solarsystem.body.Body;
+import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.ui.controls.button.MyButton;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import lombok.extern.slf4j.Slf4j;

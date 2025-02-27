@@ -14,7 +14,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 
 public class Convert extends SimpleApplication {
-    Spatial model;
 
     public static void main(String[] args) {
         Convert app = new Convert();
@@ -23,28 +22,38 @@ public class Convert extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        String name = "Asteroid";
-        String path = "Models/Asteroid4/" + name;
-
-        model = assetManager.loadModel(path + ".obj");
-
-        // model.setMaterial(mat);
-        model.setLocalScale(0.5f);
-        rootNode.attachChild(model);
-        model.setLocalTranslation(new Vector3f(0, 0, 20));
-        Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        TextureKey key = new TextureKey(path + ".png");
-        Texture tex = assetManager.loadTexture(key);
-        mat.setTexture("DiffuseMap", tex);
-        model.setMaterial(mat);
-        // Texture normalMap = assetManager.loadTexture("Models/Asteroid1/" + name +
-        // "_Normal.png");
-        // mat.setTexture("NormalMap", normalMap);
-        mat.setBoolean("UseMaterialColors", true);
-        mat.setColor("Diffuse", ColorRGBA.White);
-        mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-        mat.setColor("Ambient", ColorRGBA.Gray);
-        mat.setFloat("Shininess", 12f);
+        flyCam.setMoveSpeed(10);
+        for (int i = 1; i < 11; i++) {
+            String name = "Asteroid";
+            String path = "Models/Asteroid" + i + "/" + name;
+            String extention = ".obj";
+            if (new File("src/main/resources/" + path + ".j3o").exists()) {
+                extention = ".j3o";
+            }
+            Spatial model = assetManager.loadModel(path + extention);
+            model.setLocalScale(0.5f);
+            rootNode.attachChild(model);
+            model.setLocalTranslation(new Vector3f(i * 3, 0, 0));
+            Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+            TextureKey key = new TextureKey(path + ".png");
+            Texture tex = assetManager.loadTexture(key);
+            mat.setTexture("DiffuseMap", tex);
+            model.setMaterial(mat);
+            // Texture normalMap = assetManager.loadTexture("Models/Asteroid1/" + name +
+            // "_Normal.png");
+            // mat.setTexture("NormalMap", normalMap);
+            mat.setBoolean("UseMaterialColors", true);
+            mat.setColor("Diffuse", ColorRGBA.White);
+            mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+            mat.setColor("Ambient", ColorRGBA.Gray);
+            mat.setFloat("Shininess", 12f);
+            if (!new File("src/main/resources/" + path + ".j3o").exists()) {
+                try {
+                    BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));
+                } catch (Exception e) {
+                }
+            }
+        }
 
         AmbientLight al = new AmbientLight();
         al.setColor(ColorRGBA.White.mult(0.1f));
@@ -53,18 +62,11 @@ public class Convert extends SimpleApplication {
         pl.setPosition(new Vector3f(0, 0, 0));
         pl.setColor(ColorRGBA.White);
         rootNode.addLight(pl);
-        cam.lookAt(model.getWorldTranslation(), Vector3f.UNIT_Y);
-        if (!new File("src/main/resources/" + path).exists()) {
-            try {
-                BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));
-            } catch (Exception e) {
-            }
-        }
+        // cam.lookAt(model.getWorldTranslation(), Vector3f.UNIT_Y);
+
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        if (model != null)
-            model.rotate(0, 0.001f, 0);
     }
 }

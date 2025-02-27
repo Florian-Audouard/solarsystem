@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.TextureKey;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.font.BitmapFont;
@@ -28,9 +29,10 @@ import com.jme3.util.SkyFactory;
 import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.style.BaseStyles;
 
-import fr.univtln.faudouard595.solarsystem.body.Body;
-import fr.univtln.faudouard595.solarsystem.body.Star;
-import fr.univtln.faudouard595.solarsystem.body.Body.TYPE;
+import fr.univtln.faudouard595.solarsystem.space.Belt;
+import fr.univtln.faudouard595.solarsystem.space.Body;
+import fr.univtln.faudouard595.solarsystem.space.Star;
+import fr.univtln.faudouard595.solarsystem.space.Body.TYPE;
 import fr.univtln.faudouard595.solarsystem.ui.controls.button.ButtonControl;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.ui.controls.trigger.TriggerControls;
@@ -43,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.io.File;
 
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
@@ -52,7 +55,6 @@ import com.jme3.material.Material;
 public class App extends SimpleApplication {
     double AU = 149_597_870.7;
     public final List<String> ASTEROID_MODELS = Arrays.asList("Ceres", "Haumea", "Eris");
-    public List<Material> materialsAsteroid = new ArrayList<>();
 
     private static final float sunSize = 500;
     public double time = 0f;
@@ -86,69 +88,6 @@ public class App extends SimpleApplication {
 
     }
 
-    public float calcObjSize(Spatial model) {
-        BoundingVolume worldBound = model.getWorldBound();
-        if (worldBound instanceof BoundingBox) {
-            BoundingBox box = (BoundingBox) worldBound;
-            Vector3f min = box.getMin(null);
-            Vector3f max = box.getMax(null);
-            Vector3f size = max.subtract(min);
-            return (size.x + size.y + size.z) / 3;
-        }
-        return 1;
-    }
-
-    public Material getRandomMaterial() {
-        return materialsAsteroid.get(random.nextInt(materialsAsteroid.size()));
-    }
-
-    private int randomIntBetween(int min, int max) {
-        return min + random.nextInt(max - min);
-    }
-
-    private float randomFloatBetween(float min, float max) {
-        return min + (max - min) * (float) Math.random();
-    }
-
-    private Geometry createIrregularAsteroid(Vector3f position, Material material, Random random,
-            float sizeOfAsteroid) {
-        float min = sizeOfAsteroid / 2;
-        float max = sizeOfAsteroid;
-        float randomSize = randomFloatBetween(min, max);
-        Sphere sphere = new Sphere(randomIntBetween(3, 15), randomIntBetween(3, 15), randomSize);
-        Geometry geom = new Geometry("Asteroid", sphere);
-        min = 0.5f;
-        max = 3f;
-        geom.setLocalScale(randomFloatBetween(min, max), randomFloatBetween(min, max), randomFloatBetween(min, max));
-        geom.setMaterial(material);
-        geom.setLocalTranslation(position);
-        Quaternion randomRotation = new Quaternion();
-        randomRotation.fromAngles(random.nextFloat() * FastMath.TWO_PI, random.nextFloat() * FastMath.TWO_PI,
-                random.nextFloat() * FastMath.TWO_PI);
-        geom.setLocalRotation(randomRotation);
-        return geom;
-    }
-
-    private void generateAsteroidBelt(String name, float innerRadius, float outerRadius, float heightVariation,
-            float sizeOfAsteroid,
-            int numObjects) {
-        Node beltNode = new Node("AsteroidBelt_" + name);
-
-        for (int i = 0; i < numObjects; i++) {
-            float radius = innerRadius + random.nextFloat() * (outerRadius - innerRadius);
-            float angle = random.nextFloat() * FastMath.TWO_PI;
-            float x = radius * FastMath.cos(angle);
-            float y = (random.nextFloat() - 0.5f) * heightVariation; // Some vertical displacement
-            float z = radius * FastMath.sin(angle);
-
-            Vector3f position = new Vector3f(x, y, z);
-
-            Geometry asteroid = createIrregularAsteroid(position, getRandomMaterial(), random, sizeOfAsteroid);
-            beltNode.attachChild(asteroid);
-        }
-        sun.getNode().attachChild(beltNode);
-    }
-
     public void createSpace() {
 
         Texture starTexture = assetManager.loadTexture("Textures/Sky/StarSky.jpg");
@@ -158,7 +97,7 @@ public class App extends SimpleApplication {
         Body.guiNode = guiNode;
         Body.cam = cam;
         Body.referenceSize = sunSize;
-
+        Belt.initModel(assetManager);
         createBodies();
 
         AmbientLight al = new AmbientLight();
@@ -170,31 +109,23 @@ public class App extends SimpleApplication {
         fpp.addFilter(bloom);
         viewPort.addProcessor(fpp);
 
-        for (String model : ASTEROID_MODELS) {
-            Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-            material.setBoolean("UseMaterialColors", true);
-            material.setColor("Diffuse", ColorRGBA.White.mult(0.5f));
-            material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-            material.setColor("Ambient", ColorRGBA.Gray);
-            material.setFloat("Shininess", 2f);
-            material.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Body/Low/" + model + ".jpg"));
-            materialsAsteroid.add(material);
-        }
-
         double INNER_RADIUS_KUIPER = 30 * AU;
         double OUTER_RADIUS_KUIPER = 50 * AU;
         double THICKNESS_KUIPER = 10 * AU;
-        double SIZE_OF_ASTEROID_KUIPER = 5_000_000;
+        double SIZE_OF_ASTEROID_KUIPER = 20_000_000;
         int NUM_OBJECTS_KUIPER = 7_000;
-        generateAsteroidBelt("Kuiper", Body.convertion(INNER_RADIUS_KUIPER), Body.convertion(OUTER_RADIUS_KUIPER),
+        double ROATION_PERIOD_KUIPER = 200 * 325 * 24 * 60 * 60;
+        sun.addAsteroidBelt(ROATION_PERIOD_KUIPER, Body.convertion(INNER_RADIUS_KUIPER),
+                Body.convertion(OUTER_RADIUS_KUIPER),
                 Body.convertion(THICKNESS_KUIPER), Body.convertion(SIZE_OF_ASTEROID_KUIPER), NUM_OBJECTS_KUIPER);
 
         double INNER_RADIUS_MAIN = 2.2 * AU;
         double OUTER_RADIUS_MAIN = 4.2 * AU;
         double THICKNESS_ASTEROID_MAIN = 1 * AU;
-        double SIZE_OF_ASTEROID_MAIN = 500_000;
+        double SIZE_OF_ASTEROID_MAIN = 3_000_000;
         int NUM_OBJECTS_ASTEROID_MAIN = 3_000;
-        generateAsteroidBelt("Main", Body.convertion(INNER_RADIUS_MAIN),
+        double ROATION_PERIOD_MAIN = 4.5 * 325 * 24 * 60 * 60;
+        sun.addAsteroidBelt(ROATION_PERIOD_MAIN, Body.convertion(INNER_RADIUS_MAIN),
                 Body.convertion(OUTER_RADIUS_MAIN),
                 Body.convertion(THICKNESS_ASTEROID_MAIN), Body.convertion(SIZE_OF_ASTEROID_MAIN),
                 NUM_OBJECTS_ASTEROID_MAIN);

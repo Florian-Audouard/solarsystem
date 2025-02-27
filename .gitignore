@@ -1,7 +1,5 @@
 target
 .vscode
-**/resources/Models
-**.j3o
 **.obj
 **.stl
 **.mtl
