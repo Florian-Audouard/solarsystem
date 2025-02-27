@@ -18,8 +18,10 @@ import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
+@Slf4j
 public class Belt {
     private Node beltNode;
     private double rotationPeriod;
@@ -51,20 +53,6 @@ public class Belt {
             String path = "Models/Asteroid" + i + "/" + name;
             String extention = ".j3o";
             Spatial model = assetManager.loadModel(path + extention);
-            Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-            TextureKey key = new TextureKey(path + ".png");
-            Texture tex = assetManager.loadTexture(key);
-            mat.setTexture("DiffuseMap", tex);
-            // Texture normalMap = assetManager.loadTexture("Models/Asteroid1/" + name +
-            // "_Normal.png");
-            // mat.setTexture("NormalMap", normalMap);
-            mat.setBoolean("UseMaterialColors", true);
-            mat.setColor("Diffuse", ColorRGBA.White);
-            mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-            mat.setColor("Ambient", ColorRGBA.Gray);
-            mat.setFloat("Shininess", 2f);
-
-            model.setMaterial(mat);
 
             asteroids.add(model);
             model.setUserData("MeanSize", calcObjSize(model));

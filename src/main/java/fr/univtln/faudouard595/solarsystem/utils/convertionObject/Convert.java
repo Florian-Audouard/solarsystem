@@ -34,19 +34,20 @@ public class Convert extends SimpleApplication {
             model.setLocalScale(0.5f);
             rootNode.attachChild(model);
             model.setLocalTranslation(new Vector3f(i * 3, 0, 0));
-            Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-            TextureKey key = new TextureKey(path + ".png");
-            Texture tex = assetManager.loadTexture(key);
-            mat.setTexture("DiffuseMap", tex);
-            model.setMaterial(mat);
-            // Texture normalMap = assetManager.loadTexture("Models/Asteroid1/" + name +
-            // "_Normal.png");
-            // mat.setTexture("NormalMap", normalMap);
-            mat.setBoolean("UseMaterialColors", true);
-            mat.setColor("Diffuse", ColorRGBA.White);
-            mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-            mat.setColor("Ambient", ColorRGBA.Gray);
-            mat.setFloat("Shininess", 12f);
+            // Material mat = new Material(assetManager,
+            // "Common/MatDefs/Light/Lighting.j3md");
+            // TextureKey key = new TextureKey(path + ".png");
+            // Texture tex = assetManager.loadTexture(key);
+            // mat.setTexture("DiffuseMap", tex);
+            // model.setMaterial(mat);
+            // // Texture normalMap = assetManager.loadTexture("Models/Asteroid1/" + name +
+            // // "_Normal.png");
+            // // mat.setTexture("NormalMap", normalMap);
+            // mat.setBoolean("UseMaterialColors", true);
+            // mat.setColor("Diffuse", ColorRGBA.White);
+            // mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+            // mat.setColor("Ambient", ColorRGBA.Gray);
+            // mat.setFloat("Shininess", 12f);
             if (!new File("src/main/resources/" + path + ".j3o").exists()) {
                 try {
                     BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));

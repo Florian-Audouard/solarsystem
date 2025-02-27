@@ -97,7 +97,6 @@ public class App extends SimpleApplication {
         Body.guiNode = guiNode;
         Body.cam = cam;
         Body.referenceSize = sunSize;
-        Belt.initModel(assetManager);
         createBodies();
 
         AmbientLight al = new AmbientLight();
@@ -109,11 +108,13 @@ public class App extends SimpleApplication {
         fpp.addFilter(bloom);
         viewPort.addProcessor(fpp);
 
+        Belt.initModel(assetManager);
+
         double INNER_RADIUS_KUIPER = 30 * AU;
         double OUTER_RADIUS_KUIPER = 50 * AU;
         double THICKNESS_KUIPER = 10 * AU;
         double SIZE_OF_ASTEROID_KUIPER = 20_000_000;
-        int NUM_OBJECTS_KUIPER = 7_000;
+        int NUM_OBJECTS_KUIPER = 4_000;
         double ROATION_PERIOD_KUIPER = 200 * 325 * 24 * 60 * 60;
         sun.addAsteroidBelt(ROATION_PERIOD_KUIPER, Body.convertion(INNER_RADIUS_KUIPER),
                 Body.convertion(OUTER_RADIUS_KUIPER),
@@ -123,7 +124,7 @@ public class App extends SimpleApplication {
         double OUTER_RADIUS_MAIN = 4.2 * AU;
         double THICKNESS_ASTEROID_MAIN = 1 * AU;
         double SIZE_OF_ASTEROID_MAIN = 3_000_000;
-        int NUM_OBJECTS_ASTEROID_MAIN = 3_000;
+        int NUM_OBJECTS_ASTEROID_MAIN = 2_000;
         double ROATION_PERIOD_MAIN = 4.5 * 325 * 24 * 60 * 60;
         sun.addAsteroidBelt(ROATION_PERIOD_MAIN, Body.convertion(INNER_RADIUS_MAIN),
                 Body.convertion(OUTER_RADIUS_MAIN),
