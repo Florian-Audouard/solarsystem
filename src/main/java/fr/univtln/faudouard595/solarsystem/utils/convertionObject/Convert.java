@@ -12,6 +12,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
+import com.jme3.util.TangentBinormalGenerator;
 
 public class Convert extends SimpleApplication {
 
@@ -22,33 +23,36 @@ public class Convert extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        boolean test = false;
+        boolean override = false;
         flyCam.setMoveSpeed(10);
         for (int i = 1; i < 11; i++) {
             String name = "Asteroid";
             String path = "Models/Asteroid" + i + "/" + name;
             String extention = ".obj";
-            if (new File("src/main/resources/" + path + ".j3o").exists()) {
+            if (!override && !test && new File("src/main/resources/" + path + ".j3o").exists()) {
                 extention = ".j3o";
             }
             Spatial model = assetManager.loadModel(path + extention);
             model.setLocalScale(0.5f);
             rootNode.attachChild(model);
             model.setLocalTranslation(new Vector3f(i * 3, 0, 0));
-            // Material mat = new Material(assetManager,
-            // "Common/MatDefs/Light/Lighting.j3md");
-            // TextureKey key = new TextureKey(path + ".png");
-            // Texture tex = assetManager.loadTexture(key);
-            // mat.setTexture("DiffuseMap", tex);
-            // model.setMaterial(mat);
-            // // Texture normalMap = assetManager.loadTexture("Models/Asteroid1/" + name +
-            // // "_Normal.png");
-            // // mat.setTexture("NormalMap", normalMap);
-            // mat.setBoolean("UseMaterialColors", true);
-            // mat.setColor("Diffuse", ColorRGBA.White);
-            // mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
-            // mat.setColor("Ambient", ColorRGBA.Gray);
-            // mat.setFloat("Shininess", 12f);
-            if (!new File("src/main/resources/" + path + ".j3o").exists()) {
+            Material mat = new Material(assetManager,
+                    "Common/MatDefs/Light/Lighting.j3md");
+            TextureKey key = new TextureKey(path + ".png");
+            Texture tex = assetManager.loadTexture(key);
+            mat.setTexture("DiffuseMap", tex);
+            model.setMaterial(mat);
+            Texture normalMap = assetManager.loadTexture(path + "_normal.png");
+            mat.setTexture("NormalMap", normalMap);
+            TangentBinormalGenerator.generate(model);
+
+            mat.setBoolean("UseMaterialColors", true);
+            mat.setColor("Diffuse", ColorRGBA.White);
+            mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
+            mat.setColor("Ambient", ColorRGBA.Gray);
+            mat.setFloat("Shininess", 12f);
+            if (override || !test && !new File("src/main/resources/" + path + ".j3o").exists()) {
                 try {
                     BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));
                 } catch (Exception e) {
