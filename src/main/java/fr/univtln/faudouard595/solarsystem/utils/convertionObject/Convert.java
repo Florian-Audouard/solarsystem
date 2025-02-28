@@ -39,11 +39,11 @@ public class Convert extends SimpleApplication {
             model.setLocalTranslation(new Vector3f(i * 3, 0, 0));
             Material mat = new Material(assetManager,
                     "Common/MatDefs/Light/Lighting.j3md");
-            TextureKey key = new TextureKey(path + ".png");
+            TextureKey key = new TextureKey(path + ".jpg");
             Texture tex = assetManager.loadTexture(key);
             mat.setTexture("DiffuseMap", tex);
             model.setMaterial(mat);
-            Texture normalMap = assetManager.loadTexture(path + "_normal.png");
+            Texture normalMap = assetManager.loadTexture(path + "_normal.jpg");
             mat.setTexture("NormalMap", normalMap);
             TangentBinormalGenerator.generate(model);
 
