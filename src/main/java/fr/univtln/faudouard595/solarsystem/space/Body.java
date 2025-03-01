@@ -30,8 +30,10 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.util.BufferUtils;
+import com.jme3.util.TangentBinormalGenerator;
 
 import fr.univtln.faudouard595.solarsystem.App;
+import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +45,7 @@ public abstract class Body {
     protected String name;
     private float radius;
     private double realSize;
-    private float scaleSize;
+    private float scaleRadius;
     private Spatial model;
     private Node node;
     private Node rotationNode;
@@ -53,6 +55,7 @@ public abstract class Body {
     protected static final String OBJPATH = "Models/Body/";
     public TYPE type;
     public float scaleMultiplier;
+    protected float saveScaleMultiplier;
     public float objSize;
     private ColorRGBA color;
     private float colorMultiplier;
@@ -62,7 +65,6 @@ public abstract class Body {
     private float rotationInclination;
     public static Body reference;
     public static float referenceSize;
-    public static RESOLUTION planetTexture = RESOLUTION.LOW;
     protected Material circleMat;
     protected Geometry circleGeo;
     public static App app;
@@ -77,21 +79,9 @@ public abstract class Body {
     protected static final NumberFormat formatter = NumberFormat.getInstance(Locale.FRENCH);
     private Node planetNode;
     private List<Belt> belts = new ArrayList<>();
-
-    public enum RESOLUTION {
-        LOW {
-            @Override
-            public String toString() {
-                return "Low";
-            }
-        },
-        HIGH {
-            @Override
-            public String toString() {
-                return "High";
-            }
-        }
-    }
+    protected static float scalePlanet = 1;
+    public static boolean dynamicScale = true;
+    public static float closeScale = 5f;
 
     public enum TYPE {
         OBJ, SPHERE
@@ -106,13 +96,14 @@ public abstract class Body {
         } else {
             this.radius = convertion(size);
         }
-        this.scaleSize = this.radius;
+        this.scaleRadius = this.radius;
         this.rotationPeriod = rotationPeriod * 60 * 60;
         this.rotationInclination = rotationInclination * FastMath.DEG_TO_RAD;
         this.planets = new HashMap<>();
         this.node = new Node(name);
         this.type = type;
         this.scaleMultiplier = 1;
+        this.saveScaleMultiplier = 1;
         this.objSize = 1;
         this.color = color;
         this.rotationNode = new Node(name + "_rotation");
@@ -127,10 +118,17 @@ public abstract class Body {
     }
 
     public static long inverseConvertion(float value) {
-        return ((long) (value / reference.getRadius()) * (long) reference.getRealSize());
+        return (long) (((double) value * reference.getRealSize()) / reference.getRadius());
     }
 
     public float calcObjSize() {
+        if (model == null) {
+            return 1;
+        }
+        if (model instanceof Geometry g) {
+            Sphere sphere = (Sphere) g.getMesh();
+            return sphere.getRadius();
+        }
         BoundingVolume worldBound = model.getWorldBound();
         if (worldBound instanceof BoundingBox) {
             BoundingBox box = (BoundingBox) worldBound;
@@ -145,16 +143,22 @@ public abstract class Body {
     public abstract Material generateMat();
 
     public void generateBody(Node rootNode) {
-
+        log.info("Generate body : {} , radius : {}", name, scaleRadius);
         if (this.type == TYPE.OBJ) {
             this.model = app.getAssetManager().loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();
         } else {
-            Sphere sphere = new Sphere(32, 32, radius);
+            int sphereRadius = 50;
+            Sphere sphere = new Sphere(32, 32, sphereRadius);
             sphere.setTextureMode(Sphere.TextureMode.Projected);
             this.model = new Geometry("Sphere_" + name, sphere);
+            model.setLocalScale(scaleRadius / sphereRadius);
         }
-        model.setMaterial(generateMat());
+        Material mat = generateMat();
+        if (mat.getParam("NormalMap") != null) {
+            TangentBinormalGenerator.generate(model);
+        }
+        model.setMaterial(mat);
         model.setShadowMode(ShadowMode.CastAndReceive);
 
         planetNode.attachChild(model);
@@ -185,11 +189,13 @@ public abstract class Body {
     }
 
     public void scale(float scaleMultiplier) {
-        objSize = calcObjSize();
-        this.scaleMultiplier *= scaleMultiplier;
-        scalePlanets(scaleMultiplier);
-        Float newSize = (getRadius() / getObjSize()) * this.scaleMultiplier;
-        model.setLocalScale(new Vector3f(newSize, newSize, newSize));
+        if (scaleMultiplier == this.scaleMultiplier) {
+            return;
+        }
+        this.scaleMultiplier = scaleMultiplier;
+        node.setLocalScale(scaleMultiplier);
+        scaleRadius = radius * node.getWorldScale().x;
+        planets.values().forEach(planet -> planet.setScaleRadius(planet.getRadius() * node.getWorldScale().x));
 
     }
 
@@ -211,7 +217,6 @@ public abstract class Body {
     }
 
     public void scalePlanets(float scaleMultiplier) {
-        this.scaleSize *= scaleMultiplier;
         planets.values().forEach(planet -> planet.scale(scaleMultiplier));
     }
 
@@ -292,7 +297,7 @@ public abstract class Body {
         Vector3f directionProjectileNormalize = directionProjectile.normalize();
         Vector3f position = getWorldTranslation();
         Vector3f planetToDepart = position.subtract(depart);
-        float radius = scaleSize * multiplierZone;
+        float radius = scaleRadius * multiplierZone;
         float b = 2 * directionProjectileNormalize.dot(planetToDepart);
         float c = planetToDepart.dot(planetToDepart) - (radius * radius);
 
@@ -339,7 +344,7 @@ public abstract class Body {
     }
 
     public boolean isTooSmall() {
-        return getRadius() < 1;
+        return scaleRadius < 1;
     }
 
     public void updateisClickable() {
@@ -395,7 +400,7 @@ public abstract class Body {
     public float get2dRadius() {
 
         Vector2f screenPos2d = getScreenCoordinates();
-        Vector3f radiusPos = cam.getScreenCoordinates(getWorldTranslation().add(cam.getLeft().mult(-radius)));
+        Vector3f radiusPos = cam.getScreenCoordinates(getWorldTranslation().add(cam.getLeft().mult(-scaleRadius)));
         Vector2f screenPos2dRadius = new Vector2f(radiusPos.x, radiusPos.y);
         return screenPos2d.distance(screenPos2dRadius);
     }
@@ -450,12 +455,18 @@ public abstract class Body {
         }
     }
 
+    public void scaleWhenSelected() {
+    }
+
     public void update(double time) {
         rotation(time);
         updateisClickable();
         shouldDisplayCircle();
+        scaleWhenSelected();
         planets.values().forEach(planet -> planet.update(time));
+        planets.values().forEach(planet -> planet.updateOrbit());
         belts.forEach(belt -> belt.update(time));
+
     }
 
     public String displayInformation() {
@@ -473,6 +484,11 @@ public abstract class Body {
         belts.add(belt);
         this.node.attachChild(belt.getBeltNode());
 
+    }
+
+    public void displayWhenSelected() {
+        // log.info("name : {} ,originalRadius : {} , size : {}", name, getRadius(),
+        // getScaleRadius());
     }
 
 }

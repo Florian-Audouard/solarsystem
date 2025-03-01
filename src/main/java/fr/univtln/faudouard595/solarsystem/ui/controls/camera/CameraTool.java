@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CameraTool {
     public static CircularHashMapBody bodies;
     private static Camera cam;
-    private static float distanceFromBody;
+    public static float distanceFromBody;
 
     private static Vector2f lastMousePosition;
 
@@ -43,7 +43,7 @@ public class CameraTool {
     private static boolean isLeftClickPressed = false;
     private static float maxDistance;
     private static float refMaxDistance = 8000;
-    private static float minDistance = 3f;
+    public static float minDistance = 3f;
     private static float lastAngle;
     private static AssetManager assetManager;
     private static boolean cursorSavePlanet = false;
@@ -62,6 +62,7 @@ public class CameraTool {
     public static App app;
 
     public static void init(Camera cam, AssetManager assetManager, InputManager inputManager) {
+
         CameraTool.cam = cam;
         CameraTool.inputManager = inputManager;
         CameraTool.assetManager = assetManager;
@@ -85,9 +86,11 @@ public class CameraTool {
     }
 
     public static void initAngle() {
-        maxDistance = ((refMaxDistance * Body.reference.getScaleSize()) / bodies.getCurrentValue().getScaleSize())
+        maxDistance = ((refMaxDistance * Body.reference.getScaleRadius()) / bodies.getCurrentValue().getScaleRadius())
                 * zoomSpeed;
-        minDistance = Math.max(3, 1.1f / bodies.getCurrentValue().getScaleSize());
+        // minDistance = 1.1f / (bodies.getCurrentValue().getRadius() *
+        // Body.closeScale);
+        minDistance = 3f;
         if (bodies.getCurrentValue() instanceof Planet planet) {
             float angle = (90 + (planet.getCurrentAngle() * FastMath.RAD_TO_DEG));
             setAngleHorizontal(angle);
@@ -132,13 +135,23 @@ public class CameraTool {
         bodies.setMainBodies(mainBodies);
     }
 
-    public static void nextBody() {
+    public static void nextMainBody() {
         bodies.nextMainBody();
         initAngle();
     }
 
-    public static void prevBody() {
+    public static void prevMainBody() {
         bodies.previousMainBody();
+        initAngle();
+    }
+
+    public static void nextBody() {
+        bodies.nextBody();
+        initAngle();
+    }
+
+    public static void prevBody() {
+        bodies.previousBody();
         initAngle();
     }
 
@@ -202,6 +215,8 @@ public class CameraTool {
             float calc = (float) Math.exp(-lambdaSmoothZoom * lastScrollTime) / expSumSmoothZoom;
 
             distanceFromBody += (distanceDifference * calc);
+            // distanceFromBody = Math.max(minDistance, Math.min(maxDistance,
+            // distanceFromBody));
             lastScrollTime++;
         }
         lastMousePosition = inputManager.getCursorPosition().clone();
@@ -209,8 +224,7 @@ public class CameraTool {
 
     public static Vector3f calcCoord() {
         Vector3f bodyPos = bodies.getCurrentValue().getWorldTranslation();
-        float practicalDistance = distanceFromBody * bodies.getCurrentValue().getScaleSize();
-
+        float practicalDistance = distanceFromBody * bodies.getCurrentValue().getScaleRadius();
         float x = bodyPos.x + practicalDistance * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
                 * FastMath.sin(FastMath.DEG_TO_RAD * angleHorizontal);
         float z = bodyPos.z + practicalDistance * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
@@ -222,6 +236,7 @@ public class CameraTool {
 
     public static void calcPos() {
         Vector3f lookAtPos;
+
         if (bodies.getCurrentValue() instanceof Planet planet) {
             Vector3f primaryPos = planet.getPrimary().getWorldTranslation();
 
@@ -283,7 +298,7 @@ public class CameraTool {
                     return espilonEqualsVector2d(cursorPos, bodiesScreenPos2d, ratioPixel * 2f)
                             || a.collision(camPos, clickDirection, 1f);
                 })
-                .max(Comparator.comparingDouble(Body::getScaleSize));
+                .max(Comparator.comparingDouble(Body::getScaleRadius));
         if (clickableBodies.isPresent()) {
             clickableBodies.get().modifColorMult(true);
             bodies.stream()
@@ -304,9 +319,9 @@ public class CameraTool {
         Optional<Body> optionalBody = primaryList.stream()
                 .filter(Body::isActualDisplayCircle)
                 .filter(a -> a.collisionCircle(testedBody))
-                .max(Comparator.comparingDouble(Body::getScaleSize));
+                .max(Comparator.comparingDouble(Body::getScaleRadius));
         if (optionalBody.isPresent()) {
-            if (testedBody.getScaleSize() > optionalBody.get().getScaleSize()) {
+            if (testedBody.getScaleRadius() > optionalBody.get().getScaleRadius()) {
                 res = true;
             }
         } else {
@@ -319,7 +334,7 @@ public class CameraTool {
         Body primary = Body.reference;
         List<Body> primaryList = new ArrayList<>(primary.getEveryBodies());
         primaryList.add(primary);
-        primaryList.sort(Comparator.comparingDouble(Body::getScaleSize));
+        primaryList.sort(Comparator.comparingDouble(Body::getScaleRadius));
         primaryList.forEach(a -> updateCircle(a, primaryList));
     }
 
@@ -342,7 +357,7 @@ public class CameraTool {
             updateCursor();
         }
         updateAllCircle();
-
+        bodies.getCurrentValue().displayWhenSelected();
     }
 
 }

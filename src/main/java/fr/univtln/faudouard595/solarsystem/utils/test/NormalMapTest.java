@@ -25,19 +25,20 @@ public class NormalMapTest extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         flyCam.setMoveSpeed(10);
-        String planet = "Moon";
+        String planet = "Mars";
+        String path = "Textures/Body/" + planet + "/" + planet;
         Sphere sphere = new Sphere(32, 32, 5);
         sphere.setTextureMode(Sphere.TextureMode.Projected);
-        model = new Geometry("Sphere_moon", sphere);
+        model = new Geometry("Sphere", sphere);
         Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         mat.setBoolean("UseMaterialColors", true);
         mat.setColor("Diffuse", ColorRGBA.White);
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.Gray);
         mat.setFloat("Shininess", 12f);
-        mat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Body/Low/" + planet + ".jpg"));
+        mat.setTexture("DiffuseMap", assetManager.loadTexture(path + "_Color.jpg"));
 
-        Texture normalMap = assetManager.loadTexture("Textures/Body/Low/" + planet + "_normal.jpg");
+        Texture normalMap = assetManager.loadTexture(path + "_Normal.jpg");
         mat.setTexture("NormalMap", normalMap);
         TangentBinormalGenerator.generate(model);
 

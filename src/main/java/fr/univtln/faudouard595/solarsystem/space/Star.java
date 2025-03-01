@@ -21,7 +21,8 @@ public class Star extends Body {
     public Material generateMat() {
         Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setTexture("ColorMap",
-                app.getAssetManager().loadTexture(TEXTUREPATH + Body.planetTexture + "/" + super.getName() + ".jpg"));
+                app.getAssetManager()
+                        .loadTexture(TEXTUREPATH + super.getName() + "/" + super.getName() + "_Color.jpg"));
         return mat;
     }
 

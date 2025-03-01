@@ -60,10 +60,10 @@ public class TriggerControls {
                 app.getSun().switchDisplayLines();
             }
             if (keyPressed && name.equals("nextAstre")) {
-                CameraTool.nextBody();
+                CameraTool.nextMainBody();
             }
             if (keyPressed && name.equals("prevAstre")) {
-                CameraTool.prevBody();
+                CameraTool.prevMainBody();
             }
             if (keyPressed && name.equals("Pause")) {
                 app.isPause = !app.isPause;

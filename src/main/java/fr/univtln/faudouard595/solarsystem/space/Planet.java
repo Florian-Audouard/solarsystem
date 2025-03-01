@@ -21,6 +21,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
+import com.jme3.util.TangentBinormalGenerator;
 
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import lombok.Getter;
@@ -78,7 +79,7 @@ public class Planet extends Body {
     }
 
     public void generateLine() {
-        int numPoints = (int) Body.reference.getScaleSize() * 5;
+        int numPoints = (int) 3000;
         Vector3f[] points = new Vector3f[numPoints];
         IntStream.range(0, numPoints).forEach(i -> {
             points[i] = calcTrajectory(i * orbitalPeriod / (numPoints - 1));
@@ -95,22 +96,26 @@ public class Planet extends Body {
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.Gray);
         mat.setFloat("Shininess", 12f);
-        String texturePath = Body.TEXTUREPATH + Body.planetTexture + "/" + super.getName() + ".jpg";
+        String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Color.jpg";
         File f = new File("src/main/resources/" + texturePath);
         if (!f.exists()) {
             String randomTexture = app.ASTEROID_MODELS.get(app.random.nextInt(app.ASTEROID_MODELS.size()));
-            texturePath = Body.TEXTUREPATH + "Low/" + randomTexture + ".jpg";
+            texturePath = Body.TEXTUREPATH + randomTexture + "_Color.jpg";
         }
         mat.setTexture("DiffuseMap", app.getAssetManager().loadTexture(texturePath));
-
+        String normalPath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Normal.jpg";
+        File normalFile = new File("src/main/resources/" + normalPath);
+        if (normalFile.exists()) {
+            Texture normalMap = app.getAssetManager().loadTexture(normalPath);
+            mat.setTexture("NormalMap", normalMap);
+        }
         return mat;
-
     }
 
     private Geometry createPlanetRings() {
         int segments = 64;
-        float innerRadius = super.getRadius() * 1.236145f;
-        float outerRadius = super.getRadius() * 2.27318f;
+        float innerRadius = super.getScaleRadius() * 1.236145f;
+        float outerRadius = super.getScaleRadius() * 2.27318f;
 
         Mesh ringMesh = new Mesh();
         Vector3f[] vertices = new Vector3f[segments * 2];
@@ -149,7 +154,7 @@ public class Planet extends Body {
 
         Geometry ringGeo = new Geometry(name + "_Ring", ringMesh);
         Material ringMat = new Material(Body.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        Texture ringTexture = Body.app.getAssetManager().loadTexture(TEXTUREPATH + Body.planetTexture + "/Ring.png");
+        Texture ringTexture = Body.app.getAssetManager().loadTexture(TEXTUREPATH + "Ring.jpg");
         ringTexture.setWrap(Texture.WrapMode.EdgeClamp); // Empêche la répétition
 
         ringMat.setTexture("ColorMap", ringTexture);
@@ -171,6 +176,10 @@ public class Planet extends Body {
     }
 
     public void generateBody(Node node) {
+
+        if (!primary.equals(reference)) {
+            semimajorAxis *= Body.scalePlanet;
+        }
         super.generateBody(node);
         generateLine();
         lineMaterial = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -185,6 +194,7 @@ public class Planet extends Body {
         circleGeo.setCullHint(Spatial.CullHint.Always);
         circleText.setText("");
         generateRing();
+
     }
 
     public float getAngle(double time) {
@@ -192,8 +202,7 @@ public class Planet extends Body {
     }
 
     public Vector3f calcTrajectory(double time, float add) {
-        float workingDistance = super.getScaleSize() + primary.getScaleSize()
-                + add + ((semimajorAxis) * distanceMultiplier);
+        float workingDistance = add + ((semimajorAxis) * distanceMultiplier);
         float angle = -getAngle(time);
         float x = FastMath.cos(angle) * workingDistance * (1 - eccentricity * eccentricity)
                 / (1 + eccentricity * FastMath.cos(angle));
@@ -209,12 +218,6 @@ public class Planet extends Body {
         return calcTrajectory(time, 0);
     }
 
-    @Override
-    public void scale(float scaleMultiplier) {
-        super.scale(scaleMultiplier);
-        generateLine();
-    }
-
     public void changeDistance(float distanceMultiplier) {
         super.changeDistancePlanets(distanceMultiplier);
         this.distanceMultiplier = distanceMultiplier;
@@ -226,6 +229,16 @@ public class Planet extends Body {
         currentAngle = getAngle(time);
         super.getNode().setLocalTranslation(position);
 
+    }
+
+    public void updateOrbit() {
+        if (saveScaleMultiplier == scaleMultiplier &&
+                primary.saveScaleMultiplier == primary.scaleMultiplier) {
+            return;
+        }
+
+        saveScaleMultiplier = scaleMultiplier;
+        generateLine();
     }
 
     public void update(double time) {
@@ -271,7 +284,7 @@ public class Planet extends Body {
     }
 
     public float getDistanceFromPrimary() {
-        return primary.getWorldTranslation().distance(super.getWorldTranslation());
+        return primary.getWorldTranslation().distance(super.getWorldTranslation()) / (getScaleRadius() / getRadius());
     }
 
     public long getActualDistanceFromPrimary() {
@@ -288,4 +301,30 @@ public class Planet extends Body {
         return res;
     }
 
+    @Override
+    public void scaleWhenSelected() {
+        if (!Body.dynamicScale) {
+            return;
+        }
+        if (!reference.equals(primary)) {
+            return;
+        }
+        if (!CameraTool.bodies.getCurrentValue().equals(this)
+                && !getPlanets().values().stream()
+                        .anyMatch(p -> p.equals(CameraTool.bodies.getCurrentValue()))) {
+            scale(1f);
+            return;
+        }
+
+        float scale = (closeScale * CameraTool.minDistance
+                / CameraTool.distanceFromBody) / CameraTool.bodies.getCurrentValue().getRadius();
+        scale = Math.max(1f, scale);
+        scale(scale);
+
+    }
+
+    @Override
+    public void displayWhenSelected() {
+        super.displayWhenSelected();
+    }
 }

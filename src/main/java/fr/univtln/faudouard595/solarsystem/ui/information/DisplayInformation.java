@@ -42,7 +42,7 @@ public class DisplayInformation {
         labelBackground.attachChild(nameLabel);
         labelBackground.attachChild(label);
         app.getGuiNode().attachChild(labelBackground);
-        MyButton prevButton = MyButton.builder()
+        MyButton prevMainButton = MyButton.builder()
                 .text("⏪")
                 .guiNode(app.getGuiNode())
                 .x(paddingBackground + 25 + 5)
@@ -52,12 +52,33 @@ public class DisplayInformation {
                 .fontSize(30)
                 .build()
                 .init();
+        prevMainButton.setActionFunction(b -> CameraTool.prevMainBody());
+        MyButton prevButton = MyButton.builder()
+                .text("◀️")
+                .guiNode(app.getGuiNode())
+                .x(paddingBackground + 25 + 5 + 50)
+                .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
+                .preferedSizeWidth(50)
+                .preferedSizeHeight(45)
+                .fontSize(30)
+                .build()
+                .init();
         prevButton.setActionFunction(b -> CameraTool.prevBody());
-
-        MyButton nextButton = MyButton.builder()
+        MyButton nextMainButton = MyButton.builder()
                 .text("⏩")
                 .guiNode(app.getGuiNode())
                 .x(paddingBackground + app.getCamera().getWidth() / 4 - paddingBackground - 25 - 5)
+                .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
+                .preferedSizeWidth(50)
+                .preferedSizeHeight(45)
+                .fontSize(30)
+                .build()
+                .init();
+        nextMainButton.setActionFunction(b -> CameraTool.nextMainBody());
+        MyButton nextButton = MyButton.builder()
+                .text("▶️")
+                .guiNode(app.getGuiNode())
+                .x(paddingBackground + app.getCamera().getWidth() / 4 - paddingBackground - 25 - 5 - 50)
                 .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
                 .preferedSizeWidth(50)
                 .preferedSizeHeight(45)

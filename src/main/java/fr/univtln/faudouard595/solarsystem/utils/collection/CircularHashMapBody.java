@@ -53,4 +53,20 @@ public class CircularHashMapBody extends CircularHashMap<String, Body> {
         return current;
     }
 
+    public Body previousBody() {
+        Body saveBody = current;
+        while (current.equals(saveBody)) {
+            prevValue();
+        }
+        return current;
+    }
+
+    public Body nextBody() {
+        Body saveBody = current;
+        while (current.equals(saveBody)) {
+            nextValue();
+        }
+        return current;
+    }
+
 }
