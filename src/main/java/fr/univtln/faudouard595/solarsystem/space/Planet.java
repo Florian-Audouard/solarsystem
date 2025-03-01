@@ -150,15 +150,18 @@ public class Planet extends Body {
         ringMesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
         ringMesh.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoords));
         ringMesh.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indices));
+
         ringMesh.updateBound();
 
         Geometry ringGeo = new Geometry(name + "_Ring", ringMesh);
         Material ringMat = new Material(Body.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        Texture ringTexture = Body.app.getAssetManager().loadTexture(TEXTUREPATH + "Ring.jpg");
-        ringTexture.setWrap(Texture.WrapMode.EdgeClamp); // Empêche la répétition
+        Texture ringTexture = Body.app.getAssetManager()
+                .loadTexture(Body.TEXTUREPATH + super.getName() + "/" + "Ring_Color.jpg");
 
         ringMat.setTexture("ColorMap", ringTexture);
-        ringMat.getAdditionalRenderState().setBlendMode(com.jme3.material.RenderState.BlendMode.Alpha);
+
+        ringMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        ringMat.getAdditionalRenderState().setDepthWrite(true);
         ringMat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
 
         ringGeo.setMaterial(ringMat);
