@@ -4,3 +4,4 @@ target
 **.stl
 **.mtl
 **.ply
+*.log

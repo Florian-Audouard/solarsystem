@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Planet extends Body {
     private Optional<Spatial> nightModel;
     private Optional<Spatial> cloudModel;
+    private Optional<Spatial> atmospherModel;
     private Node nightNode;
     private float eccentricity;
     private double orbitalPeriod;
@@ -80,6 +81,7 @@ public class Planet extends Body {
         }
         this.nightModel = Optional.empty();
         this.cloudModel = Optional.empty();
+        this.atmospherModel = Optional.empty();
     }
 
     public void generateLine() {
@@ -166,14 +168,16 @@ public class Planet extends Body {
         if (!enableAtmosphere) {
             return;
         }
-        String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Atmosphere.png";
+        String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Atmosphere.jpg";
         File f = new File("src/main/resources/" + texturePath);
         if (!f.exists()) {
             return;
         }
-        Spatial atmosphere = generateTransparentSphere(texturePath, 1);
-        atmosphere.scale(1.3f);
-        super.getNode().attachChild(atmosphere);
+        Spatial atmosphere = generateTransparentSphere(texturePath, 0.1f);
+        atmosphere.scale(1.05f);
+        atmospherModel = Optional.of(atmosphere);
+        Node atmosphereNode = attachCorrectNode(atmosphere);
+        super.getNode().attachChild(atmosphereNode);
     }
 
     public void generateCloud() {
@@ -187,7 +191,7 @@ public class Planet extends Body {
         }
         Spatial cloud = generateTransparentSphere(texturePath, 0.5f);
         cloudModel = Optional.of(cloud);
-        cloud.scale(1.02f);
+        cloud.scale(1.03f);
         Node cloudNode = attachCorrectNode(cloud);
         super.getNode().attachChild(cloudNode);
     }
@@ -289,21 +293,13 @@ public class Planet extends Body {
     @Override
     public void rotation(double time) {
         super.rotation(time);
-
-        nightModel.ifPresent(spatial -> {
-            Quaternion rotation = new Quaternion().fromAngles(
-                    0,
-                    0,
-                    calcRoatation(time));
-            spatial.setLocalRotation(rotation);
-        });
-        cloudModel.ifPresent(spatial -> {
-            Quaternion rotation = new Quaternion().fromAngles(
-                    0,
-                    0,
-                    calcRoatation(time));
-            spatial.setLocalRotation(rotation);
-        });
+        Quaternion rotation = new Quaternion().fromAngles(
+                0,
+                0,
+                calcRoatation(time));
+        nightModel.ifPresent(spatial -> spatial.setLocalRotation(rotation));
+        cloudModel.ifPresent(spatial -> spatial.setLocalRotation(rotation));
+        atmospherModel.ifPresent(spatial -> spatial.setLocalRotation(rotation));
     }
 
     public float getAngle(double time) {

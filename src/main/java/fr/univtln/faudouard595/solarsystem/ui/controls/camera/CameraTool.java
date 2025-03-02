@@ -43,7 +43,7 @@ public class CameraTool {
     private static boolean isLeftClickPressed = false;
     private static float maxDistance;
     private static float refMaxDistance = 8000;
-    public static float minDistance = 1.5f;
+    public static float minDistance = 3f;
     private static float lastAngle;
     private static AssetManager assetManager;
     private static boolean cursorSavePlanet = false;
