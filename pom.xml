@@ -64,54 +64,16 @@
       <artifactId>jme3-lwjgl3</artifactId>
       <version>${jme3_v}</version>
     </dependency>
+
 <!-- test -->
-    <dependency>
-      <groupId>${jme3_g}</groupId>
-      <artifactId>jme3-networking</artifactId>
-      <version>${jme3_v}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>${jme3_g}</groupId>
-      <artifactId>jme3-niftygui</artifactId>
-      <version>${jme3_v}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>${jme3_g}</groupId>
-      <artifactId>jme3-plugins</artifactId>
-      <version>${jme3_v}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>${jme3_g}</groupId>
-      <artifactId>jme3-terrain</artifactId>
-      <version>${jme3_v}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>${jme3_g}</groupId>
-      <artifactId>jme3-vr</artifactId>
-      <version>${jme3_v}</version>
-    </dependency>
-    <dependency>
+      <dependency>
       <groupId>${jme3_g}</groupId>
       <artifactId>jme3-testdata</artifactId>
       <version>${jme3_v}</version>
     </dependency>
+    <!-- test/ -->
 
-        <dependency>
-      <groupId>${jme3_g}</groupId>
-      <artifactId>jme3-jbullet</artifactId>
-      <version>${jme3_v}</version>
-    </dependency>
 
-    <dependency>
-      <groupId>${jme3_g}</groupId>
-      <artifactId>jme3-jogg</artifactId>
-      <version>${jme3_v}</version>
-    </dependency>
-<!-- test -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
@@ -154,8 +116,17 @@
         <!-- default lifecycle, jar packaging: see
         https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>3.3.0</version>
+          <executions>
+              <execution>
+                  <phase>process-resources</phase>
+                  <goals>
+                      <goal>resources</goal>
+                  </goals>
+              </execution>
+          </executions>
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -205,6 +176,7 @@
             </execution>
           </executions>
         </plugin>
+
       </plugins>
   </build>
 </project>

@@ -2,6 +2,7 @@ package fr.univtln.faudouard595.solarsystem.utils.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,6 +22,7 @@ import com.jme3.math.ColorRGBA;
 import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.space.Star;
 import fr.univtln.faudouard595.solarsystem.space.Body.TYPE;
+import fr.univtln.faudouard595.solarsystem.utils.file.MyLoadFile;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,7 +31,7 @@ public class ApiBodyInfo {
     private HttpClient client;
     private Map<String, Body> astres;;
     private JsonNode bodyJsonNode;
-    private static String filePath = "src/main/resources/Data/body.json";
+    private static String filePath = "Data/body.json";
     private ObjectMapper mapper;
     private ObjectNode fileNode;
     File file;
@@ -41,7 +43,7 @@ public class ApiBodyInfo {
         this.client = HttpClient.newHttpClient();
         this.astres = new HashMap<>();
         this.mapper = new ObjectMapper();
-        this.file = new File(filePath);
+        this.file = MyLoadFile.loadFile(filePath).get();
     }
 
     public void fillFileNodeList(Collection<ApiData> urls) {
@@ -97,7 +99,7 @@ public class ApiBodyInfo {
 
     public void verifFile(Collection<DataCreationNeeded> data) {
         try {
-            if (!file.exists()) {
+            if (!MyLoadFile.fileExists(filePath)) {
                 log.info("File not found");
                 createFile(data);
             }

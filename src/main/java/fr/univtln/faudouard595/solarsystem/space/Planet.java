@@ -25,6 +25,7 @@ import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
 
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.utils.file.MyLoadFile;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -103,15 +104,13 @@ public class Planet extends Body {
         mat.setColor("Ambient", ColorRGBA.White.mult(0.5f));
         mat.setFloat("Shininess", 6f);
         String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Color.jpg";
-        File f = new File("src/main/resources/" + texturePath);
-        if (!f.exists()) {
+        if (!MyLoadFile.fileExists(texturePath)) {
             String randomTexture = app.ASTEROID_MODELS.get(app.random.nextInt(app.ASTEROID_MODELS.size()));
             texturePath = Body.TEXTUREPATH + randomTexture + "_Color.jpg";
         }
         mat.setTexture("DiffuseMap", app.getAssetManager().loadTexture(texturePath));
         String normalPath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Normal.jpg";
-        File normalFile = new File("src/main/resources/" + normalPath);
-        if (normalFile.exists()) {
+        if (MyLoadFile.fileExists(normalPath)) {
             Texture normalMap = app.getAssetManager().loadTexture(normalPath);
             mat.setTexture("NormalMap", normalMap);
         }
@@ -153,8 +152,7 @@ public class Planet extends Body {
             return;
         }
         String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Night.png";
-        File f = new File("src/main/resources/" + texturePath);
-        if (!f.exists()) {
+        if (!MyLoadFile.fileExists(texturePath)) {
             return;
         }
 
@@ -169,8 +167,7 @@ public class Planet extends Body {
             return;
         }
         String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Atmosphere.jpg";
-        File f = new File("src/main/resources/" + texturePath);
-        if (!f.exists()) {
+        if (!MyLoadFile.fileExists(texturePath)) {
             return;
         }
         Spatial atmosphere = generateTransparentSphere(texturePath, 0.1f);
@@ -185,8 +182,7 @@ public class Planet extends Body {
             return;
         }
         String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Cloud.png";
-        File f = new File("src/main/resources/" + texturePath);
-        if (!f.exists()) {
+        if (!MyLoadFile.fileExists(texturePath)) {
             return;
         }
         Spatial cloud = generateTransparentSphere(texturePath, 0.5f);
@@ -256,8 +252,7 @@ public class Planet extends Body {
 
     public void generateRing() {
         String texturePath = Body.TEXTUREPATH + super.getName() + "/Ring_Color.jpg";
-        File f = new File("src/main/resources/" + texturePath);
-        if (!f.exists()) {
+        if (!MyLoadFile.fileExists(texturePath)) {
             return;
         }
         Geometry ringGeo = createPlanetRings(texturePath);
