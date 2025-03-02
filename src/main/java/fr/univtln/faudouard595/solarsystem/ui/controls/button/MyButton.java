@@ -10,20 +10,24 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.simsilica.lemur.Button;
 import com.simsilica.lemur.Command;
+import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.HAlignment;
 import com.simsilica.lemur.VAlignment;
 import com.simsilica.lemur.event.MouseEventControl;
+import com.simsilica.lemur.event.KeyInterceptState;
 import com.simsilica.lemur.event.MouseListener;
 
 import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Builder
 @AllArgsConstructor
+@Getter
 public class MyButton implements Updatable {
     private Button button;
     private String text;
@@ -61,6 +65,10 @@ public class MyButton implements Updatable {
     @Builder.Default
     private int currentSpeed = 0;
 
+    @Builder.Default
+    private Runnable updateFunction = () -> {
+    };
+
     public static App app;
 
     public MyButton init() {
@@ -69,14 +77,13 @@ public class MyButton implements Updatable {
         float width = preferedSizeWidth == -1 ? prefSize.x : preferedSizeWidth;
         float height = preferedSizeHeight == -1 ? prefSize.y : preferedSizeHeight;
         button.setFont(app.font);
-        button.setFontSize(fontSize); // Set the text size to 20
+        button.setFontSize(fontSize);
         button.setPreferredSize(new Vector3f(width, height, prefSize.z));
         button.setTextHAlignment(HAlignment.Center);
         button.setTextVAlignment(VAlignment.Center);
         button.setColor(defaultColor);
         button.addClickCommands(actionFunction);
         button.setLocalTranslation(x - (width / 2), y + height / 2, 0);
-
         MouseEventControl.addListenersToSpatial(button, new MouseListener() {
             @Override
             public void mouseButtonEvent(MouseButtonEvent event, Spatial target, Spatial capture) {
@@ -86,6 +93,7 @@ public class MyButton implements Updatable {
                     isAnalog = false;
                 } else {
                     button.setColor(hoverColor);
+                    GuiGlobals.getInstance().releaseFocus(button);
                 }
             }
 
@@ -105,6 +113,7 @@ public class MyButton implements Updatable {
             public void mouseMoved(MouseMotionEvent event, Spatial target, Spatial capture) {
             }
         });
+
         guiNode.attachChild(button);
         return this;
     }
@@ -113,7 +122,14 @@ public class MyButton implements Updatable {
         button.addClickCommands(command);
     }
 
+    public void setUpdateFunction(Runnable command) {
+        updateFunction = command;
+    }
+
     public void setText(String text) {
+        if (button.getText().equals(text)) {
+            return;
+        }
         button.setText(text);
     }
 
@@ -133,6 +149,8 @@ public class MyButton implements Updatable {
             }
             currentSpeed++;
         }
+        updateFunction.run();
+
     }
 
 }

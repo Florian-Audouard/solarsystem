@@ -43,7 +43,7 @@ public class CameraTool {
     private static boolean isLeftClickPressed = false;
     private static float maxDistance;
     private static float refMaxDistance = 8000;
-    public static float minDistance = 3f;
+    public static float minDistance = 1.5f;
     private static float lastAngle;
     private static AssetManager assetManager;
     private static boolean cursorSavePlanet = false;
@@ -88,9 +88,6 @@ public class CameraTool {
     public static void initAngle() {
         maxDistance = ((refMaxDistance * Body.reference.getScaleRadius()) / bodies.getCurrentValue().getScaleRadius())
                 * zoomSpeed;
-        // minDistance = 1.1f / (bodies.getCurrentValue().getRadius() *
-        // Body.closeScale);
-        minDistance = 3f;
         if (bodies.getCurrentValue() instanceof Planet planet) {
             float angle = (90 + (planet.getCurrentAngle() * FastMath.RAD_TO_DEG));
             setAngleHorizontal(angle);

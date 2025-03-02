@@ -25,7 +25,7 @@ public class NormalMapTest extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         flyCam.setMoveSpeed(10);
-        String planet = "Mars";
+        String planet = "Earth";
         String path = "Textures/Body/" + planet + "/" + planet;
         Sphere sphere = new Sphere(32, 32, 5);
         sphere.setTextureMode(Sphere.TextureMode.Projected);

@@ -42,6 +42,7 @@ public class ButtonControl {
 
         app.getGuiNode().attachChild(speedText);
 
+        // pause.setText(app.isPause ? "⏵" : "⏸");
         MyButton pause = MyButton.builder()
                 .text("⏸")
                 .guiNode(app.getGuiNode())
@@ -50,12 +51,10 @@ public class ButtonControl {
                 .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
                 .fontSize(controlButtonTextSize)
+                .actionFunction(b -> app.isPause = !app.isPause)
                 .build()
                 .init();
-        pause.setActionFunction(b -> {
-            app.isPause = !app.isPause;
-            pause.setText(app.isPause ? "⏵" : "⏸");
-        });
+        pause.setUpdateFunction(() -> pause.setText(app.isPause ? "⏵" : "⏸"));
         updatables.add(pause);
         updatables.add(MyButton.builder()
                 .text("⏩")

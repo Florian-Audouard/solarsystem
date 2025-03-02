@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import com.jme3.bounding.BoundingBox;
@@ -48,7 +49,7 @@ public abstract class Body {
     private float scaleRadius;
     private Spatial model;
     private Node node;
-    private Node rotationNode;
+    private Node rotationOrbitalNode;
     private Map<String, Planet> planets;
     private double rotationPeriod;
     protected static final String TEXTUREPATH = "Textures/Body/";
@@ -78,10 +79,16 @@ public abstract class Body {
     protected boolean shouldBeDisplayed = true;
     protected static final NumberFormat formatter = NumberFormat.getInstance(Locale.FRENCH);
     private Node planetNode;
-    private List<Belt> belts = new ArrayList<>();
+    private List<AsteroidBelt> belts = new ArrayList<>();
     protected static float scalePlanet = 1;
     public static boolean dynamicScale = true;
-    public static float closeScale = 5f;
+    public static float closeScale = 10f;
+    public static int sphereSample = 32;
+    public static int nightSphereSample = 128;
+    public static int sphereRadius = 50;
+    public static boolean enableNightTexture = true;
+    public static boolean enableAtmosphere = true;
+    public static boolean enableCloud = true;
 
     public enum TYPE {
         OBJ, SPHERE
@@ -106,7 +113,7 @@ public abstract class Body {
         this.saveScaleMultiplier = 1;
         this.objSize = 1;
         this.color = color;
-        this.rotationNode = new Node(name + "_rotation");
+        this.rotationOrbitalNode = new Node(name + "_rotationOrbital");
         this.planetNode = new Node(name + "_planet");
         this.colorMultiplier = 0.5f;
         this.displayLines = true;
@@ -148,8 +155,11 @@ public abstract class Body {
             this.model = app.getAssetManager().loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();
         } else {
-            int sphereRadius = 50;
-            Sphere sphere = new Sphere(32, 32, sphereRadius);
+            int customSphereSample = sphereSample;
+            if (enableNightTexture && name.equals("Earth")) {
+                customSphereSample = nightSphereSample;
+            }
+            Sphere sphere = new Sphere(customSphereSample, customSphereSample, sphereRadius);
             sphere.setTextureMode(Sphere.TextureMode.Projected);
             this.model = new Geometry("Sphere_" + name, sphere);
             model.setLocalScale(scaleRadius / sphereRadius);
@@ -165,24 +175,27 @@ public abstract class Body {
         planetNode
                 .setLocalRotation(new Quaternion().fromAngles(FastMath.DEG_TO_RAD * (-90f),
                         0, 0));
-        rotationNode.attachChild(planetNode);
+        rotationOrbitalNode.attachChild(planetNode);
 
-        node.attachChild(rotationNode);
+        node.attachChild(rotationOrbitalNode);
         rootNode.attachChild(node);
         circleGeo = createCircle();
         guiNode.attachChild(circleGeo);
+    }
+
+    public float calcRoatation(double time) {
+        double rotationSpeed = FastMath.TWO_PI / rotationPeriod;
+        return (float) ((rotationSpeed * time) % FastMath.TWO_PI);
     }
 
     public void rotation(double time) {
         if (rotationPeriod == 0) {
             return;
         }
-        double rotationSpeed = FastMath.TWO_PI / rotationPeriod;
-        float rotationZ = (float) ((rotationSpeed * time) % FastMath.TWO_PI);
         Quaternion rotation = new Quaternion().fromAngles(
                 0,
                 0,
-                rotationZ);
+                calcRoatation(time));
 
         model.setLocalRotation(rotation);
 
@@ -201,12 +214,11 @@ public abstract class Body {
 
     public Planet addPlanet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
             float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
-            float argPeriapsis, float mainAnomaly, TYPE type, ColorRGBA lineColor,
-            boolean ring) {
+            float argPeriapsis, float mainAnomaly, TYPE type, ColorRGBA lineColor) {
         Planet planet = new Planet(name, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
                 orbitalInclination, rotationInclination, longAscNode,
                 argPeriapsis, mainAnomaly, this,
-                type, lineColor, ring);
+                type, lineColor);
         planet.generateBody(node);
         planets.put(name, planet);
         return planet;
@@ -479,7 +491,7 @@ public abstract class Body {
     public void addAsteroidBelt(double rotation, float innerRadius, float outerRadius, float heightVariation,
             float sizeOfAsteroid,
             int numObjects) {
-        Belt belt = new Belt(rotation).generateAsteroidBelt(innerRadius, outerRadius, heightVariation, sizeOfAsteroid,
+        AsteroidBelt belt = new AsteroidBelt(rotation).generateAsteroidBelt(innerRadius, outerRadius, heightVariation, sizeOfAsteroid,
                 numObjects);
         belts.add(belt);
         this.node.attachChild(belt.getBeltNode());

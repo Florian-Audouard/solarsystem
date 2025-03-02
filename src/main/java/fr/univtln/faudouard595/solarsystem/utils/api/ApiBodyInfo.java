@@ -119,12 +119,12 @@ public class ApiBodyInfo {
         for (DataCreationNeeded entry : data) {
             String name = entry.getName();
             ColorRGBA color = entry.getColor();
-            createBody(name, entry.isRing(), TYPE.SPHERE, color);
+            createBody(name, TYPE.SPHERE, color);
         }
         List<String> remaining = bodyJsonNode.findValuesAsText("id").stream()
                 .filter(id -> !astres.containsKey(id))
                 .toList();
-        remaining.forEach(id -> createBody(id, false, type, null));
+        remaining.forEach(id -> createBody(id, type, null));
         return astres.get(data.get(0).getName());
     }
 
@@ -146,7 +146,7 @@ public class ApiBodyInfo {
         return jsonNode;
     }
 
-    public Body createBody(String name, boolean ring, TYPE type, ColorRGBA color) {
+    public Body createBody(String name, TYPE type, ColorRGBA color) {
         JsonNode JsonNode = bodyJsonNode.get(name);
         Body body = null;
 
@@ -172,7 +172,7 @@ public class ApiBodyInfo {
             }
             body = ref.addPlanet(nameBody, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
                     orbitalInclination,
-                    rotationInclination, longAscNode, argPeriapsis, mainAnomaly, type, color, ring);
+                    rotationInclination, longAscNode, argPeriapsis, mainAnomaly, type, color);
         }
         astres.put(id, body);
         return body;

@@ -15,10 +15,5 @@ public class DataCreationNeeded {
     private String name;
     private ColorRGBA color;
     private int numberOfMoons;
-    private boolean ring;
-
-    public DataCreationNeeded(String name, ColorRGBA color, int numberOfMoons) {
-        this(name, color, numberOfMoons, false);
-    }
 
 }
