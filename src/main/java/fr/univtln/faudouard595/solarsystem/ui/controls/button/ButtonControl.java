@@ -39,13 +39,12 @@ public class ButtonControl {
         speedText = app.font.createLabel("");
         speedText.setSize(32);
         speedText.setColor(ColorRGBA.White);
-
-        app.getGuiNode().attachChild(speedText);
+        app.getMyGuiNode().attachChild(speedText);
 
         // pause.setText(app.isPause ? "⏵" : "⏸");
         MyButton pause = MyButton.builder()
                 .text("⏸")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(app.getCamera().getWidth() / 2)
                 .y(positionYFlowButton)
                 .preferedSizeWidth(widthFlowButton)
@@ -58,7 +57,7 @@ public class ButtonControl {
         updatables.add(pause);
         updatables.add(MyButton.builder()
                 .text("⏩")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(app.getCamera().getWidth() / 2 + pause.getSize().x / 2 + 30)
                 .y(positionYFlowButton)
                 .preferedSizeWidth(widthFlowButton)
@@ -69,7 +68,7 @@ public class ButtonControl {
                 .init());
         updatables.add(MyButton.builder()
                 .text("⏪")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(app.getCamera().getWidth() / 2 - pause.getSize().x / 2 - 30)
                 .y(positionYFlowButton)
                 .preferedSizeWidth(widthFlowButton)
@@ -80,7 +79,7 @@ public class ButtonControl {
                 .init());
         MyButton lineDisplay = MyButton.builder()
                 .text("✦")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(app.getCamera().getWidth() - 50)
                 .y(app.getCamera().getHeight() - 50)
                 .preferedSizeWidth(widthFlowButton)
@@ -95,7 +94,7 @@ public class ButtonControl {
         timeText = app.font.createLabel("");
         timeText.setSize(40);
         timeText.setColor(ColorRGBA.White);
-        app.getGuiNode().attachChild(timeText);
+        app.getMyGuiNode().attachChild(timeText);
     }
 
     public static void updateSpeedText() {

@@ -58,7 +58,7 @@ public class Planet extends Body {
             float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
             float argPeriapsis, float mainAnomaly, Body primary, TYPE type,
             ColorRGBA color) {
-        super(name, size, rotationPeriod, rotationInclination, type, color);
+        super(primary.getNode(),name, size, rotationPeriod, rotationInclination, type, color);
 
         this.semimajorAxis = convertion(semimajorAxis);
         this.realSemimajorAxis = (int) semimajorAxis;
@@ -260,12 +260,12 @@ public class Planet extends Body {
     }
 
     @Override
-    public void generateBody(Node node) {
+    public void generateBody() {
 
         if (!primary.equals(reference)) {
             semimajorAxis *= Body.scalePlanet;
         }
-        super.generateBody(node);
+        super.generateBody();
         generateNightModel();
         generateAtmosphere();
         generateCloud();
@@ -275,7 +275,7 @@ public class Planet extends Body {
         orbitMesh.setMode(Mesh.Mode.LineLoop);
         orbitGeometry.setMesh(orbitMesh);
         orbitGeometry.setMaterial(lineMaterial);
-        node.attachChild(orbitGeometry);
+        getParentNode().attachChild(orbitGeometry);
         trajectory(0);
         super.rotation(0);
         displayLine();

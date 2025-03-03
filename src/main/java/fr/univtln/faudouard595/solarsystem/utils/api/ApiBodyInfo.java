@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jme3.math.ColorRGBA;
 
+import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.space.Star;
 import fr.univtln.faudouard595.solarsystem.space.Body.TYPE;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ApiBodyInfo {
 
+    public static App app;
     private HttpClient client;
     private Map<String, Body> astres;;
     private JsonNode bodyJsonNode;
@@ -159,7 +161,7 @@ public class ApiBodyInfo {
         float rotationInclination = JsonNode.get("axialTilt").floatValue();
         String bodyType = JsonNode.get("bodyType").asText();
         if (bodyType.equals("Star")) {
-            body = new Star(nameBody, size, rotationPeriod, rotationInclination, type, color);
+            body = new Star(app.getRootNode(),nameBody, size, rotationPeriod, rotationInclination, type, color);
         } else {
             double semimajorAxis = JsonNode.get("semimajorAxis").doubleValue();
             float eccentricity = JsonNode.get("eccentricity").floatValue();

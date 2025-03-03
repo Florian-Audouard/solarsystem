@@ -25,8 +25,8 @@ public class Star extends Body {
 
     private static final Type EMITTER_TYPE = POINT_SPRITE ? Type.Point : Type.Triangle;
 
-    public Star(String name, float size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
-        super(name, size, rotationPeriod, rotationInclination, type, color);
+    public Star(Node parentNode,String name, float size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
+        super(parentNode,name, size, rotationPeriod, rotationInclination, type, color);
 
     }
 
@@ -51,8 +51,8 @@ public class Star extends Body {
         return mat;
     }
 
-    public void generateBody(Node rootNode, ViewPort viewPort) {
-        super.generateBody(rootNode);
+    public void generateBody() {
+        super.generateBody();
         PointLight sunLight = new PointLight();
         sunLight.setPosition(super.getNode().getWorldTranslation());
         sunLight.setColor(ColorRGBA.White);

@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -59,6 +60,11 @@ import com.jme3.material.Material;
 public class App extends SimpleApplication {
     private boolean loaded = false;
     private boolean startLoading = false;
+    private boolean initLoaded = false;
+    public Node loadingNode;
+    public Node myGuiNode;
+    public int tmp = 0;
+
     public double AU = 149_597_870.7;
     public final List<String> ASTEROID_MODELS = Arrays.asList("Ceres", "Haumea", "Eris");
 
@@ -72,6 +78,8 @@ public class App extends SimpleApplication {
     private float maxRenderDistanceMult = 10000000f;
     public SpeedList speedList = new SpeedList();
     public Random random = new Random();
+    private Iterator<Body> assetBodies;
+    private Iterator<Integer> assetAsteroid = AsteroidBelt.getIterator();
 
     public static void main(String[] args) {
         boolean test = true;
@@ -94,27 +102,8 @@ public class App extends SimpleApplication {
 
     }
 
-    public void createSpace() {
 
-        Texture starTexture = assetManager.loadTexture("Textures/Sky/StarSky.jpg");
-        Spatial sky = SkyFactory.createSky(assetManager, starTexture, SkyFactory.EnvMapType.EquirectMap);
-        rootNode.attachChild(sky);
-        Body.app = this;
-        Body.guiNode = guiNode;
-        Body.cam = cam;
-        Body.referenceSize = sunSize;
-        createBodies();
-
-        AmbientLight al = new AmbientLight();
-        al.setColor(ColorRGBA.White.mult(0.05f));
-        rootNode.addLight(al);
-
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Scene);
-        fpp.addFilter(bloom);
-        viewPort.addProcessor(fpp);
-
-        AsteroidBelt.initModel(assetManager);
+    public void generateAsteroidBelt(){
         int totalAsteroid = 6_000;
 
         double INNER_RADIUS_KUIPER = 30 * AU;
@@ -139,9 +128,34 @@ public class App extends SimpleApplication {
                 NUM_OBJECTS_ASTEROID_MAIN);
     }
 
+
+    public void createSpace() {
+
+        Texture starTexture = assetManager.loadTexture("Textures/Sky/StarSky.jpg");
+        Spatial sky = SkyFactory.createSky(assetManager, starTexture, SkyFactory.EnvMapType.EquirectMap);
+        rootNode.attachChild(sky);
+        Body.app = this;
+        Body.guiNode = myGuiNode;
+        Body.cam = cam;
+        Body.referenceSize = sunSize;
+        createBodies();
+        if(true){
+            return;
+        }
+        
+        AmbientLight al = new AmbientLight();
+        al.setColor(ColorRGBA.White.mult(0.05f));
+        rootNode.addLight(al);
+
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Scene);
+        fpp.addFilter(bloom);
+        viewPort.addProcessor(fpp);
+    }
+
     private void initSettings() {
         CameraTool.app = this;
-        flyCam.setEnabled(false);
+        
 
         cam.setFrustumFar(sunSize * maxRenderDistanceMult);
         GuiGlobals.initialize(this);
@@ -152,6 +166,7 @@ public class App extends SimpleApplication {
 
     public void createBodies() {
         ApiBodyInfo apiAstreInfo = new ApiBodyInfo();
+        ApiBodyInfo.app = this;
         List<DataCreationNeeded> bodies = new ArrayList<>();
         bodies.add(new DataCreationNeeded("soleil", ColorRGBA.Yellow, 0));
         bodies.add(new DataCreationNeeded("terre", new ColorRGBA(0f / 255, 153f / 255, 204f / 255, 1f), 1));
@@ -164,73 +179,78 @@ public class App extends SimpleApplication {
         bodies.add(new DataCreationNeeded("neptune", new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f), 1));
 
         sun = (Star) apiAstreInfo.getBodies(bodies, TYPE.SPHERE);
-        sun.generateBody(rootNode, viewPort);
+
+        assetBodies = sun.getEveryBodies().iterator();
+
     }
 
     public void init(){
-        
-
+        guiNode.attachChild(myGuiNode);
         initSettings();
+        generateAsteroidBelt();
         TriggerControls.init(this);
         ButtonControl.init(this);
-        createSpace();
+        
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
         CameraTool.init(cam, assetManager, inputManager);
         CameraTool.setBody(sun);
-
-    }
-    public void initInterface(){
-
+        DisplayInformation.app = this;
+        DisplayInformation.init();
+        guiNode.attachChild(myGuiNode);
+        initLoaded = true;
+        LoadingAppState.cleanUp();
     }
     @Override
     public void simpleInitApp() {
+        flyCam.setEnabled(false);
+        myGuiNode = new Node("MyGuiNode");
+        loadingNode = new Node("LoadingNode");
+        loadingNode.setLocalTranslation(0, 0, 1);
+        guiNode.attachChild(loadingNode);
         setDisplayStatView(false);
         setDisplayFps(false);
         font = assetManager.loadFont("Fonts/Segoe.fnt");
-
-
     }
 
-
-    private void loadGameContent() {
-        // Now initialize the actual game
-        enqueue(() -> {
-            init();
-            loaded = true;
-            DisplayInformation.app = this;
-            DisplayInformation.init();
-        });
-    }
-
-
-    private void loadInterface(){
-        enqueue(() -> {
-
-
-        });
-    }
     private void startLoading(){
         LoadingAppState.createInstance(font);
         LoadingAppState.init(40);
-        new Thread(() -> {
-
-            loadGameContent();
-            // Remove loading screen once finished
-            stateManager.detach(LoadingAppState.getInstance());
-            loadInterface();
-        }).start();
+        LoadingAppState.initialize(this);
+        createSpace();
         startLoading = true;
+
+    }
+
+    private void updateLoading(){
+        if(assetBodies.hasNext()){
+            Body currentAsset = assetBodies.next();
+            currentAsset.generateBody();
+            LoadingAppState.updateProgress();
+            return;
+        }
+        if(assetAsteroid.hasNext()){
+            int i = assetAsteroid.next();
+            AsteroidBelt.initModel(assetManager, i+1);
+            LoadingAppState.updateProgress();
+            return;
+        }
+        loaded = true;
+
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        // LoadingAppState.updateProgress();
         if(!startLoading){
             startLoading();
         }
+
+        updateLoading();
         if(!loaded){
             return;
+        }
+        if(!initLoaded){
+            init();
         }
         if (!isPause) {
             time += tpf * speedList.getCurrentSpeed();

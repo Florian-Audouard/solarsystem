@@ -7,6 +7,7 @@ import com.jme3.font.BitmapText;
 import com.jme3.scene.Node;
 import com.jme3.ui.Picture;
 
+import fr.univtln.faudouard595.solarsystem.App;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,19 +45,18 @@ public class LoadingAppState {
         instance.updateProgressInstance();
     }
 
+    public static void  initialize(App app){
+        instance.initializeInstance(app);
+    }
 
-    @Override
-    protected void initialize(Application app) {
-        guiNode = ((com.jme3.app.SimpleApplication) app).getGuiNode();
-        node = new Node("loadingNode");
-        guiNode.attachChild(node);
-        // Background Image (Optional)
-        // background = new Picture("Loading Screen");
-        // background.setImage(app.getAssetManager(), "Image/loading.jpg", true);
-        // background.setWidth(app.getCamera().getWidth());
-        // background.setHeight(app.getCamera().getHeight());
-        // background.setPosition(0, 0);
-        // guiNode.attachChild(background);
+    private void initializeInstance(App app) {
+        guiNode = app.getLoadingNode();
+        background = new Picture("Loading Screen");
+        background.setImage(app.getAssetManager(), "Textures/Sky/StarSky.jpg", true);
+        background.setWidth(app.getCamera().getWidth());
+        background.setHeight(app.getCamera().getHeight());
+        background.setPosition(0, 0);
+        guiNode.attachChild(background);
 
         // Progress Bar Background
         float barWidth = app.getCamera().getWidth() * 0.5f;
@@ -66,12 +66,12 @@ public class LoadingAppState {
 
         Geometry progressBarBackground = createQuad(app, barWidth, barHeight, ColorRGBA.Gray);
         progressBarBackground.setLocalTranslation(x, y, 0);
-        node.attachChild(progressBarBackground);
+        guiNode.attachChild(progressBarBackground);
 
         // Progress Bar (Red)
         progressBar = createQuad(app, 0, barHeight, ColorRGBA.Red);
         progressBar.setLocalTranslation(x, y, 1);
-        node.attachChild(progressBar);
+        guiNode.attachChild(progressBar);
 
         maxWidth = barWidth;
 
@@ -81,21 +81,18 @@ public class LoadingAppState {
         loadingText.setColor(ColorRGBA.White);
         loadingText.setText("Loading... 0%");
         loadingText.setLocalTranslation(x, y + 60, 2);
-        node.attachChild(loadingText);
+        guiNode.attachChild(loadingText);
     }
 
-    @Override
-    protected void cleanup(Application app) {
-        node.detachAllChildren();
+
+    public static void cleanUp(){
+        instance.cleanupInstance();
     }
 
-    @Override
-    protected void onEnable() {
+    protected void cleanupInstance() {
+        guiNode.detachAllChildren();
     }
 
-    @Override
-    protected void onDisable() {
-    }
 
 
     public static void init(int total){
@@ -109,9 +106,9 @@ public class LoadingAppState {
 
     private void updateProgressInstance() {
         progress++;
-        float val = progress/ total;
-        // progressBar.setLocalScale(val * maxWidth, 1, 1);
-        loadingText.setText("Loading... " + progress + "%");
+        float val = (float)(progress)/ total;
+        progressBar.setLocalScale(val * maxWidth, 1, 1);
+        loadingText.setText("Loading... " + ((float)Math.round(val*1000))/10 + "%");
     }
 
     private Geometry createQuad(Application app, float width, float height, ColorRGBA color) {

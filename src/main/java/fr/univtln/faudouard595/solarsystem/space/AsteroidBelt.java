@@ -1,8 +1,11 @@
 package fr.univtln.faudouard595.solarsystem.space;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
@@ -30,12 +33,16 @@ public class AsteroidBelt {
     private static List<Spatial> asteroids = new ArrayList<>();
     public Random random = new Random();
 
+
     public AsteroidBelt(double rotationPeriod) {
         this.beltNode = new Node("AsteroidBelt");
         ;
         this.rotationPeriod = rotationPeriod;
     }
 
+    public static Iterator<Integer> getIterator(){
+        return IntStream.range(0, numberOfAsteroidsModel).boxed().collect(Collectors.toList()).iterator();
+    }
     public static float calcObjSize(Spatial model) {
         BoundingVolume worldBound = model.getWorldBound();
         if (worldBound instanceof BoundingBox) {
@@ -48,19 +55,16 @@ public class AsteroidBelt {
         return 1;
     }
 
-    public static void initModel(AssetManager assetManager) {
-        ProgressBar.init(numberOfAsteroidsModel, "Creating Asteroids : ");
-        for (int i = 1; i < numberOfAsteroidsModel + 1; i++) {
-            LoadingAppState.updateProgress();
-            String name = "Asteroid";
-            String path = "Models/Asteroid" + i + "/" + name;
-            String extention = ".j3o";
-            Spatial model = assetManager.loadModel(path + extention);
+    public static void initModel(AssetManager assetManager,int i) {
+        
+        String name = "Asteroid";
+        String path = "Models/Asteroid" + i + "/" + name;
+        String extention = ".j3o";
+        Spatial model = assetManager.loadModel(path + extention);
 
-            asteroids.add(model);
-            model.setUserData("MeanSize", calcObjSize(model));
-            ProgressBar.update();
-        }
+        asteroids.add(model);
+        model.setUserData("MeanSize", calcObjSize(model));
+        
     }
 
     private float randomFloatBetween(float min, float max) {

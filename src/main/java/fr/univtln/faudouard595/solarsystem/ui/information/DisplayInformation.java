@@ -41,10 +41,10 @@ public class DisplayInformation {
         labelBackground.setLocalTranslation(paddingBackground, app.getCamera().getHeight() - paddingBackground, 0);
         labelBackground.attachChild(nameLabel);
         labelBackground.attachChild(label);
-        app.getGuiNode().attachChild(labelBackground);
+        app.getMyGuiNode().attachChild(labelBackground);
         MyButton prevMainButton = MyButton.builder()
                 .text("⏪")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(paddingBackground + 25 + 5)
                 .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
                 .preferedSizeWidth(50)
@@ -55,7 +55,7 @@ public class DisplayInformation {
         prevMainButton.setActionFunction(b -> CameraTool.prevMainBody());
         MyButton prevButton = MyButton.builder()
                 .text("◀️")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(paddingBackground + 25 + 5 + 50)
                 .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
                 .preferedSizeWidth(50)
@@ -66,7 +66,7 @@ public class DisplayInformation {
         prevButton.setActionFunction(b -> CameraTool.prevBody());
         MyButton nextMainButton = MyButton.builder()
                 .text("⏩")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(paddingBackground + app.getCamera().getWidth() / 4 - paddingBackground - 25 - 5)
                 .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
                 .preferedSizeWidth(50)
@@ -77,7 +77,7 @@ public class DisplayInformation {
         nextMainButton.setActionFunction(b -> CameraTool.nextMainBody());
         MyButton nextButton = MyButton.builder()
                 .text("▶️")
-                .guiNode(app.getGuiNode())
+                .guiNode(app.getMyGuiNode())
                 .x(paddingBackground + app.getCamera().getWidth() / 4 - paddingBackground - 25 - 5 - 50)
                 .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
                 .preferedSizeWidth(50)

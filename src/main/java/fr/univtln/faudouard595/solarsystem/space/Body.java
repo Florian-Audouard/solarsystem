@@ -34,8 +34,6 @@ import com.jme3.util.BufferUtils;
 import com.jme3.util.TangentBinormalGenerator;
 
 import fr.univtln.faudouard595.solarsystem.App;
-import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
-import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +80,8 @@ public abstract class Body {
     private Node planetNode;
     private List<AsteroidBelt> belts = new ArrayList<>();
     protected static float scalePlanet = 1;
+    private Node parentNode;
+
     public static boolean dynamicScale = true;
     public static float closeScale = 10f;
     public static int sphereSample = 32;
@@ -95,7 +95,8 @@ public abstract class Body {
         OBJ, SPHERE
     }
 
-    public Body(String name, double size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
+    public Body(Node parentNode,String name, double size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
+        this.parentNode = parentNode;
         this.name = name;
         this.realSize = size;
         if (reference == null) {
@@ -150,9 +151,8 @@ public abstract class Body {
 
     public abstract Material generateMat();
 
-    public void generateBody(Node rootNode) {
+    public void generateBody() {
         log.info("Generate body : {} , radius : {}", name, scaleRadius);
-        LoadingAppState.updateProgress();
         if (this.type == TYPE.OBJ) {
             this.model = app.getAssetManager().loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();
@@ -180,7 +180,7 @@ public abstract class Body {
         rotationOrbitalNode.attachChild(planetNode);
 
         node.attachChild(rotationOrbitalNode);
-        rootNode.attachChild(node);
+        parentNode.attachChild(node);
         circleGeo = createCircle();
         guiNode.attachChild(circleGeo);
     }
@@ -221,7 +221,6 @@ public abstract class Body {
                 orbitalInclination, rotationInclination, longAscNode,
                 argPeriapsis, mainAnomaly, this,
                 type, lineColor);
-        planet.generateBody(node);
         planets.put(name, planet);
         return planet;
     }

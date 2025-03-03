@@ -21,7 +21,7 @@ public class MySlider implements Updatable {
         slider.setLocalTranslation(50, 50, 0);
         DefaultRangedValueModel model = new DefaultRangedValueModel(0, 100, 50);
         slider.setModel(model);
-        app.getGuiNode().attachChild(slider);
+        app.getMyGuiNode().attachChild(slider);
         return this;
     }
 
