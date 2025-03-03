@@ -20,7 +20,7 @@ public class SunWithFlare extends SimpleApplication {
 
     private Node sunNode;
     private ParticleEmitter flame;
-    private static final int COUNT_FACTOR = 50;
+    private static final int COUNT_FACTOR = 10;
     private static final float COUNT_FACTOR_F = 1f;
     private static final boolean POINT_SPRITE = false;
 
@@ -33,7 +33,7 @@ public class SunWithFlare extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        flyCam.setMoveSpeed(10); // Increase the camera movement speed
+        flyCam.setMoveSpeed(50); // Increase the camera movement speed
         cam.setFrustumFar(50000000);
 
         float radius = 500f;
@@ -42,7 +42,7 @@ public class SunWithFlare extends SimpleApplication {
         createFlame(radius);
 
         addBloomEffect();
-        cam.setLocation(new Vector3f(0, 0, 1000)); // Move the camera back a bit
+        cam.setLocation(new Vector3f(0, 0, 2000)); // Move the camera back a bit
     }
 
     private void createSun(float radius) {
@@ -73,15 +73,15 @@ public class SunWithFlare extends SimpleApplication {
         flame.setSelectRandomImage(true);
         flame.setStartColor(new ColorRGBA(1f, 0.4f, 0.05f, (1f / COUNT_FACTOR_F)));
         flame.setEndColor(new ColorRGBA(.4f, .22f, .12f, 0f));
-        flame.setStartSize(radius / 2);
-        flame.setEndSize(radius);
-        flame.setShape(new EmitterSphereShape(Vector3f.ZERO, 1f));
+        flame.setStartSize(radius * 1f);
+        flame.setEndSize(radius * 1.2f);
+        flame.setShape(new EmitterSphereShape(Vector3f.ZERO, 1));
         flame.setParticlesPerSec(0);
         flame.setGravity(0, 0, 0);
-        flame.setLowLife(0f);
+        flame.setLowLife(1f);
         flame.setHighLife(5f);
-        flame.getParticleInfluencer().setInitialVelocity(new Vector3f(0, radius / 4, 0));
-        flame.getParticleInfluencer().setVelocityVariation(1f);
+        flame.getParticleInfluencer().setInitialVelocity(new Vector3f(100, 100, 100));
+        flame.getParticleInfluencer().setVelocityVariation(1);
         flame.setImagesX(2);
         flame.setImagesY(2);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");

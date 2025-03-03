@@ -58,7 +58,7 @@ public class Planet extends Body {
             float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
             float argPeriapsis, float mainAnomaly, Body primary, TYPE type,
             ColorRGBA color) {
-        super(primary.getNode(),name, size, rotationPeriod, rotationInclination, type, color);
+        super(primary.getNode(), name, size, rotationPeriod, rotationInclination, type, color);
 
         this.semimajorAxis = convertion(semimajorAxis);
         this.realSemimajorAxis = (int) semimajorAxis;
@@ -185,7 +185,7 @@ public class Planet extends Body {
         if (!MyLoadFile.fileExists(texturePath)) {
             return;
         }
-        Spatial cloud = generateTransparentSphere(texturePath, 0.5f);
+        Spatial cloud = generateTransparentSphere(texturePath, 0.2f);
         cloudModel = Optional.of(cloud);
         cloud.scale(1.03f);
         Node cloudNode = attachCorrectNode(cloud);

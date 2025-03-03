@@ -1,6 +1,7 @@
 package fr.univtln.faudouard595.solarsystem.space;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -20,7 +21,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
-import fr.univtln.faudouard595.solarsystem.utils.Console.ProgressBar;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,16 +33,16 @@ public class AsteroidBelt {
     private static List<Spatial> asteroids = new ArrayList<>();
     public Random random = new Random();
 
-
     public AsteroidBelt(double rotationPeriod) {
         this.beltNode = new Node("AsteroidBelt");
         ;
         this.rotationPeriod = rotationPeriod;
     }
 
-    public static Iterator<Integer> getIterator(){
-        return IntStream.range(0, numberOfAsteroidsModel).boxed().collect(Collectors.toList()).iterator();
+    public static Collection<Integer> getCollection() {
+        return IntStream.range(0, numberOfAsteroidsModel).boxed().collect(Collectors.toList());
     }
+
     public static float calcObjSize(Spatial model) {
         BoundingVolume worldBound = model.getWorldBound();
         if (worldBound instanceof BoundingBox) {
@@ -55,8 +55,8 @@ public class AsteroidBelt {
         return 1;
     }
 
-    public static void initModel(AssetManager assetManager,int i) {
-        
+    public static void initModel(AssetManager assetManager, int i) {
+        log.info("Loading Asteroid model {}", i);
         String name = "Asteroid";
         String path = "Models/Asteroid" + i + "/" + name;
         String extention = ".j3o";
@@ -64,7 +64,7 @@ public class AsteroidBelt {
 
         asteroids.add(model);
         model.setUserData("MeanSize", calcObjSize(model));
-        
+
     }
 
     private float randomFloatBetween(float min, float max) {

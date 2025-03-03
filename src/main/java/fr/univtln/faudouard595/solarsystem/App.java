@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -40,7 +41,6 @@ import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.ui.controls.trigger.TriggerControls;
 import fr.univtln.faudouard595.solarsystem.ui.information.DisplayInformation;
 import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
-import fr.univtln.faudouard595.solarsystem.utils.Console.ProgressBar;
 import fr.univtln.faudouard595.solarsystem.utils.api.ApiBodyInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
 import fr.univtln.faudouard595.solarsystem.utils.collection.SpeedList;
@@ -58,6 +58,7 @@ import com.jme3.material.Material;
 @Slf4j
 @Getter
 public class App extends SimpleApplication {
+    private boolean firstUpdate = true;
     private boolean loaded = false;
     private boolean startLoading = false;
     private boolean initLoaded = false;
@@ -79,10 +80,13 @@ public class App extends SimpleApplication {
     public SpeedList speedList = new SpeedList();
     public Random random = new Random();
     private Iterator<Body> assetBodies;
-    private Iterator<Integer> assetAsteroid = AsteroidBelt.getIterator();
+    private Iterator<Integer> assetAsteroid;
+    private int loadingNumber = 0;
+    private Runnable currentGeneration = () -> {
+    };
 
     public static void main(String[] args) {
-        boolean test = true;
+        boolean test = false;
 
         App app = new App();
         AppSettings settings = new AppSettings(true);
@@ -102,14 +106,13 @@ public class App extends SimpleApplication {
 
     }
 
-
-    public void generateAsteroidBelt(){
-        int totalAsteroid = 6_000;
+    public void generateAsteroidBelt() {
+        int totalAsteroid = 3_000;
 
         double INNER_RADIUS_KUIPER = 30 * AU;
         double OUTER_RADIUS_KUIPER = 50 * AU;
         double THICKNESS_KUIPER = 10 * AU;
-        double SIZE_OF_ASTEROID_KUIPER = 20_000_000;
+        double SIZE_OF_ASTEROID_KUIPER = 30_000_000;
         int NUM_OBJECTS_KUIPER = (totalAsteroid * 2) / 3;
         double ROATION_PERIOD_KUIPER = 200 * 325 * 24 * 60 * 60;
         sun.addAsteroidBelt(ROATION_PERIOD_KUIPER, Body.convertion(INNER_RADIUS_KUIPER),
@@ -119,7 +122,7 @@ public class App extends SimpleApplication {
         double INNER_RADIUS_MAIN = 2.2 * AU;
         double OUTER_RADIUS_MAIN = 4.2 * AU;
         double THICKNESS_ASTEROID_MAIN = 1 * AU;
-        double SIZE_OF_ASTEROID_MAIN = 3_000_000;
+        double SIZE_OF_ASTEROID_MAIN = 5_000_000;
         int NUM_OBJECTS_ASTEROID_MAIN = totalAsteroid / 3;
         double ROATION_PERIOD_MAIN = 4.5 * 325 * 24 * 60 * 60;
         sun.addAsteroidBelt(ROATION_PERIOD_MAIN, Body.convertion(INNER_RADIUS_MAIN),
@@ -127,7 +130,6 @@ public class App extends SimpleApplication {
                 Body.convertion(THICKNESS_ASTEROID_MAIN), Body.convertion(SIZE_OF_ASTEROID_MAIN),
                 NUM_OBJECTS_ASTEROID_MAIN);
     }
-
 
     public void createSpace() {
 
@@ -139,10 +141,7 @@ public class App extends SimpleApplication {
         Body.cam = cam;
         Body.referenceSize = sunSize;
         createBodies();
-        if(true){
-            return;
-        }
-        
+
         AmbientLight al = new AmbientLight();
         al.setColor(ColorRGBA.White.mult(0.05f));
         rootNode.addLight(al);
@@ -155,13 +154,7 @@ public class App extends SimpleApplication {
 
     private void initSettings() {
         CameraTool.app = this;
-        
-
         cam.setFrustumFar(sunSize * maxRenderDistanceMult);
-        GuiGlobals.initialize(this);
-        BaseStyles.loadGlassStyle();
-        // GuiGlobals.getInstance().
-        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
     }
 
     public void createBodies() {
@@ -180,17 +173,22 @@ public class App extends SimpleApplication {
 
         sun = (Star) apiAstreInfo.getBodies(bodies, TYPE.SPHERE);
 
-        assetBodies = sun.getEveryBodies().iterator();
+        Collection<Body> tmp = sun.getEveryBodies();
+        loadingNumber += tmp.size();
+        assetBodies = tmp.iterator();
+        Collection<Integer> tmpAsteroid = AsteroidBelt.getCollection();
+        loadingNumber += tmpAsteroid.size();
+        assetAsteroid = tmpAsteroid.iterator();
 
     }
 
-    public void init(){
+    public void init() {
         guiNode.attachChild(myGuiNode);
         initSettings();
         generateAsteroidBelt();
         TriggerControls.init(this);
         ButtonControl.init(this);
-        
+
         time = startOfUniver + ((double) Instant.now().getEpochSecond());
 
         CameraTool.init(cam, assetManager, inputManager);
@@ -201,9 +199,12 @@ public class App extends SimpleApplication {
         initLoaded = true;
         LoadingAppState.cleanUp();
     }
+
     @Override
     public void simpleInitApp() {
         flyCam.setEnabled(false);
+        GuiGlobals.initialize(this);
+
         myGuiNode = new Node("MyGuiNode");
         loadingNode = new Node("LoadingNode");
         loadingNode.setLocalTranslation(0, 0, 1);
@@ -211,47 +212,67 @@ public class App extends SimpleApplication {
         setDisplayStatView(false);
         setDisplayFps(false);
         font = assetManager.loadFont("Fonts/Segoe.fnt");
+        LoadingAppState.createInstance(font);
+        LoadingAppState.initialize(this);
+        LoadingAppState.initBackground(this);
     }
 
-    private void startLoading(){
-        LoadingAppState.createInstance(font);
-        LoadingAppState.init(40);
-        LoadingAppState.initialize(this);
+    private void startLoading() {
+        BaseStyles.loadGlassStyle();
+        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
         createSpace();
+        LoadingAppState.initBar(this);
+        LoadingAppState.init(loadingNumber);
         startLoading = true;
 
     }
 
-    private void updateLoading(){
-        if(assetBodies.hasNext()){
+    private void updateLoading() {
+        if (initLoaded) {
+            return;
+        }
+        // new Thread(() -> {
+        // enqueue(() -> {
+        // currentGeneration.run();
+        // });
+        // }).start();
+        currentGeneration.run();
+
+        if (assetBodies.hasNext()) {
             Body currentAsset = assetBodies.next();
-            currentAsset.generateBody();
-            LoadingAppState.updateProgress();
+            currentGeneration = () -> currentAsset.generateBody();
+            LoadingAppState.updateProgress("Loading ... %s (" + currentAsset.getName() + ")");
             return;
         }
-        if(assetAsteroid.hasNext()){
-            int i = assetAsteroid.next();
-            AsteroidBelt.initModel(assetManager, i+1);
-            LoadingAppState.updateProgress();
+        if (assetAsteroid.hasNext()) {
+            int i = assetAsteroid.next() + 1;
+            currentGeneration = () -> AsteroidBelt.initModel(assetManager, i);
+            LoadingAppState.updateProgress("Loading ... %s (Asteroid " + i + ")");
             return;
         }
+        LoadingAppState.updateProgress("Loading ... %s (Done)");
         loaded = true;
 
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        if(!startLoading){
-            startLoading();
-        }
-
-        updateLoading();
-        if(!loaded){
+        if (firstUpdate) {
+            firstUpdate = false;
             return;
         }
-        if(!initLoaded){
+        if (!startLoading) {
+            startLoading();
+            return;
+        }
+        if (!loaded) {
+            updateLoading();
+            return;
+        }
+        if (!initLoaded) {
             init();
         }
+
         if (!isPause) {
             time += tpf * speedList.getCurrentSpeed();
         }

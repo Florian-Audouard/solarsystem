@@ -7,7 +7,6 @@ import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -19,14 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Star extends Body {
     private ParticleEmitter flame;
-    private static final int COUNT_FACTOR = 50;
+    private static final int COUNT_FACTOR = 10;
     private static final float COUNT_FACTOR_F = 1f;
     private static final boolean POINT_SPRITE = false;
 
     private static final Type EMITTER_TYPE = POINT_SPRITE ? Type.Point : Type.Triangle;
 
-    public Star(Node parentNode,String name, float size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
-        super(parentNode,name, size, rotationPeriod, rotationInclination, type, color);
+    public Star(Node parentNode, String name, float size, float rotationPeriod, float rotationInclination, TYPE type,
+            ColorRGBA color) {
+        super(parentNode, name, size, rotationPeriod, rotationInclination, type, color);
 
     }
 
@@ -70,16 +70,15 @@ public class Star extends Body {
         flame.setSelectRandomImage(true);
         flame.setStartColor(new ColorRGBA(1f, 0.4f, 0.05f, (1f / COUNT_FACTOR_F)));
         flame.setEndColor(new ColorRGBA(.4f, .22f, .12f, 0f));
-        flame.setStartSize(radius / 2);
-        flame.setEndSize(radius);
-        flame.setShape(new EmitterSphereShape(Vector3f.ZERO, 1f));
+        flame.setStartSize(radius * 1f);
+        flame.setEndSize(radius * 1.2f);
+        flame.setShape(new EmitterSphereShape(Vector3f.ZERO, 1));
         flame.setParticlesPerSec(0);
         flame.setGravity(0, 0, 0);
-        flame.setLowLife(0f);
+        flame.setLowLife(1f);
         flame.setHighLife(5f);
-        flame.getParticleInfluencer().setInitialVelocity(new Vector3f(0, radius / 4, 0));
-
-        flame.getParticleInfluencer().setVelocityVariation(1f);
+        flame.getParticleInfluencer().setInitialVelocity(new Vector3f(100, 100, 100));
+        flame.getParticleInfluencer().setVelocityVariation(1);
         flame.setImagesX(2);
         flame.setImagesY(2);
         Material mat = new Material(Body.app.getAssetManager(),
