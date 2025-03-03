@@ -38,6 +38,7 @@ import fr.univtln.faudouard595.solarsystem.ui.controls.button.MyButton;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.ui.controls.trigger.TriggerControls;
 import fr.univtln.faudouard595.solarsystem.ui.information.DisplayInformation;
+import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
 import fr.univtln.faudouard595.solarsystem.utils.Console.ProgressBar;
 import fr.univtln.faudouard595.solarsystem.utils.api.ApiBodyInfo;
 import fr.univtln.faudouard595.solarsystem.utils.api.DataCreationNeeded;
@@ -56,7 +57,8 @@ import com.jme3.material.Material;
 @Slf4j
 @Getter
 public class App extends SimpleApplication {
-    double AU = 149_597_870.7;
+    private boolean loaded = false;
+    public double AU = 149_597_870.7;
     public final List<String> ASTEROID_MODELS = Arrays.asList("Ceres", "Haumea", "Eris");
 
     private static final float sunSize = 500;
@@ -165,9 +167,9 @@ public class App extends SimpleApplication {
         sun.generateBody(rootNode, viewPort);
     }
 
-    @Override
-    public void simpleInitApp() {
+    public void init(){
         font = assetManager.loadFont("Fonts/Segoe.fnt");
+
         // font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         initSettings();
         TriggerControls.init(this);
@@ -179,10 +181,35 @@ public class App extends SimpleApplication {
         CameraTool.setBody(sun);
         DisplayInformation.app = this;
         DisplayInformation.init();
+        loaded = true;
+    }
+    @Override
+    public void simpleInitApp() {
+        // Attach loading screen
+        LoadingAppState loadingState = new LoadingAppState();
+        stateManager.attach(loadingState);
+
+        // Start loading the game in a new thread
+        new Thread(() -> {
+            loadGameContent();
+            // Remove loading screen once finished
+            stateManager.detach(loadingState);
+        }).start();
     }
 
+
+    private void loadGameContent() {
+        // Now initialize the actual game
+        enqueue(() -> {
+            init();
+
+        });
+    }
     @Override
     public void simpleUpdate(float tpf) {
+        if(!loaded){
+            return;
+        }
         if (!isPause) {
             time += tpf * speedList.getCurrentSpeed();
         }
