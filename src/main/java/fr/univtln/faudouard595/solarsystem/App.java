@@ -58,6 +58,7 @@ import com.jme3.material.Material;
 @Getter
 public class App extends SimpleApplication {
     private boolean loaded = false;
+    private boolean startLoading = false;
     public double AU = 149_597_870.7;
     public final List<String> ASTEROID_MODELS = Arrays.asList("Ceres", "Haumea", "Eris");
 
@@ -169,7 +170,6 @@ public class App extends SimpleApplication {
     public void init(){
         
 
-        // font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         initSettings();
         TriggerControls.init(this);
         ButtonControl.init(this);
@@ -188,15 +188,7 @@ public class App extends SimpleApplication {
         setDisplayStatView(false);
         setDisplayFps(false);
         font = assetManager.loadFont("Fonts/Segoe.fnt");
-        LoadingAppState.createInstance(font);
-        LoadingAppState.init(40);
-        stateManager.attach(LoadingAppState.getInstance());
-        new Thread(() -> {
-            loadGameContent();
-            // Remove loading screen once finished
-            stateManager.detach(LoadingAppState.getInstance());
-            loadInterface();
-        }).start();
+
 
     }
 
@@ -205,22 +197,38 @@ public class App extends SimpleApplication {
         // Now initialize the actual game
         enqueue(() -> {
             init();
-
+            loaded = true;
+            DisplayInformation.app = this;
+            DisplayInformation.init();
         });
     }
 
 
     private void loadInterface(){
         enqueue(() -> {
-            DisplayInformation.app = this;
-            DisplayInformation.init();
-            loaded = true;
+
 
         });
+    }
+    private void startLoading(){
+        LoadingAppState.createInstance(font);
+        LoadingAppState.init(40);
+        new Thread(() -> {
+
+            loadGameContent();
+            // Remove loading screen once finished
+            stateManager.detach(LoadingAppState.getInstance());
+            loadInterface();
+        }).start();
+        startLoading = true;
     }
 
     @Override
     public void simpleUpdate(float tpf) {
+        // LoadingAppState.updateProgress();
+        if(!startLoading){
+            startLoading();
+        }
         if(!loaded){
             return;
         }

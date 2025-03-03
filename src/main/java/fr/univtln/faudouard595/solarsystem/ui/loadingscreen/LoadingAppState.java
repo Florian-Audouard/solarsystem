@@ -16,7 +16,7 @@ import com.jme3.scene.shape.Quad;
 import com.jme3.material.Material;
 
 @Slf4j
-public class LoadingAppState extends BaseAppState {
+public class LoadingAppState {
     private Node guiNode;
     private Picture background;
     private Geometry progressBar;
@@ -108,11 +108,10 @@ public class LoadingAppState extends BaseAppState {
     }
 
     private void updateProgressInstance() {
-
+        progress++;
         float val = progress/ total;
-        log.debug("{}",val);
-        progressBar.setLocalScale(val * maxWidth, 1, 1);
-        loadingText.setText("Loading... " + (int) (val * 100) + "%");
+        // progressBar.setLocalScale(val * maxWidth, 1, 1);
+        loadingText.setText("Loading... " + progress + "%");
     }
 
     private Geometry createQuad(Application app, float width, float height, ColorRGBA color) {
