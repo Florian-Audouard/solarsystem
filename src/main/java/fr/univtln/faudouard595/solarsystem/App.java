@@ -141,8 +141,7 @@ public class App extends SimpleApplication {
     private void initSettings() {
         CameraTool.app = this;
         flyCam.setEnabled(false);
-        setDisplayStatView(false);
-        setDisplayFps(false);
+
         cam.setFrustumFar(sunSize * maxRenderDistanceMult);
         GuiGlobals.initialize(this);
         BaseStyles.loadGlassStyle();
@@ -168,7 +167,7 @@ public class App extends SimpleApplication {
     }
 
     public void init(){
-        font = assetManager.loadFont("Fonts/Segoe.fnt");
+        
 
         // font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         initSettings();
@@ -185,15 +184,18 @@ public class App extends SimpleApplication {
     }
     @Override
     public void simpleInitApp() {
+        setDisplayStatView(false);
+        setDisplayFps(false);
+        font = assetManager.loadFont("Fonts/Segoe.fnt");
         // Attach loading screen
-        LoadingAppState loadingState = new LoadingAppState();
-        stateManager.attach(loadingState);
+        LoadingAppState.createInstance(font);
+        stateManager.attach(LoadingAppState.getInstance());
 
         // Start loading the game in a new thread
         new Thread(() -> {
             loadGameContent();
             // Remove loading screen once finished
-            stateManager.detach(loadingState);
+            stateManager.detach(LoadingAppState.getInstance());
         }).start();
     }
 
