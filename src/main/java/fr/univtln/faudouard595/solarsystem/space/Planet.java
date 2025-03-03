@@ -156,7 +156,7 @@ public class Planet extends Body {
             return;
         }
 
-        Spatial nighSpatial = generateTransparentSphere(texturePath, 1);
+        Spatial nighSpatial = generateTransparentSphere(texturePath, 1.5f);
         nightModel = Optional.of(nighSpatial);
         nightNode = attachCorrectNode(nighSpatial);
         super.getNode().attachChild(nightNode);

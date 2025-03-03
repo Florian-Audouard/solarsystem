@@ -16,7 +16,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
-import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
 import fr.univtln.faudouard595.solarsystem.utils.Console.ProgressBar;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class AsteroidBelt {
     public static void initModel(AssetManager assetManager) {
         ProgressBar.init(numberOfAsteroidsModel, "Creating Asteroids : ");
         for (int i = 1; i < numberOfAsteroidsModel + 1; i++) {
-            LoadingAppState.updateProgress();
+            // LoadingAppState.updateProgress();
             String name = "Asteroid";
             String path = "Models/Asteroid" + i + "/" + name;
             String extention = ".j3o";

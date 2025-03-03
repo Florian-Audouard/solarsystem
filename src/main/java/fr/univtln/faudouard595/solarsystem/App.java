@@ -178,25 +178,26 @@ public class App extends SimpleApplication {
 
         CameraTool.init(cam, assetManager, inputManager);
         CameraTool.setBody(sun);
-        DisplayInformation.app = this;
-        DisplayInformation.init();
-        loaded = true;
+
+    }
+    public void initInterface(){
+
     }
     @Override
     public void simpleInitApp() {
         setDisplayStatView(false);
         setDisplayFps(false);
         font = assetManager.loadFont("Fonts/Segoe.fnt");
-        // Attach loading screen
         LoadingAppState.createInstance(font);
+        LoadingAppState.init(40);
         stateManager.attach(LoadingAppState.getInstance());
-
-        // Start loading the game in a new thread
         new Thread(() -> {
             loadGameContent();
             // Remove loading screen once finished
             stateManager.detach(LoadingAppState.getInstance());
+            loadInterface();
         }).start();
+
     }
 
 
@@ -207,6 +208,17 @@ public class App extends SimpleApplication {
 
         });
     }
+
+
+    private void loadInterface(){
+        enqueue(() -> {
+            DisplayInformation.app = this;
+            DisplayInformation.init();
+            loaded = true;
+
+        });
+    }
+
     @Override
     public void simpleUpdate(float tpf) {
         if(!loaded){

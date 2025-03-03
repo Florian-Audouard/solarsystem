@@ -35,7 +35,6 @@ import com.jme3.util.TangentBinormalGenerator;
 
 import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
-import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -152,7 +151,7 @@ public abstract class Body {
 
     public void generateBody(Node rootNode) {
         log.info("Generate body : {} , radius : {}", name, scaleRadius);
-        LoadingAppState.updateProgress();
+        // LoadingAppState.updateProgress();
         if (this.type == TYPE.OBJ) {
             this.model = app.getAssetManager().loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();

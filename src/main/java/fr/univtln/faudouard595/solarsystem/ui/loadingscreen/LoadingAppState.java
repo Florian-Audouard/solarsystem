@@ -28,6 +28,8 @@ public class LoadingAppState extends BaseAppState {
     @Getter
     private static LoadingAppState instance;
 
+    private Node node;
+
 
     public LoadingAppState(BitmapFont font){
         this.font = font;
@@ -46,7 +48,8 @@ public class LoadingAppState extends BaseAppState {
     @Override
     protected void initialize(Application app) {
         guiNode = ((com.jme3.app.SimpleApplication) app).getGuiNode();
-
+        node = new Node("loadingNode");
+        guiNode.attachChild(node);
         // Background Image (Optional)
         // background = new Picture("Loading Screen");
         // background.setImage(app.getAssetManager(), "Image/loading.jpg", true);
@@ -63,12 +66,12 @@ public class LoadingAppState extends BaseAppState {
 
         Geometry progressBarBackground = createQuad(app, barWidth, barHeight, ColorRGBA.Gray);
         progressBarBackground.setLocalTranslation(x, y, 0);
-        guiNode.attachChild(progressBarBackground);
+        node.attachChild(progressBarBackground);
 
         // Progress Bar (Red)
         progressBar = createQuad(app, 0, barHeight, ColorRGBA.Red);
         progressBar.setLocalTranslation(x, y, 1);
-        guiNode.attachChild(progressBar);
+        node.attachChild(progressBar);
 
         maxWidth = barWidth;
 
@@ -78,12 +81,12 @@ public class LoadingAppState extends BaseAppState {
         loadingText.setColor(ColorRGBA.White);
         loadingText.setText("Loading... 0%");
         loadingText.setLocalTranslation(x, y + 60, 2);
-        guiNode.attachChild(loadingText);
+        node.attachChild(loadingText);
     }
 
     @Override
     protected void cleanup(Application app) {
-        guiNode.detachAllChildren();
+        node.detachAllChildren();
     }
 
     @Override
