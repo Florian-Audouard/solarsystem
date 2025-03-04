@@ -51,7 +51,6 @@ public abstract class Body {
     protected static final String OBJPATH = "Models/Body/";
     public float scaleMultiplier;
     protected float saveScaleMultiplier;
-    public float objSize;
     private ColorRGBA color;
     private float colorMultiplier;
     public static Node guiNode;
@@ -104,7 +103,6 @@ public abstract class Body {
         this.node = new Node(name);
         this.scaleMultiplier = 1;
         this.saveScaleMultiplier = 1;
-        this.objSize = 1;
         this.color = color;
         this.rotationOrbitalNode = new Node(name + "_rotationOrbital");
         this.planetNode = new Node(name + "_planet");
@@ -125,10 +123,6 @@ public abstract class Body {
         if (model == null) {
             return 1;
         }
-        if (model instanceof Geometry g) {
-            Sphere sphere = (Sphere) g.getMesh();
-            return sphere.getRadius();
-        }
         BoundingVolume worldBound = model.getWorldBound();
         if (worldBound instanceof BoundingBox) {
             BoundingBox box = (BoundingBox) worldBound;
@@ -137,6 +131,10 @@ public abstract class Body {
             Vector3f size = max.subtract(min);
             return (size.x + size.y + size.z) / 3;
         }
+        if (model instanceof Geometry g) {
+            Sphere sphere = (Sphere) g.getMesh();
+            return sphere.getRadius();
+        }
         return 1;
     }
 
@@ -144,10 +142,14 @@ public abstract class Body {
 
     public void generateBody() {
         log.info("Generate body : {} , radius : {}", name, scaleRadius);
-        if (MyLoadFile.fileExists("Models/Body/" + name + "/" + name + ".j3o")) {
-            this.model = app.getAssetManager().loadModel(OBJPATH + name + ".j3o");
-            this.objSize = calcObjSize();
-        } else {
+        String objPath = "Models/Body/" + name + "/" + name + ".j3o";
+        if (MyLoadFile.fileExists(objPath)) {
+            this.model = app.getAssetManager().loadModel(objPath);
+            float objSize = calcObjSize();
+            model.setLocalScale(0.001f);
+            log.info("Size : {} , Ratio : {}",objSize,scaleRadius / objSize,scaleRadius);
+        } 
+        else {
             int customSphereSample = sphereSample;
             if (enableNightTexture && name.equals("Earth")) {
                 customSphereSample = nightSphereSample;
@@ -493,8 +495,7 @@ public abstract class Body {
     }
 
     public void displayWhenSelected() {
-        // log.info("name : {} ,originalRadius : {} , size : {}", name, getRadius(),
-        // getScaleRadius());
+        log.info("name : {} ,Position : {},planetPos : {}", name,getWorldTranslation() , model.getWorldTranslation());
     }
 
 }

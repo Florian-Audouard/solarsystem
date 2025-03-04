@@ -10,8 +10,10 @@ import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 
 import fr.univtln.faudouard595.solarsystem.utils.file.MyLoadFile;
@@ -46,6 +48,14 @@ public class ConvertObject extends SimpleApplication {
         }
         model.scale(0.05f);
         rootNode.attachChild(myNode);
+        Sphere sphereMesh = new Sphere(16, 16, 0.5f); // 16x16 segments, radius 0.5
+        Geometry sphereGeom = new Geometry("SmallSphere", sphereMesh);
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", ColorRGBA.Blue);
+        sphereGeom.setMaterial(mat);
+        sphereGeom.setLocalTranslation(0, 0, 0); // Position at (0,0,0)
+        rootNode.attachChild(sphereGeom);
+
 
         AmbientLight al = new AmbientLight();
         al.setColor(ColorRGBA.White.mult(0.1f));

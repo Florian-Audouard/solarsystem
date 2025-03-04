@@ -75,7 +75,7 @@ public class App extends SimpleApplication {
     };
 
     public static void main(String[] args) {
-        boolean test = false;
+        boolean test = true;
 
         App app = new App();
         AppSettings settings = new AppSettings(true);
