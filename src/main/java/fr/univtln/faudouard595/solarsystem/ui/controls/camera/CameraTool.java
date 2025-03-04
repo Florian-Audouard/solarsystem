@@ -34,6 +34,7 @@ public class CameraTool {
     public static CircularHashMapBody bodies;
     private static Camera cam;
     public static float distanceFromBody;
+    public static boolean changeCam;
 
     private static Vector2f lastMousePosition;
 
@@ -344,6 +345,15 @@ public class CameraTool {
         flyCam.setEnabled(!flyCam.isEnabled());
         flyCam.setMoveSpeed(10);
         inputManager.setCursorVisible(!flyCam.isEnabled());
+        app.changeCamOnce = false;
+    }
+
+    public static void updateSwitchCam(){
+        if(!changeCam){
+            return;
+        }
+        switchFlyCam();
+        changeCam = false;
     }
 
     public static void update() {
@@ -353,7 +363,9 @@ public class CameraTool {
             updateLocation();
             updateCursor();
         }
+        updateSwitchCam();
         updateAllCircle();
+
         bodies.getCurrentValue().displayWhenSelected();
     }
 

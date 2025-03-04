@@ -413,7 +413,7 @@ public class Planet extends Body {
         if (!reference.equals(primary)) {
             return;
         }
-        if (!CameraTool.bodies.getCurrentValue().equals(this)
+        if (app.getFlyByCamera().isEnabled() || !CameraTool.bodies.getCurrentValue().equals(this)
                 && !getPlanets().values().stream()
                         .anyMatch(p -> p.equals(CameraTool.bodies.getCurrentValue()))) {
             scale(1f);
@@ -422,6 +422,24 @@ public class Planet extends Body {
 
         float scale = (closeScale * CameraTool.minDistance
                 / CameraTool.distanceFromBody) / CameraTool.bodies.getCurrentValue().getRadius();
+        scale = Math.max(1f, scale);
+        scale(scale);
+
+    }
+    @Override
+    public void scaleWhenSelected(float scale) {
+        if (!Body.dynamicScale) {
+            return;
+        }
+        if (!reference.equals(primary)) {
+            return;
+        }
+        if (app.getFlyByCamera().isEnabled() || !CameraTool.bodies.getCurrentValue().equals(this)
+                && !getPlanets().values().stream()
+                        .anyMatch(p -> p.equals(CameraTool.bodies.getCurrentValue()))) {
+            scale(1f);
+            return;
+        }
         scale = Math.max(1f, scale);
         scale(scale);
 

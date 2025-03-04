@@ -464,6 +464,9 @@ public abstract class Body {
 
     public void scaleWhenSelected() {
     }
+    public void scaleWhenSelected(float scale) {
+    }
+
 
     public void update(double time) {
         rotation(time);
@@ -495,7 +498,7 @@ public abstract class Body {
     }
 
     public void displayWhenSelected() {
-        log.info("name : {} ,Position : {},planetPos : {}", name,getWorldTranslation() , model.getWorldTranslation());
+        // log.info("name : {} ,Position : {},planetPos : {}", name,getWorldTranslation() , model.getWorldTranslation());
     }
 
 }

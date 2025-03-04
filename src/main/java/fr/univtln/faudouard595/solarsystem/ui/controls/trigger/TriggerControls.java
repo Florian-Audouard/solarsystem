@@ -22,7 +22,7 @@ public class TriggerControls {
     private static void initKeys() {
         inputManager.addMapping("SpeedUp", new KeyTrigger(KeyInput.KEY_F1));
         inputManager.addMapping("SpeedDown", new KeyTrigger(KeyInput.KEY_F2));
-        inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_F7));
+        inputManager.addMapping("SwitchCam", new KeyTrigger(KeyInput.KEY_F7));
         inputManager.addMapping("nextAstre", new KeyTrigger(KeyInput.KEY_RIGHT));
         inputManager.addMapping("prevAstre", new KeyTrigger(KeyInput.KEY_LEFT));
 
@@ -32,7 +32,7 @@ public class TriggerControls {
         inputManager.addMapping("Sprint", new KeyTrigger(KeyInput.KEY_LSHIFT));
         inputManager.addMapping("UltraSprint", new KeyTrigger(KeyInput.KEY_LCONTROL));
 
-        inputManager.addListener(actionListener, "Test", "removeLines", "nextAstre", "prevAstre", "Pause", "SpeedUp",
+        inputManager.addListener(actionListener, "SwitchCam", "removeLines", "nextAstre", "prevAstre", "Pause", "SpeedUp",
                 "SpeedDown", "Sprint", "UltraSprint");
         inputManager.addListener(analogListener, "");
     }
@@ -53,8 +53,8 @@ public class TriggerControls {
             if (name.equals("SpeedDown")) {
                 app.speedList.decreaseSpeed();
             }
-            if (name.equals("Test") && keyPressed) {
-                CameraTool.switchFlyCam();
+            if (name.equals("SwitchCam") && keyPressed) {
+                CameraTool.changeCam = true;
             }
             if (keyPressed && name.equals("removeLines")) {
                 app.getSun().switchDisplayLines();

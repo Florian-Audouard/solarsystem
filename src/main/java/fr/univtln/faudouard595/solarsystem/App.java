@@ -54,6 +54,7 @@ public class App extends SimpleApplication {
     public Node loadingNode;
     public Node myGuiNode;
     public int tmp = 0;
+    public boolean changeCamOnce = false;
 
     public double AU = 149_597_870.7;
     public final List<String> ASTEROID_MODELS = Arrays.asList("Ceres", "Haumea", "Eris");
@@ -265,7 +266,16 @@ public class App extends SimpleApplication {
         if (!isPause) {
             time += tpf * speedList.getCurrentSpeed();
         }
+
         sun.update(time);
+        if(!changeCamOnce && flyCam.isEnabled()){
+            log.info("INPUT_MAPPING_CAMERA_POS");
+            flyCam.setEnabled(false);
+            cam.setLocation(CameraTool.bodies.getCurrent().getWorldTranslation());
+            flyCam.setEnabled(true);
+
+            changeCamOnce = true;
+        }
         CameraTool.update();
         ButtonControl.update();
         DisplayInformation.update();
