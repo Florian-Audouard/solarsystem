@@ -36,7 +36,7 @@ public class ConvertObject extends SimpleApplication {
         boolean test = false;
         boolean override = false;
         flyCam.setMoveSpeed(10);
-        String name = "Phobos";
+        String name = "Deimos";
         String path = "Models/Body/" + name + "/" + name;
         Node myNode = new Node();
         model = Convert.convert(path, assetManager, myNode, override, test, 0);
@@ -53,7 +53,7 @@ public class ConvertObject extends SimpleApplication {
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.Blue);
         sphereGeom.setMaterial(mat);
-        sphereGeom.setLocalTranslation(0, 0, 0); // Position at (0,0,0)
+        sphereGeom.setLocalTranslation(0, 1000, 0); // Position at (0,0,0)
         rootNode.attachChild(sphereGeom);
 
         AmbientLight al = new AmbientLight();
