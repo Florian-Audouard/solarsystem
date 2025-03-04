@@ -54,7 +54,7 @@ public class AsteroidBelt {
     public static void initModel(AssetManager assetManager, int i) {
         log.info("Loading Asteroid model {}", i);
         String name = "Asteroid";
-        String path = "Models/Asteroid" + i + "/" + name;
+        String path = "Models/Asteroid/Asteroid" + i + "/" + name;
         String extention = ".j3o";
         Spatial model = assetManager.loadModel(path + extention);
 

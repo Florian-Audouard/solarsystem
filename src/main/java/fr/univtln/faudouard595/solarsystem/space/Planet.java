@@ -52,9 +52,9 @@ public class Planet extends Body {
 
     public Planet(String name, double size, double semimajorAxis, float eccentricity, float orbitalPeriod,
             float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
-            float argPeriapsis, float mainAnomaly, Body primary, TYPE type,
+            float argPeriapsis, float mainAnomaly, Body primary,
             ColorRGBA color) {
-        super(primary.getNode(), name, size, rotationPeriod, rotationInclination, type, color);
+        super(primary.getNode(), name, size, rotationPeriod, rotationInclination, color);
 
         this.semimajorAxis = convertion(semimajorAxis);
         this.realSemimajorAxis = (int) semimajorAxis;
@@ -92,13 +92,17 @@ public class Planet extends Body {
         orbitMesh.updateBound();
     }
 
-    public Material generateMat() {
-        Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+    public static void armoniseMat(Material mat) {
         mat.setBoolean("UseMaterialColors", true);
         mat.setColor("Diffuse", ColorRGBA.White);
         mat.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f).mult(0.2f));
         mat.setColor("Ambient", ColorRGBA.White.mult(0.5f));
         mat.setFloat("Shininess", 6f);
+    }
+
+    public Material generateMat() {
+        Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+        armoniseMat(mat);
         String texturePath = Body.TEXTUREPATH + super.getName() + "/" + super.getName() + "_Color.jpg";
         if (!MyLoadFile.fileExists(texturePath)) {
             String randomTexture = app.ASTEROID_MODELS.get(app.random.nextInt(app.ASTEROID_MODELS.size()));

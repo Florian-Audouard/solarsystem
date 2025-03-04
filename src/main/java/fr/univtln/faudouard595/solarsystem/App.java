@@ -28,7 +28,6 @@ import com.simsilica.lemur.style.BaseStyles;
 import fr.univtln.faudouard595.solarsystem.space.AsteroidBelt;
 import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.space.Star;
-import fr.univtln.faudouard595.solarsystem.space.Body.TYPE;
 import fr.univtln.faudouard595.solarsystem.ui.controls.button.ButtonControl;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.ui.controls.trigger.TriggerControls;
@@ -161,7 +160,7 @@ public class App extends SimpleApplication {
         bodies.add(new DataCreationNeeded("uranus", new ColorRGBA(104f / 255, 204f / 255, 218f / 255, 1f), 5));
         bodies.add(new DataCreationNeeded("neptune", new ColorRGBA(112f / 255, 140f / 255, 227f / 255, 1f), 1));
 
-        sun = (Star) apiAstreInfo.getBodies(bodies, TYPE.SPHERE);
+        sun = (Star) apiAstreInfo.getBodies(bodies);
 
         Collection<Body> tmp = sun.getEveryBodies();
         loadingNumber += tmp.size();

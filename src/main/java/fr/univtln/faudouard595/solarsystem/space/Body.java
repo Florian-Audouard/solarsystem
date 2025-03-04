@@ -29,6 +29,7 @@ import com.jme3.util.BufferUtils;
 import com.jme3.util.TangentBinormalGenerator;
 
 import fr.univtln.faudouard595.solarsystem.App;
+import fr.univtln.faudouard595.solarsystem.utils.file.MyLoadFile;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,6 @@ public abstract class Body {
     private double rotationPeriod;
     protected static final String TEXTUREPATH = "Textures/Body/";
     protected static final String OBJPATH = "Models/Body/";
-    public TYPE type;
     public float scaleMultiplier;
     protected float saveScaleMultiplier;
     public float objSize;
@@ -86,11 +86,7 @@ public abstract class Body {
     public static boolean enableAtmosphere = true;
     public static boolean enableCloud = true;
 
-    public enum TYPE {
-        OBJ, SPHERE
-    }
-
-    public Body(Node parentNode, String name, double size, float rotationPeriod, float rotationInclination, TYPE type,
+    public Body(Node parentNode, String name, double size, float rotationPeriod, float rotationInclination,
             ColorRGBA color) {
         this.parentNode = parentNode;
         this.name = name;
@@ -106,7 +102,6 @@ public abstract class Body {
         this.rotationInclination = rotationInclination * FastMath.DEG_TO_RAD;
         this.planets = new HashMap<>();
         this.node = new Node(name);
-        this.type = type;
         this.scaleMultiplier = 1;
         this.saveScaleMultiplier = 1;
         this.objSize = 1;
@@ -149,7 +144,7 @@ public abstract class Body {
 
     public void generateBody() {
         log.info("Generate body : {} , radius : {}", name, scaleRadius);
-        if (this.type == TYPE.OBJ) {
+        if (MyLoadFile.fileExists("Models/Body/" + name + "/" + name + ".j3o")) {
             this.model = app.getAssetManager().loadModel(OBJPATH + name + ".j3o");
             this.objSize = calcObjSize();
         } else {
@@ -161,12 +156,13 @@ public abstract class Body {
             sphere.setTextureMode(Sphere.TextureMode.Projected);
             this.model = new Geometry("Sphere_" + name, sphere);
             model.setLocalScale(scaleRadius / sphereRadius);
+            Material mat = generateMat();
+            if (mat.getParam("NormalMap") != null) {
+                TangentBinormalGenerator.generate(model);
+            }
+            model.setMaterial(mat);
         }
-        Material mat = generateMat();
-        if (mat.getParam("NormalMap") != null) {
-            TangentBinormalGenerator.generate(model);
-        }
-        model.setMaterial(mat);
+
         model.setShadowMode(ShadowMode.CastAndReceive);
 
         planetNode.attachChild(model);
@@ -212,11 +208,11 @@ public abstract class Body {
 
     public Planet addPlanet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
             float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
-            float argPeriapsis, float mainAnomaly, TYPE type, ColorRGBA lineColor) {
+            float argPeriapsis, float mainAnomaly, ColorRGBA lineColor) {
         Planet planet = new Planet(name, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
                 orbitalInclination, rotationInclination, longAscNode,
                 argPeriapsis, mainAnomaly, this,
-                type, lineColor);
+                lineColor);
         planets.put(name, planet);
         return planet;
     }

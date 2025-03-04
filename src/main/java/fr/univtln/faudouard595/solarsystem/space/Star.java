@@ -24,9 +24,9 @@ public class Star extends Body {
 
     private static final Type EMITTER_TYPE = POINT_SPRITE ? Type.Point : Type.Triangle;
 
-    public Star(Node parentNode, String name, float size, float rotationPeriod, float rotationInclination, TYPE type,
+    public Star(Node parentNode, String name, float size, float rotationPeriod, float rotationInclination,
             ColorRGBA color) {
-        super(parentNode, name, size, rotationPeriod, rotationInclination, type, color);
+        super(parentNode, name, size, rotationPeriod, rotationInclination, color);
 
     }
 

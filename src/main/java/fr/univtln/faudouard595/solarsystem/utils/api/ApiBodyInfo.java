@@ -20,7 +20,6 @@ import com.jme3.math.ColorRGBA;
 import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.space.Star;
-import fr.univtln.faudouard595.solarsystem.space.Body.TYPE;
 import fr.univtln.faudouard595.solarsystem.utils.file.MyLoadFile;
 import lombok.extern.slf4j.Slf4j;
 
@@ -116,17 +115,17 @@ public class ApiBodyInfo {
         }
     }
 
-    public Body getBodies(List<DataCreationNeeded> data, TYPE type) {
+    public Body getBodies(List<DataCreationNeeded> data) {
         verifFile(data);
         for (DataCreationNeeded entry : data) {
             String name = entry.getName();
             ColorRGBA color = entry.getColor();
-            createBody(name, TYPE.SPHERE, color);
+            createBody(name, color);
         }
         List<String> remaining = bodyJsonNode.findValuesAsText("id").stream()
                 .filter(id -> !astres.containsKey(id))
                 .toList();
-        remaining.forEach(id -> createBody(id, type, null));
+        remaining.forEach(id -> createBody(id, null));
         return astres.get(data.get(0).getName());
     }
 
@@ -148,7 +147,7 @@ public class ApiBodyInfo {
         return jsonNode;
     }
 
-    public Body createBody(String name, TYPE type, ColorRGBA color) {
+    public Body createBody(String name, ColorRGBA color) {
         JsonNode JsonNode = bodyJsonNode.get(name);
         Body body = null;
 
@@ -159,7 +158,7 @@ public class ApiBodyInfo {
         float rotationInclination = JsonNode.get("axialTilt").floatValue();
         String bodyType = JsonNode.get("bodyType").asText();
         if (bodyType.equals("Star")) {
-            body = new Star(app.getRootNode(), nameBody, size, rotationPeriod, rotationInclination, type, color);
+            body = new Star(app.getRootNode(), nameBody, size, rotationPeriod, rotationInclination, color);
         } else {
             double semimajorAxis = JsonNode.get("semimajorAxis").doubleValue();
             float eccentricity = JsonNode.get("eccentricity").floatValue();
@@ -174,7 +173,7 @@ public class ApiBodyInfo {
             }
             body = ref.addPlanet(nameBody, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
                     orbitalInclination,
-                    rotationInclination, longAscNode, argPeriapsis, mainAnomaly, type, color);
+                    rotationInclination, longAscNode, argPeriapsis, mainAnomaly, color);
         }
         astres.put(id, body);
         return body;
