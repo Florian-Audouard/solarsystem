@@ -39,7 +39,7 @@ public class ConvertObject extends SimpleApplication {
         String name = "Phobos";
         String path = "Models/Body/" + name + "/" + name;
         Node myNode = new Node();
-        model = Convert.convert(path, assetManager, myNode, override, test, 5);
+        model = Convert.convert(path, assetManager, myNode, override, test, 0);
         if (override || !test && !MyLoadFile.fileExists(path + ".j3o")) {
             try {
                 BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));
@@ -55,7 +55,6 @@ public class ConvertObject extends SimpleApplication {
         sphereGeom.setMaterial(mat);
         sphereGeom.setLocalTranslation(0, 0, 0); // Position at (0,0,0)
         rootNode.attachChild(sphereGeom);
-
 
         AmbientLight al = new AmbientLight();
         al.setColor(ColorRGBA.White.mult(0.1f));
