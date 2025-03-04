@@ -76,7 +76,7 @@ public class App extends SimpleApplication {
     };
 
     public static void main(String[] args) {
-        boolean test = true;
+        boolean test = false;
 
         App app = new App();
         AppSettings settings = new AppSettings(true);
@@ -93,7 +93,6 @@ public class App extends SimpleApplication {
         }
         app.setSettings(settings);
         app.start();
-
     }
 
     public void generateAsteroidBelt() {
