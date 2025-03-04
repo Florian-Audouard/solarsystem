@@ -273,7 +273,7 @@ public class App extends SimpleApplication {
             flyCam.setEnabled(false);
             cam.setLocation(CameraTool.bodies.getCurrent().getWorldTranslation());
             flyCam.setEnabled(true);
-
+            inputManager.setCursorVisible(false);
             changeCamOnce = true;
         }
         CameraTool.update();
