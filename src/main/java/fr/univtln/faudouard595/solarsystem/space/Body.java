@@ -146,7 +146,7 @@ public abstract class Body {
         if (MyLoadFile.fileExists(objPath)) {
             this.model = app.getAssetManager().loadModel(objPath);
             float objSize = calcObjSize();
-            model.setLocalScale(0.001f);
+            model.setLocalScale(scaleRadius / objSize);
             log.info("Size : {} , Ratio : {}",objSize,scaleRadius / objSize,scaleRadius);
         } 
         else {
