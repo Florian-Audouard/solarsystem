@@ -413,7 +413,7 @@ public class Planet extends Body {
         if (!reference.equals(primary)) {
             return;
         }
-        if (app.getFlyByCamera().isEnabled() || !CameraTool.bodies.getCurrentValue().equals(this)
+        if (app.changeCam || app.getFlyByCamera().isEnabled() || !CameraTool.bodies.getCurrentValue().equals(this)
                 && !getPlanets().values().stream()
                         .anyMatch(p -> p.equals(CameraTool.bodies.getCurrentValue()))) {
             scale(1f);
@@ -426,6 +426,7 @@ public class Planet extends Body {
         scale(scale);
 
     }
+
     @Override
     public void scaleWhenSelected(float scale) {
         if (!Body.dynamicScale) {

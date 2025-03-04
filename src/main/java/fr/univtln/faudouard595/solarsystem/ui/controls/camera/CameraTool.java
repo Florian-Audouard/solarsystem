@@ -34,7 +34,6 @@ public class CameraTool {
     public static CircularHashMapBody bodies;
     private static Camera cam;
     public static float distanceFromBody;
-    public static boolean changeCam;
 
     private static Vector2f lastMousePosition;
 
@@ -223,13 +222,13 @@ public class CameraTool {
     public static Vector3f calcCoord() {
         Vector3f bodyPos = bodies.getCurrentValue().getWorldTranslation();
         float practicalDistance = distanceFromBody * bodies.getCurrentValue().getScaleRadius();
-        float x = bodyPos.x + practicalDistance * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
+        float x = FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
                 * FastMath.sin(FastMath.DEG_TO_RAD * angleHorizontal);
-        float z = bodyPos.z + practicalDistance * FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
+        float y = FastMath.sin(FastMath.DEG_TO_RAD * angleVertical);
+        float z = FastMath.cos(FastMath.DEG_TO_RAD * angleVertical)
                 * FastMath.cos(FastMath.DEG_TO_RAD * angleHorizontal);
-        float y = bodyPos.y + practicalDistance * FastMath.sin(FastMath.DEG_TO_RAD * angleVertical);
-
-        return new Vector3f(x, y, z);
+        Vector3f res = new Vector3f(x, y, z).mult(practicalDistance).add(bodyPos);
+        return res;
     }
 
     public static void calcPos() {
@@ -341,19 +340,26 @@ public class CameraTool {
     }
 
     public static void switchFlyCam() {
-        FlyByCamera flyCam = app.getFlyByCamera();
-        flyCam.setEnabled(!flyCam.isEnabled());
-        flyCam.setMoveSpeed(10);
-        inputManager.setCursorVisible(!flyCam.isEnabled());
-        app.changeCamOnce = false;
+        if (app.getFlyByCamera().isEnabled()) {
+            disableFlyCam();
+        } else {
+            enableFlyCam();
+        }
+        app.changeCam = false;
     }
 
-    public static void updateSwitchCam(){
-        if(!changeCam){
-            return;
-        }
-        switchFlyCam();
-        changeCam = false;
+    public static void enableFlyCam() {
+        FlyByCamera flyCam = app.getFlyByCamera();
+        flyCam.setEnabled(false);
+        cam.setLocation(CameraTool.calcCoord());
+        flyCam.setEnabled(true);
+        inputManager.setCursorVisible(false);
+    }
+
+    public static void disableFlyCam() {
+        FlyByCamera flyCam = app.getFlyByCamera();
+        flyCam.setEnabled(false);
+        inputManager.setCursorVisible(true);
     }
 
     public static void update() {
@@ -363,7 +369,6 @@ public class CameraTool {
             updateLocation();
             updateCursor();
         }
-        updateSwitchCam();
         updateAllCircle();
 
         bodies.getCurrentValue().displayWhenSelected();

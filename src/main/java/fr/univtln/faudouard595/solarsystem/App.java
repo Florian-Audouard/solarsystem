@@ -54,7 +54,7 @@ public class App extends SimpleApplication {
     public Node loadingNode;
     public Node myGuiNode;
     public int tmp = 0;
-    public boolean changeCamOnce = false;
+    public boolean changeCam = false;
 
     public double AU = 149_597_870.7;
     public final List<String> ASTEROID_MODELS = Arrays.asList("Ceres", "Haumea", "Eris");
@@ -76,13 +76,15 @@ public class App extends SimpleApplication {
     };
 
     public static void main(String[] args) {
-        boolean test = false;
+        boolean test = true;
 
         App app = new App();
         AppSettings settings = new AppSettings(true);
         settings.setFrameRate(60);
         if (test) {
             settings.setResolution(1920, 780);
+            settings.setFullscreen(false);
+            settings.setResizable(true);
         } else {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
             DisplayMode dm = gd.getDisplayMode();
@@ -111,7 +113,7 @@ public class App extends SimpleApplication {
         double INNER_RADIUS_MAIN = 2.2 * AU;
         double OUTER_RADIUS_MAIN = 4.2 * AU;
         double THICKNESS_ASTEROID_MAIN = 1 * AU;
-        double SIZE_OF_ASTEROID_MAIN = 5_000_000;
+        double SIZE_OF_ASTEROID_MAIN = 3_000_000;
         int NUM_OBJECTS_ASTEROID_MAIN = totalAsteroid / 3;
         double ROATION_PERIOD_MAIN = 4.5 * 325 * 24 * 60 * 60;
         sun.addAsteroidBelt(ROATION_PERIOD_MAIN, Body.convertion(INNER_RADIUS_MAIN),
@@ -144,6 +146,7 @@ public class App extends SimpleApplication {
     private void initSettings() {
         CameraTool.app = this;
         cam.setFrustumFar(sunSize * maxRenderDistanceMult);
+
     }
 
     public void createBodies() {
@@ -267,13 +270,8 @@ public class App extends SimpleApplication {
         }
 
         sun.update(time);
-        if(!changeCamOnce && flyCam.isEnabled()){
-            log.info("INPUT_MAPPING_CAMERA_POS");
-            flyCam.setEnabled(false);
-            cam.setLocation(CameraTool.bodies.getCurrent().getWorldTranslation());
-            flyCam.setEnabled(true);
-            inputManager.setCursorVisible(false);
-            changeCamOnce = true;
+        if (changeCam) {
+            CameraTool.switchFlyCam();
         }
         CameraTool.update();
         ButtonControl.update();

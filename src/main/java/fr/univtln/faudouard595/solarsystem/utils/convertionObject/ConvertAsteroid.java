@@ -36,12 +36,13 @@ public class ConvertAsteroid extends SimpleApplication {
         for (int i = 1; i < 11; i++) {
             String name = "Asteroid";
             String path = "Models/Asteroid/Asteroid" + i + "/" + name;
-            Spatial model = Convert.convert(path, assetManager, rootNode, override, test, i);
+            Spatial model = Convert.convert(path, assetManager, rootNode, override, test, 0 * i);
 
-            if (override || !test && MyLoadFile.fileExists(path + ".j3o")) {
+            if (override || !test && !MyLoadFile.fileExists(path + ".j3o")) {
                 try {
                     BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }

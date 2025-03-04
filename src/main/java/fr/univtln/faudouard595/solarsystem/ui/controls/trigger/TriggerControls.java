@@ -32,7 +32,8 @@ public class TriggerControls {
         inputManager.addMapping("Sprint", new KeyTrigger(KeyInput.KEY_LSHIFT));
         inputManager.addMapping("UltraSprint", new KeyTrigger(KeyInput.KEY_LCONTROL));
 
-        inputManager.addListener(actionListener, "SwitchCam", "removeLines", "nextAstre", "prevAstre", "Pause", "SpeedUp",
+        inputManager.addListener(actionListener, "SwitchCam", "removeLines", "nextAstre", "prevAstre", "Pause",
+                "SpeedUp",
                 "SpeedDown", "Sprint", "UltraSprint");
         inputManager.addListener(analogListener, "");
     }
@@ -54,7 +55,7 @@ public class TriggerControls {
                 app.speedList.decreaseSpeed();
             }
             if (name.equals("SwitchCam") && keyPressed) {
-                CameraTool.changeCam = true;
+                app.changeCam = true;
             }
             if (keyPressed && name.equals("removeLines")) {
                 app.getSun().switchDisplayLines();

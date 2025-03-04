@@ -147,9 +147,7 @@ public abstract class Body {
             this.model = app.getAssetManager().loadModel(objPath);
             float objSize = calcObjSize();
             model.setLocalScale(scaleRadius / objSize);
-            log.info("Size : {} , Ratio : {}",objSize,scaleRadius / objSize,scaleRadius);
-        } 
-        else {
+        } else {
             int customSphereSample = sphereSample;
             if (enableNightTexture && name.equals("Earth")) {
                 customSphereSample = nightSphereSample;
@@ -164,7 +162,7 @@ public abstract class Body {
             }
             model.setMaterial(mat);
         }
-
+        model.setCullHint(Spatial.CullHint.Never);
         model.setShadowMode(ShadowMode.CastAndReceive);
 
         planetNode.attachChild(model);
@@ -464,9 +462,9 @@ public abstract class Body {
 
     public void scaleWhenSelected() {
     }
+
     public void scaleWhenSelected(float scale) {
     }
-
 
     public void update(double time) {
         rotation(time);
@@ -498,7 +496,8 @@ public abstract class Body {
     }
 
     public void displayWhenSelected() {
-        // log.info("name : {} ,Position : {},planetPos : {}", name,getWorldTranslation() , model.getWorldTranslation());
+        // log.info("name : {} ,Position : {},planetPos : {}",
+        // name,getWorldTranslation() , model.getWorldTranslation());
     }
 
 }
