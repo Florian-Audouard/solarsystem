@@ -1,7 +1,5 @@
 package fr.univtln.faudouard595.solarsystem.ui.loadingscreen;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.BaseAppState;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.scene.Node;
@@ -14,9 +12,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import com.jme3.math.ColorRGBA;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Quad;
-import com.jme3.material.Material;
 
 @Slf4j
 public class LoadingAppState {

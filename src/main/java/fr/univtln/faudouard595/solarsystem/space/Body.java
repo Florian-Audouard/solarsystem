@@ -1,21 +1,16 @@
 package fr.univtln.faudouard595.solarsystem.space;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
 
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
-import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -95,7 +90,8 @@ public abstract class Body {
         OBJ, SPHERE
     }
 
-    public Body(Node parentNode,String name, double size, float rotationPeriod, float rotationInclination, TYPE type, ColorRGBA color) {
+    public Body(Node parentNode, String name, double size, float rotationPeriod, float rotationInclination, TYPE type,
+            ColorRGBA color) {
         this.parentNode = parentNode;
         this.name = name;
         this.realSize = size;
@@ -492,7 +488,8 @@ public abstract class Body {
     public void addAsteroidBelt(double rotation, float innerRadius, float outerRadius, float heightVariation,
             float sizeOfAsteroid,
             int numObjects) {
-        AsteroidBelt belt = new AsteroidBelt(rotation).generateAsteroidBelt(innerRadius, outerRadius, heightVariation, sizeOfAsteroid,
+        AsteroidBelt belt = new AsteroidBelt(rotation).generateAsteroidBelt(innerRadius, outerRadius, heightVariation,
+                sizeOfAsteroid,
                 numObjects);
         belts.add(belt);
         this.node.attachChild(belt.getBeltNode());

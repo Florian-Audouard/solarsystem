@@ -2,25 +2,21 @@ package fr.univtln.faudouard595.solarsystem.space;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.asset.TextureKey;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
+
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
-import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,9 +1,5 @@
 package fr.univtln.faudouard595.solarsystem.space;
 
-import static fr.univtln.faudouard595.solarsystem.space.Body.formatter;
-
-import java.io.File;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 

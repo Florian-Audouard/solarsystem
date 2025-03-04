@@ -1,7 +1,6 @@
 package fr.univtln.faudouard595.solarsystem.utils.collection;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 

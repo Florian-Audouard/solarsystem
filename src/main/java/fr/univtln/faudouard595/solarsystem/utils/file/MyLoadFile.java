@@ -1,9 +1,6 @@
 package fr.univtln.faudouard595.solarsystem.utils.file;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +45,7 @@ public class MyLoadFile {
         return Optional.ofNullable(tempFile);
     }
 
-    public  boolean doesFileExist(String filePath) {
+    public boolean doesFileExist(String filePath) {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath);
         return inputStream != null; // If inputStream is not null, the file exists
     }

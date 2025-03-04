@@ -10,21 +10,15 @@ import java.util.List;
 import java.util.Random;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.asset.TextureKey;
-import com.jme3.bounding.BoundingBox;
-import com.jme3.bounding.BoundingVolume;
+
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
+
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
@@ -36,7 +30,6 @@ import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.space.Star;
 import fr.univtln.faudouard595.solarsystem.space.Body.TYPE;
 import fr.univtln.faudouard595.solarsystem.ui.controls.button.ButtonControl;
-import fr.univtln.faudouard595.solarsystem.ui.controls.button.MyButton;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.ui.controls.trigger.TriggerControls;
 import fr.univtln.faudouard595.solarsystem.ui.information.DisplayInformation;
@@ -49,11 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.event.KeyListener;
-import java.io.File;
 
 import com.jme3.light.AmbientLight;
-import com.jme3.material.Material;
 
 @Slf4j
 @Getter

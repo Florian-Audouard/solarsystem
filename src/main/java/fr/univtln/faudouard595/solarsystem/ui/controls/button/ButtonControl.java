@@ -8,13 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jme3.font.BitmapText;
-import com.jme3.font.BitmapFont.Align;
 import com.jme3.math.ColorRGBA;
-import com.simsilica.lemur.Axis;
-import com.simsilica.lemur.DefaultRangedValueModel;
-import com.simsilica.lemur.GuiGlobals;
-import com.simsilica.lemur.style.BaseStyles;
-import com.simsilica.lemur.Slider;
 import fr.univtln.faudouard595.solarsystem.App;
 import lombok.extern.slf4j.Slf4j;
 

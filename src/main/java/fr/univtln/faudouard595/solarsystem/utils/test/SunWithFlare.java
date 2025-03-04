@@ -1,7 +1,6 @@
 package fr.univtln.faudouard595.solarsystem.utils.test;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh.Type;
 import com.jme3.effect.shapes.EmitterSphereShape;
@@ -12,7 +11,6 @@ import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 

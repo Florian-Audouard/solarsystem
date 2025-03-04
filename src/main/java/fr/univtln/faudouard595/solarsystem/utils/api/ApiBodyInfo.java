@@ -2,12 +2,10 @@ package fr.univtln.faudouard595.solarsystem.utils.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -161,7 +159,7 @@ public class ApiBodyInfo {
         float rotationInclination = JsonNode.get("axialTilt").floatValue();
         String bodyType = JsonNode.get("bodyType").asText();
         if (bodyType.equals("Star")) {
-            body = new Star(app.getRootNode(),nameBody, size, rotationPeriod, rotationInclination, type, color);
+            body = new Star(app.getRootNode(), nameBody, size, rotationPeriod, rotationInclination, type, color);
         } else {
             double semimajorAxis = JsonNode.get("semimajorAxis").doubleValue();
             float eccentricity = JsonNode.get("eccentricity").floatValue();

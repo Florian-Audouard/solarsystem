@@ -1,7 +1,5 @@
 package fr.univtln.faudouard595.solarsystem.ui.controls.button;
 
-import java.util.function.Function;
-
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.input.event.MouseMotionEvent;
 import com.jme3.math.ColorRGBA;
@@ -14,7 +12,6 @@ import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.HAlignment;
 import com.simsilica.lemur.VAlignment;
 import com.simsilica.lemur.event.MouseEventControl;
-import com.simsilica.lemur.event.KeyInterceptState;
 import com.simsilica.lemur.event.MouseListener;
 
 import fr.univtln.faudouard595.solarsystem.App;
