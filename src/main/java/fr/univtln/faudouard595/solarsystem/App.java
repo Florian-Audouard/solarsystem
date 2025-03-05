@@ -98,7 +98,7 @@ public class App extends SimpleApplication {
     }
 
     public void generateAsteroidBelt() {
-        int totalAsteroid = 3_000;
+        int totalAsteroid = 6_000;
 
         double INNER_RADIUS_KUIPER = 30 * AU;
         double OUTER_RADIUS_KUIPER = 50 * AU;

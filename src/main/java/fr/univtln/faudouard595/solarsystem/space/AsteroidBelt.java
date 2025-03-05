@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AsteroidBelt {
     private Node beltNode;
     private double rotationPeriod;
-    private static int numberOfAsteroidsModel = 10;
+    private static int numberOfAsteroidsModel = 7;
     private static List<Spatial> asteroids = new ArrayList<>();
     public Random random = new Random();
 

@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Star extends Body {
     private ParticleEmitter flame;
-    private static final int COUNT_FACTOR = 10;
+    private static final int COUNT_FACTOR = 8;
     private static final float COUNT_FACTOR_F = 1f;
     private static final boolean POINT_SPRITE = false;
 
@@ -71,7 +71,7 @@ public class Star extends Body {
         flame.setStartColor(new ColorRGBA(1f, 0.4f, 0.05f, (1f / COUNT_FACTOR_F)));
         flame.setEndColor(new ColorRGBA(.4f, .22f, .12f, 0f));
         flame.setStartSize(radius * 1f);
-        flame.setEndSize(radius * 1.2f);
+        flame.setEndSize(radius * 1.3f);
         flame.setShape(new EmitterSphereShape(Vector3f.ZERO, 1));
         flame.setParticlesPerSec(0);
         flame.setGravity(0, 0, 0);

@@ -388,6 +388,9 @@ public class Planet extends Body {
     }
 
     public float getDistanceFromPrimary() {
+        if (primary.equals(reference)) {
+            return primary.getWorldTranslation().distance(super.getWorldTranslation());
+        }
         return primary.getWorldTranslation().distance(super.getWorldTranslation()) / (getScaleRadius() / getRadius());
     }
 
