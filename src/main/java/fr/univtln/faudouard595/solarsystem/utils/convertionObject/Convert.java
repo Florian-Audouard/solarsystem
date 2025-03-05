@@ -18,16 +18,13 @@ import fr.univtln.faudouard595.solarsystem.utils.file.MyLoadFile;
 public class Convert {
 
     public static Spatial convert(String path, AssetManager assetManager, Node rootNode,
-            boolean override, boolean test,
-            int i) {
+            boolean override, boolean test) {
         String extention = ".obj";
         if (!override && !test && MyLoadFile.fileExists(path + ".j3o")) {
             extention = ".j3o";
         }
         Spatial model = assetManager.loadModel(path + extention);
-        model.setLocalScale(0.5f);
         rootNode.attachChild(model);
-        model.setLocalTranslation(new Vector3f(i * 3, 0, 0));
         Material mat = new Material(assetManager,
                 "Common/MatDefs/Light/Lighting.j3md");
         TextureKey key = new TextureKey(path + "_Color.jpg");

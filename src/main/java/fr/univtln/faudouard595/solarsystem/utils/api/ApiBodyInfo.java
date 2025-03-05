@@ -33,7 +33,7 @@ public class ApiBodyInfo {
     private static String filePath = "Data/body.json";
     private ObjectMapper mapper;
     private ObjectNode fileNode;
-    File file;
+    private File file;
     List<String> usedId = List.of("id", "englishName", "meanRadius", "sideralRotation", "axialTilt", "bodyType",
             "semimajorAxis", "eccentricity", "sideralOrbit", "inclination", "orbitAround", "longAscNode",
             "argPeriapsis", "mainAnomaly", "perihelion");
@@ -42,7 +42,6 @@ public class ApiBodyInfo {
         this.client = HttpClient.newHttpClient();
         this.astres = new HashMap<>();
         this.mapper = new ObjectMapper();
-        this.file = MyLoadFile.loadFile(filePath).get();
     }
 
     public void fillFileNodeList(Collection<ApiData> urls) {
@@ -85,6 +84,7 @@ public class ApiBodyInfo {
                 .toList();
         fillFileNodeList(urlName);
         try {
+            file = new File("src/main/resources/" + filePath);
             mapper.writeValue(file, fileNode);
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,6 +101,9 @@ public class ApiBodyInfo {
             if (!MyLoadFile.fileExists(filePath)) {
                 log.info("File not found");
                 createFile(data);
+            } else {
+                file = MyLoadFile.loadFile(filePath).get();
+
             }
             bodyJsonNode = mapper.readTree(file);
             List<String> namesList = data.stream().map(DataCreationNeeded::getName).toList();

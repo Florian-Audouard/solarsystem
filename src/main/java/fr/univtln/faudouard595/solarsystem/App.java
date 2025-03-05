@@ -19,6 +19,7 @@ import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.LodControl;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
@@ -31,6 +32,7 @@ import fr.univtln.faudouard595.solarsystem.space.Star;
 import fr.univtln.faudouard595.solarsystem.ui.controls.button.ButtonControl;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
 import fr.univtln.faudouard595.solarsystem.ui.controls.trigger.TriggerControls;
+import fr.univtln.faudouard595.solarsystem.ui.controls.updatable.Updatable;
 import fr.univtln.faudouard595.solarsystem.ui.information.DisplayInformation;
 import fr.univtln.faudouard595.solarsystem.ui.loadingscreen.LoadingAppState;
 import fr.univtln.faudouard595.solarsystem.utils.api.ApiBodyInfo;
@@ -52,7 +54,8 @@ public class App extends SimpleApplication {
     private boolean startLoading = false;
     private boolean initLoaded = false;
     public Node loadingNode;
-    public Node myGuiNode;
+    private Node myGuiNode;
+    private Node circleNode;
     public int tmp = 0;
     public boolean changeCam = false;
 
@@ -128,7 +131,9 @@ public class App extends SimpleApplication {
         Spatial sky = SkyFactory.createSky(assetManager, starTexture, SkyFactory.EnvMapType.EquirectMap);
         rootNode.attachChild(sky);
         Body.app = this;
-        Body.guiNode = myGuiNode;
+        circleNode = new Node("CircleNode");
+        guiNode.attachChild(circleNode);
+        Body.guiNode = circleNode;
         Body.cam = cam;
         Body.referenceSize = sunSize;
         createBodies();
@@ -276,5 +281,6 @@ public class App extends SimpleApplication {
         CameraTool.update();
         ButtonControl.update();
         DisplayInformation.update();
+        Updatable.updateAll();
     }
 }

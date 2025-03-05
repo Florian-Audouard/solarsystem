@@ -12,6 +12,7 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.LodControl;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
@@ -30,14 +31,13 @@ public class ConvertAsteroid extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        boolean test = false;
+        boolean test = true;
         boolean override = false;
         flyCam.setMoveSpeed(10);
-        for (int i = 1; i < 11; i++) {
+        for (int i = 1; i < 8; i++) {
             String name = "Asteroid";
             String path = "Models/Asteroid/Asteroid" + i + "/" + name;
-            Spatial model = Convert.convert(path, assetManager, rootNode, override, test, 0 * i);
-
+            Spatial model = Convert.convert(path, assetManager, rootNode, override, test);
             if (override || !test && !MyLoadFile.fileExists(path + ".j3o")) {
                 try {
                     BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));

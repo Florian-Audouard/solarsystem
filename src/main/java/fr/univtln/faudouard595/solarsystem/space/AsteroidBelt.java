@@ -57,7 +57,6 @@ public class AsteroidBelt {
         String path = "Models/Asteroid/Asteroid" + i + "/" + name;
         String extention = ".j3o";
         Spatial model = assetManager.loadModel(path + extention);
-
         asteroids.add(model);
         model.setUserData("MeanSize", calcObjSize(model));
 

@@ -10,6 +10,7 @@ import java.util.List;
 import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
 import fr.univtln.faudouard595.solarsystem.App;
+import fr.univtln.faudouard595.solarsystem.ui.information.DisplayInformation;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -21,14 +22,12 @@ public class ButtonControl {
     private static int timeTextY = 10;
     private static BitmapText speedText;
     private static App app;
-    private static List<Updatable> updatables = new ArrayList<>();
     public static boolean actualPauseTimeText = false;
     private static BitmapText timeText;
 
     public static void init(App app) {
         ButtonControl.app = app;
         MyButton.app = app;
-        MySlider.app = app;
 
         speedText = app.font.createLabel("");
         speedText.setSize(32);
@@ -44,12 +43,12 @@ public class ButtonControl {
                 .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
                 .fontSize(controlButtonTextSize)
-                .actionFunction(b -> app.isPause = !app.isPause)
+                .actionFunction(() -> app.isPause = !app.isPause)
                 .build()
                 .init();
         pause.setUpdateFunction(() -> pause.setText(app.isPause ? "⏵" : "⏸"));
-        updatables.add(pause);
-        updatables.add(MyButton.builder()
+
+        MyButton.builder()
                 .text("⏩")
                 .guiNode(app.getMyGuiNode())
                 .x(app.getCamera().getWidth() / 2 + pause.getSize().x / 2 + 30)
@@ -57,10 +56,11 @@ public class ButtonControl {
                 .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
                 .fontSize(controlButtonTextSize)
-                .analogFunction(() -> app.speedList.increaseSpeed())
+                .actionFunction(() -> app.speedList.increaseSpeed())
+                .isAnalog(true)
                 .build()
-                .init());
-        updatables.add(MyButton.builder()
+                .init();
+        MyButton.builder()
                 .text("⏪")
                 .guiNode(app.getMyGuiNode())
                 .x(app.getCamera().getWidth() / 2 - pause.getSize().x / 2 - 30)
@@ -68,9 +68,10 @@ public class ButtonControl {
                 .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
                 .fontSize(controlButtonTextSize)
-                .analogFunction(() -> app.speedList.decreaseSpeed())
+                .actionFunction(() -> app.speedList.decreaseSpeed())
+                .isAnalog(true)
                 .build()
-                .init());
+                .init();
         MyButton lineDisplay = MyButton.builder()
                 .text("✦")
                 .guiNode(app.getMyGuiNode())
@@ -79,12 +80,32 @@ public class ButtonControl {
                 .preferedSizeWidth(widthFlowButton)
                 .preferedSizeHeight(heightFlowButton)
                 .fontSize(controlButtonTextSize)
+                .actionFunction(() -> app.getSun().switchDisplayLines())
                 .build()
                 .init();
-        lineDisplay.setActionFunction(b -> {
-            app.getSun().switchDisplayLines();
-            lineDisplay.setText(app.getSun().isDisplayLines() ? "✦" : "✧");
-        });
+        lineDisplay.setUpdateFunction(() -> lineDisplay.setText(app.getSun().isDisplayLines() ? "✦" : "✧"));
+        MyButton.builder()
+                .text("ⓘ")
+                .guiNode(app.getMyGuiNode())
+                .x(app.getCamera().getWidth() - 50)
+                .y(app.getCamera().getHeight() - 100)
+                .preferedSizeWidth(widthFlowButton)
+                .preferedSizeHeight(heightFlowButton)
+                .fontSize(controlButtonTextSize)
+                .actionFunction(() -> DisplayInformation.switchDisplayInformation())
+                .build()
+                .init();
+        MyButton.builder()
+                .text("❔")
+                .guiNode(app.getMyGuiNode())
+                .x(app.getCamera().getWidth() - 50)
+                .y(app.getCamera().getHeight() - 150)
+                .preferedSizeWidth(widthFlowButton)
+                .preferedSizeHeight(heightFlowButton)
+                .fontSize(controlButtonTextSize)
+                .actionFunction(() -> DisplayInformation.switchHelpInformation())
+                .build()
+                .init();
         timeText = app.font.createLabel("");
         timeText.setSize(40);
         timeText.setColor(ColorRGBA.White);
@@ -107,10 +128,6 @@ public class ButtonControl {
         speedText.setText(text);
         speedText.setLocalTranslation(app.getCamera().getWidth() / 2 - speedText.getLineWidth() / 2,
                 positionYFlowButton + heightFlowButton + speedText.getLineHeight() - 15, 0);
-    }
-
-    public static void updateButtons() {
-        updatables.forEach(Updatable::update);
     }
 
     public static void updateTextDate() {
@@ -138,8 +155,6 @@ public class ButtonControl {
 
     public static void update() {
         updateSpeedText();
-        updateButtons();
         updateTextDate();
-
     }
 }

@@ -34,19 +34,18 @@ public class ConvertObject extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         boolean test = false;
-        boolean override = false;
+        boolean override = true;
         flyCam.setMoveSpeed(10);
-        String name = "Deimos";
+        String name = "Phobos";
         String path = "Models/Body/" + name + "/" + name;
         Node myNode = new Node();
-        model = Convert.convert(path, assetManager, myNode, override, test, 0);
+        model = Convert.convert(path, assetManager, myNode, override, test);
         if (override || !test && !MyLoadFile.fileExists(path + ".j3o")) {
             try {
                 BinaryExporter.getInstance().save(model, new File("src/main/resources/" + path + ".j3o"));
             } catch (Exception e) {
             }
         }
-        model.scale(0.05f);
         rootNode.attachChild(myNode);
         Sphere sphereMesh = new Sphere(16, 16, 0.5f); // 16x16 segments, radius 0.5
         Geometry sphereGeom = new Geometry("SmallSphere", sphereMesh);

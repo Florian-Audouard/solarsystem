@@ -16,16 +16,17 @@ import com.simsilica.lemur.event.MouseListener;
 
 import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.ui.controls.camera.CameraTool;
+import fr.univtln.faudouard595.solarsystem.ui.controls.updatable.Updatable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Builder
-@AllArgsConstructor
+@SuperBuilder
 @Getter
-public class MyButton implements Updatable {
+public class MyButton extends Updatable {
     private Button button;
     private String text;
     private Node guiNode;
@@ -41,30 +42,9 @@ public class MyButton implements Updatable {
     private ColorRGBA hoverColor = ColorRGBA.Gray;
     @Builder.Default
     private ColorRGBA clickColor = ColorRGBA.Blue;
-    @Builder.Default
-    private Command<Button> actionFunction = b -> {
-    };
-    @Builder.Default
-    private Runnable analogFunction = () -> {
-    };
+
     @Builder.Default
     private int fontSize = 20;
-
-    @Builder.Default
-    private int analogSpeed = 6;
-
-    @Builder.Default
-    private int waitTimeBeforeAnalog = 18;
-
-    @Builder.Default
-    private boolean isAnalog = false;
-
-    @Builder.Default
-    private int currentSpeed = 0;
-
-    @Builder.Default
-    private Runnable updateFunction = () -> {
-    };
 
     public static App app;
 
@@ -79,18 +59,18 @@ public class MyButton implements Updatable {
         button.setTextHAlignment(HAlignment.Center);
         button.setTextVAlignment(VAlignment.Center);
         button.setColor(defaultColor);
-        button.addClickCommands(actionFunction);
         button.setLocalTranslation(x - (width / 2), y + height / 2, 0);
         MouseEventControl.addListenersToSpatial(button, new MouseListener() {
             @Override
             public void mouseButtonEvent(MouseButtonEvent event, Spatial target, Spatial capture) {
                 if (event.isPressed()) {
                     button.setColor(clickColor);
-                    currentSpeed = 0;
-                    isAnalog = false;
+                    activate();
+
                 } else {
                     button.setColor(hoverColor);
                     GuiGlobals.getInstance().releaseFocus(button);
+                    deactivate();
                 }
             }
 
@@ -115,13 +95,6 @@ public class MyButton implements Updatable {
         return this;
     }
 
-    public void setActionFunction(Command<Button> command) {
-        button.addClickCommands(command);
-    }
-
-    public void setUpdateFunction(Runnable command) {
-        updateFunction = command;
-    }
 
     public void setText(String text) {
         if (button.getText().equals(text)) {
@@ -132,22 +105,6 @@ public class MyButton implements Updatable {
 
     public Vector3f getSize() {
         return button.getPreferredSize();
-    }
-
-    public void update() {
-        if (button.isPressed()) {
-            if (!isAnalog && currentSpeed == 0) {
-                analogFunction.run();
-            }
-            if (currentSpeed >= analogSpeed && (isAnalog || currentSpeed >= waitTimeBeforeAnalog)) {
-                currentSpeed = 0;
-                analogFunction.run();
-                isAnalog = true;
-            }
-            currentSpeed++;
-        }
-        updateFunction.run();
-
     }
 
 }

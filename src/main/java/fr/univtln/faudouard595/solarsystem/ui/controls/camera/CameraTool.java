@@ -22,6 +22,7 @@ import com.jme3.renderer.Camera;
 import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.space.Planet;
+import fr.univtln.faudouard595.solarsystem.ui.information.DisplayInformation;
 import fr.univtln.faudouard595.solarsystem.utils.collection.CircularHashMapBody;
 import lombok.Getter;
 import lombok.Setter;
@@ -354,12 +355,16 @@ public class CameraTool {
         cam.setLocation(CameraTool.calcCoord());
         flyCam.setEnabled(true);
         inputManager.setCursorVisible(false);
+        // DisplayInformation.disableInformation();
+        app.getGuiNode().detachChild(app.getMyGuiNode());
     }
 
     public static void disableFlyCam() {
         FlyByCamera flyCam = app.getFlyByCamera();
         flyCam.setEnabled(false);
         inputManager.setCursorVisible(true);
+        // DisplayInformation.enableInformation();
+        app.getGuiNode().attachChild(app.getMyGuiNode());
     }
 
     public static void update() {
