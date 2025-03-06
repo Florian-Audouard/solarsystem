@@ -85,7 +85,7 @@ public class App extends SimpleApplication {
         AppSettings settings = new AppSettings(true);
         settings.setFrameRate(60);
         if (test) {
-            settings.setResolution(1920, 780);
+            settings.setResolution(1920, 1080);
             settings.setFullscreen(false);
             settings.setResizable(true);
         } else {
@@ -143,8 +143,11 @@ public class App extends SimpleApplication {
         rootNode.addLight(al);
 
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Scene);
-        fpp.addFilter(bloom);
+        BloomFilter bloomFilter = new BloomFilter();
+        bloomFilter.setBlurScale(0.5f); // Higher values for blur quality
+        bloomFilter.setBloomIntensity(4f); // Adjust as needed
+        bloomFilter.setDownSamplingFactor(1.0f);
+        fpp.addFilter(bloomFilter);
         viewPort.addProcessor(fpp);
     }
 

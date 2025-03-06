@@ -87,8 +87,9 @@ public abstract class Body {
 
     public static boolean dynamicScale = true;
     public static float closeScale = 10f;
+    public static float closeScaleEarth = 50f;
     public static int sphereSample = 32;
-    public static int nightSphereSample = 128;
+    public static int nightSphereSample = 256;
     public static int sphereRadius = 50;
     public static boolean enableNightTexture = true;
     public static boolean enableAtmosphere = true;

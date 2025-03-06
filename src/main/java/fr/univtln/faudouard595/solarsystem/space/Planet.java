@@ -178,7 +178,7 @@ public class Planet extends Body {
         if (!MyLoadFile.fileExists(texturePath)) {
             return;
         }
-        Spatial atmosphere = generateTransparentSphere(texturePath, 0.1f);
+        Spatial atmosphere = generateTransparentSphere(texturePath, 0.05f);
         atmosphere.scale(1.05f);
         atmospherModel = Optional.of(atmosphere);
         Node atmosphereNode = attachCorrectNode(atmosphere);
@@ -432,8 +432,11 @@ public class Planet extends Body {
             scale(1f);
             return;
         }
-
-        float scale = (closeScale * CameraTool.minDistance
+        float myCloseScale = closeScale;
+        if (this.getName().equals("Earth")) {
+            myCloseScale = closeScaleEarth;
+        }
+        float scale = (myCloseScale * CameraTool.minDistance
                 / CameraTool.distanceFromBody) / CameraTool.bodies.getCurrentValue().getRadius();
         scale = Math.max(1f, scale);
         scale(scale);
