@@ -145,6 +145,22 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.1.2</version>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.1.0</version> <!-- Ensure you're using a compatible version -->
+          <executions>
+              <execution>
+                  <goals>
+                      <goal>java</goal>
+                  </goals>
+  
+              </execution>
+          </executions>
+          <configuration>
+            <mainClass>fr.univtln.faudouard595.solarsystem.App</mainClass>
+          </configuration>
+       </plugin>
         <!-- site lifecycle, see
         https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
         <plugin>
@@ -176,6 +192,7 @@
             </execution>
           </executions>
         </plugin>
+
 
       </plugins>
 
