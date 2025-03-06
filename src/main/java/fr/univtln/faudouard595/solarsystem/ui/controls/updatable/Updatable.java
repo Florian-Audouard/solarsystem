@@ -21,7 +21,7 @@ public abstract class Updatable {
     private Runnable actionFunction = () -> {
     };
     @Builder.Default
-    private int analogSpeed = 6;
+    private int analogSpeed = 3;
 
     @Builder.Default
     private boolean isAnalog = false;
@@ -30,12 +30,15 @@ public abstract class Updatable {
     private boolean analogStarting = false;
 
     @Builder.Default
+    private boolean firstUpdate = true;
+
+    @Builder.Default
     private int currentSpeed = 0;
     @Builder.Default
     private Runnable updateFunction = () -> {
     };
     @Builder.Default
-    private int waitTimeBeforeAnalog = 18;
+    private int waitTimeBeforeAnalog = 30;
 
     @Builder.Default
     private boolean isActivate = false;
@@ -60,11 +63,11 @@ public abstract class Updatable {
         isActivate = true;
         currentSpeed = 0;
         analogStarting = true;
+        firstUpdate = true;
     }
 
     public void deactivate() {
         isActivate = false;
-        analogStarting = false;
     }
 
     public void update() {
@@ -81,9 +84,10 @@ public abstract class Updatable {
                 actionFunction.run();
             }
             currentSpeed++;
-        } else if (analogStarting) {
+        }
+        if (firstUpdate) {
             actionFunction.run();
-            analogStarting = false;
+            firstUpdate = false;
         }
 
     }

@@ -193,7 +193,7 @@ public class Planet extends Body {
         if (!MyLoadFile.fileExists(texturePath)) {
             return;
         }
-        Spatial cloud = generateTransparentSphere(texturePath, 0.2f);
+        Spatial cloud = generateTransparentSphere(texturePath, 0.5f);
         cloudModel = Optional.of(cloud);
         cloud.scale(1.03f);
         Node cloudNode = attachCorrectNode(cloud);
