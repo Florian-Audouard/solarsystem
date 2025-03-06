@@ -3,6 +3,8 @@ package fr.univtln.faudouard595.solarsystem.ui.information;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import com.simsilica.lemur.Container;
+import com.simsilica.lemur.HAlignment;
 import com.simsilica.lemur.Label;
 import com.simsilica.lemur.Panel;
 import com.simsilica.lemur.component.QuadBackgroundComponent;
@@ -18,9 +20,7 @@ public class DisplayInformation {
     private static Body currentBody;
     private static Label label;
     private static Label nameLabel;
-    private static Panel labelBackground;
     public static App app;
-    private static float paddingWidth = 10;
     private static Node informationNode;
     public static boolean isInformationDisplayed = false;
 
@@ -63,31 +63,43 @@ public class DisplayInformation {
     }
 
     public static void init() {
+        int margin = 10;
+        int boxHeight = 600;
+        int boxWidth = 450;
+        // int posHeight = (int) (app.getCamera().getHeight() * size * (2 - size));
+        float paddingBackground = 50f;
+        Container box = new Container();
         informationNode = new Node("InformationNode");
         label = new Label("");
+        label.setLocalTranslation(margin * 2, 0, 1);
         nameLabel = new Label("Sun");
+        nameLabel.setPreferredSize(new Vector3f(150, 50, 1));
+        box.addChild(nameLabel);
+        box.addChild(label);
         nameLabel.setFont(app.font);
-
-        label.setLocalTranslation(paddingWidth, -80, 1);
+        nameLabel.setFontSize(42);
+        nameLabel.setTextHAlignment(HAlignment.Center);
         label.setColor(ColorRGBA.White);
         label.setFont(app.font);
-        labelBackground = new Panel();
         QuadBackgroundComponent background = new QuadBackgroundComponent();
         background.setColor(new ColorRGBA(27f / 255, 25f / 255, 27f / 255, 0.15f));
-        labelBackground.setBackground(background);
-        float paddingBackground = 50f;
-        labelBackground.setPreferredSize(
-                new Vector3f(app.getCamera().getWidth() / 4 - paddingBackground,
-                        app.getCamera().getHeight() - paddingBackground * 2, 0));
-        labelBackground.setLocalTranslation(paddingBackground, app.getCamera().getHeight() - paddingBackground, 0);
-        labelBackground.attachChild(nameLabel);
-        labelBackground.attachChild(label);
-        informationNode.attachChild(labelBackground);
+        background.setMargin(margin, margin);
+        box.setBackground(background);
+
+        label.setPreferredSize(
+                new Vector3f(boxWidth, boxHeight, 0));
+        int toalSize = boxHeight + 50 + 10;
+        int posHeight = (int) (app.getCamera().getHeight() - ((app.getCamera().getHeight() - toalSize) / 2));
+        box.setLocalTranslation(paddingBackground - margin,
+                posHeight, 0);
+
+        informationNode.attachChild(box);
+
         MyButton.builder()
                 .text("⏪")
                 .guiNode(informationNode)
-                .x(paddingBackground + 25 + 5)
-                .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
+                .x(paddingBackground + 25)
+                .y(posHeight - nameLabel.getPreferredSize().y / 2 - margin / 2)
                 .preferedSizeWidth(50)
                 .preferedSizeHeight(45)
                 .fontSize(30)
@@ -97,36 +109,36 @@ public class DisplayInformation {
         MyButton.builder()
                 .text("◀️")
                 .guiNode(informationNode)
-                .x(paddingBackground + 25 + 5 + 50)
-                .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
+                .x(paddingBackground + 25 + 60)
+                .y(posHeight - nameLabel.getPreferredSize().y / 2 - margin / 2)
                 .preferedSizeWidth(50)
                 .preferedSizeHeight(45)
                 .fontSize(30)
                 .actionFunction(() -> CameraTool.prevBody())
                 .build()
                 .init();
-        MyButton nextMainButton = MyButton.builder()
+        MyButton.builder()
                 .text("⏩")
                 .guiNode(informationNode)
-                .x(paddingBackground + app.getCamera().getWidth() / 4 - paddingBackground - 25 - 5)
-                .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
+                .x(paddingBackground + boxWidth - 25)
+                .y(posHeight - nameLabel.getPreferredSize().y / 2 - margin / 2)
                 .preferedSizeWidth(50)
                 .preferedSizeHeight(45)
                 .fontSize(30)
+                .actionFunction(() -> CameraTool.nextMainBody())
                 .build()
                 .init();
-        nextMainButton.setActionFunction(() -> CameraTool.nextMainBody());
-        MyButton nextButton = MyButton.builder()
+        MyButton.builder()
                 .text("▶️")
                 .guiNode(informationNode)
-                .x(paddingBackground + app.getCamera().getWidth() / 4 - paddingBackground - 25 - 5 - 50)
-                .y(app.getCamera().getHeight() - paddingBackground - nameLabel.getPreferredSize().y / 2)
+                .x(paddingBackground + boxWidth - 25 - 60)
+                .y(posHeight - nameLabel.getPreferredSize().y / 2 - margin / 2)
                 .preferedSizeWidth(50)
                 .preferedSizeHeight(45)
                 .fontSize(30)
+                .actionFunction(() -> CameraTool.nextBody())
                 .build()
                 .init();
-        nextButton.setActionFunction(() -> CameraTool.nextBody());
 
         initHelp();
 
@@ -136,13 +148,10 @@ public class DisplayInformation {
 
         nameLabel.setText(currentBody.getName());
         nameLabel.setColor(currentBody.getColor());
-        nameLabel.setFontSize(64);
-        nameLabel.setLocalTranslation(labelBackground.getPreferredSize().x / 2 - nameLabel.getPreferredSize().x / 2, 0,
-                1);
-
     }
 
     public static void displayInfo() {
+
         label.setText(currentBody.displayInformation());
         label.setFontSize(30);
     }
@@ -173,11 +182,11 @@ public class DisplayInformation {
     }
 
     public static void disableHelp() {
-        app.getMyGuiNode().detachChild(helpNode);
+        app.getGuiNode().detachChild(helpNode);
     }
 
     public static void enableHelp() {
-        app.getMyGuiNode().attachChild(helpNode);
+        app.getGuiNode().attachChild(helpNode);
     }
 
     public static void switchHelpInformation() {

@@ -36,7 +36,8 @@ public class ApiBodyInfo {
     private File file;
     List<String> usedId = List.of("id", "englishName", "meanRadius", "sideralRotation", "axialTilt", "bodyType",
             "semimajorAxis", "eccentricity", "sideralOrbit", "inclination", "orbitAround", "longAscNode",
-            "argPeriapsis", "mainAnomaly", "perihelion");
+            "argPeriapsis", "mainAnomaly", "perihelion", "discoveredBy", "discoveryDate", "alternativeName", "density",
+            "gravity", "vol", "mass", "escape");
 
     public ApiBodyInfo() {
         this.client = HttpClient.newHttpClient();
@@ -160,8 +161,27 @@ public class ApiBodyInfo {
         float rotationPeriod = JsonNode.get("sideralRotation").floatValue();
         float rotationInclination = JsonNode.get("axialTilt").floatValue();
         String bodyType = JsonNode.get("bodyType").asText();
+        JsonNode massNode = JsonNode.get("mass");
+        Map.Entry<Float, Integer> mass = Map.entry(massNode.get("massValue").floatValue(),
+                massNode.get("massExponent").intValue());
+        JsonNode vol = JsonNode.get("vol");
+        Map.Entry<Float, Integer> volume = Map.entry(vol.get("volValue").floatValue(),
+                vol.get("volExponent").intValue());
+        double density = JsonNode.get("density").asDouble();
+        double gravity = JsonNode.get("gravity").asDouble();
+        String discoveredBy = JsonNode.get("discoveredBy").asText();
+        String discoveryDate = JsonNode.get("discoveryDate").asText();
+        String alternativeName = JsonNode.get("alternativeName").asText();
+        discoveredBy = discoveredBy.equals("") ? null : discoveredBy;
+        discoveryDate = discoveryDate.equals("") ? null : discoveryDate;
+        alternativeName = alternativeName.equals("") ? null : alternativeName;
+        Optional<String> discoveredByOp = Optional.ofNullable(discoveredBy);
+        Optional<String> discoveryDateOp = Optional.ofNullable(discoveryDate);
+        Optional<String> alternativeNameOp = Optional.ofNullable(alternativeName);
         if (bodyType.equals("Star")) {
-            body = new Star(app.getRootNode(), nameBody, size, rotationPeriod, rotationInclination, color);
+            body = new Star(app.getRootNode(), nameBody, size, rotationPeriod, rotationInclination,
+                    mass, volume, density, gravity, discoveredByOp, discoveryDateOp, alternativeNameOp,
+                    color);
         } else {
             double semimajorAxis = JsonNode.get("semimajorAxis").doubleValue();
             float eccentricity = JsonNode.get("eccentricity").floatValue();
@@ -171,10 +191,12 @@ public class ApiBodyInfo {
             float argPeriapsis = JsonNode.get("argPeriapsis").floatValue();
             float mainAnomaly = JsonNode.get("mainAnomaly").floatValue();
             Body ref = astres.get(JsonNode.get("orbitAround").asText());
+            double escapeVelocity = JsonNode.get("escape").doubleValue();
             if (color == null) {
                 color = ref.getColor();
             }
             body = ref.addPlanet(nameBody, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
+                    mass, volume, density, gravity, discoveredByOp, discoveryDateOp, alternativeNameOp, escapeVelocity,
                     orbitalInclination,
                     rotationInclination, longAscNode, argPeriapsis, mainAnomaly, color);
         }

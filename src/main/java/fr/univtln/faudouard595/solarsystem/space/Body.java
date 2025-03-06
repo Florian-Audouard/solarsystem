@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
@@ -42,6 +43,14 @@ public abstract class Body {
     private float radius;
     private double realSize;
     private float scaleRadius;
+    private Map.Entry<Float, Integer> mass;
+    private Map.Entry<Float, Integer> volume;
+    private double density;
+    private double gravity;
+    private Optional<String> discoveredBy;
+    private Optional<String> discoveryDate;
+    private Optional<String> alternativeName;
+
     private Spatial model;
     private Node node;
     private Node rotationOrbitalNode;
@@ -86,6 +95,8 @@ public abstract class Body {
     public static boolean enableCloud = true;
 
     public Body(Node parentNode, String name, double size, float rotationPeriod, float rotationInclination,
+            Map.Entry<Float, Integer> mass, Map.Entry<Float, Integer> volume, double density, double gravity,
+            Optional<String> discoveredBy, Optional<String> discoveryDate, Optional<String> alternativeName,
             ColorRGBA color) {
         this.parentNode = parentNode;
         this.name = name;
@@ -108,7 +119,13 @@ public abstract class Body {
         this.planetNode = new Node(name + "_planet");
         this.colorMultiplier = 0.5f;
         this.displayLines = true;
-
+        this.discoveredBy = discoveredBy;
+        this.discoveryDate = discoveryDate;
+        this.alternativeName = alternativeName;
+        this.mass = mass;
+        this.volume = volume;
+        this.density = density;
+        this.gravity = gravity;
     }
 
     public static float convertion(double value) {
@@ -207,9 +224,15 @@ public abstract class Body {
     }
 
     public Planet addPlanet(String name, float size, double semimajorAxis, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
+            float rotationPeriod,
+            Map.Entry<Float, Integer> mass, Map.Entry<Float, Integer> volume, double density, double gravity,
+            Optional<String> discoveredBy, Optional<String> discoveryDate, Optional<String> alternativeName,
+            double escapeVelocity,
+            float orbitalInclination, float rotationInclination, float longAscNode,
             float argPeriapsis, float mainAnomaly, ColorRGBA lineColor) {
         Planet planet = new Planet(name, size, semimajorAxis, eccentricity, orbitalPeriod, rotationPeriod,
+                mass, volume, density, gravity,
+                discoveredBy, discoveryDate, alternativeName, escapeVelocity,
                 orbitalInclination, rotationInclination, longAscNode,
                 argPeriapsis, mainAnomaly, this,
                 lineColor);
@@ -478,10 +501,21 @@ public abstract class Body {
     }
 
     public String displayInformation() {
-        String realSizeFormat = formatter.format(Math.round(realSize));
-        String res = String.format("""
-                Radius : %s km""", realSizeFormat);
-        return res;
+        StringBuilder res = new StringBuilder();
+        res.append(String.format("Radius : %s km\n", formatter.format(Math.round(realSize))));
+        res.append(String.format("Mass : %.3f kg^%d\n", mass.getKey(), mass.getValue()));
+        if (volume.getValue() != 0) {
+            res.append(String.format("Volume : %.3f km^%d\n", volume.getKey(), volume.getValue()));
+        }
+        res.append(String.format("Density : %.3f g/cm^3\n", density));
+        if (gravity != 0) {
+            res.append(String.format("Gravity : %.3f m/s^2\n", gravity));
+        }
+        discoveredBy.ifPresent(discover -> res.append("Discovered by : ").append(discover).append("\n"));
+        discoveryDate.ifPresent(discover -> res.append("Discovery date : ").append(discover).append("\n"));
+        alternativeName.ifPresent(discover -> res.append("Alternative name : ").append(discover).append("\n"));
+
+        return res.toString();
     }
 
     public void addAsteroidBelt(double rotation, float innerRadius, float outerRadius, float heightVariation,

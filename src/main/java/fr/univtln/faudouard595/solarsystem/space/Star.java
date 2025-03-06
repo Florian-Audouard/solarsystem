@@ -1,5 +1,8 @@
 package fr.univtln.faudouard595.solarsystem.space;
 
+import java.util.Map;
+import java.util.Optional;
+
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh.Type;
 import com.jme3.effect.shapes.EmitterSphereShape;
@@ -25,8 +28,12 @@ public class Star extends Body {
     private static final Type EMITTER_TYPE = POINT_SPRITE ? Type.Point : Type.Triangle;
 
     public Star(Node parentNode, String name, float size, float rotationPeriod, float rotationInclination,
+            Map.Entry<Float, Integer> mass, Map.Entry<Float, Integer> volume, double density, double gravity,
+            Optional<String> discoveredBy, Optional<String> discoveryDate, Optional<String> alternativeName,
             ColorRGBA color) {
-        super(parentNode, name, size, rotationPeriod, rotationInclination, color);
+        super(parentNode, name, size, rotationPeriod, rotationInclination,
+                mass, volume, density, gravity, discoveredBy, discoveryDate, alternativeName,
+                color);
 
     }
 

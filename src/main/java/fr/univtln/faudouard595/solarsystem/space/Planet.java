@@ -1,5 +1,6 @@
 package fr.univtln.faudouard595.solarsystem.space;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -49,12 +50,18 @@ public class Planet extends Body {
     private float longAscNode;
     private float argPeriapsis;
     private float meanAnomaly;
+    private double escapeVelocity;
 
     public Planet(String name, double size, double semimajorAxis, float eccentricity, float orbitalPeriod,
-            float rotationPeriod, float orbitalInclination, float rotationInclination, float longAscNode,
+            float rotationPeriod,
+            Map.Entry<Float, Integer> mass, Map.Entry<Float, Integer> volume, double density, double gravity,
+            Optional<String> discoveredBy, Optional<String> discoveryDate, Optional<String> alternativeName,
+            double escapeVelocity,
+            float orbitalInclination, float rotationInclination, float longAscNode,
             float argPeriapsis, float mainAnomaly, Body primary,
             ColorRGBA color) {
-        super(primary.getNode(), name, size, rotationPeriod, rotationInclination, color);
+        super(primary.getNode(), name, size, rotationPeriod, rotationInclination,
+                mass, volume, density, gravity, discoveredBy, discoveryDate, alternativeName, color);
 
         this.semimajorAxis = convertion(semimajorAxis);
         this.realSemimajorAxis = (int) semimajorAxis;
@@ -79,6 +86,7 @@ public class Planet extends Body {
         this.nightModel = Optional.empty();
         this.cloudModel = Optional.empty();
         this.atmospherModel = Optional.empty();
+        this.escapeVelocity = escapeVelocity;
     }
 
     public void generateLine() {
@@ -400,12 +408,14 @@ public class Planet extends Body {
 
     @Override
     public String displayInformation() {
-        String stringRealSemimajorAxis = formatter.format(getActualDistanceFromPrimary());
-        String res = String.format("""
-                %s
-                Distance from %s : %s km
-                """, super.displayInformation(), primary.getName(), stringRealSemimajorAxis);
-        return res;
+        StringBuilder res = new StringBuilder();
+        res.append(super.displayInformation());
+        res.append("Distance from %s : %s km\n".formatted(primary.getName(),
+                formatter.format(getActualDistanceFromPrimary())));
+        res.append("Orbital Period : %.2f days\n".formatted((orbitalPeriod / (60 * 60 * 24))));
+        res.append("Orbital Inclination : %.2f°\n".formatted((orbitalInclination * FastMath.RAD_TO_DEG)));
+        res.append("Rotation Inclination : %.2f°\n".formatted((getRotationInclination() * FastMath.RAD_TO_DEG)));
+        return res.toString();
     }
 
     @Override
