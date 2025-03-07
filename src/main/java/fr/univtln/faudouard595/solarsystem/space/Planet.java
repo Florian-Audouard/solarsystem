@@ -406,6 +406,7 @@ public class Planet extends Body {
         return (long) inverseConvertion(getDistanceFromPrimary());
     }
 
+    
     @Override
     public String displayInformation() {
         StringBuilder res = new StringBuilder();

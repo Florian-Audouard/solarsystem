@@ -500,17 +500,32 @@ public abstract class Body {
         belts.forEach(belt -> belt.update(time));
 
     }
+    private static final char[] EXPONENT_DIGITS = {'⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'};
+    public static String toExponent(int number) {
+        String numStr = Integer.toString(number);
+        StringBuilder exponentStr = new StringBuilder();
+        
+        for (char digit : numStr.toCharArray()) {
+            if (Character.isDigit(digit)) {
+                exponentStr.append(EXPONENT_DIGITS[digit - '0']);
+            } else {
+                exponentStr.append(digit); // Gérer le signe négatif si nécessaire
+            }
+        }
+        
+        return exponentStr.toString();
+    }
 
     public String displayInformation() {
         StringBuilder res = new StringBuilder();
         res.append(String.format("Radius : %s km\n", formatter.format(Math.round(realSize))));
-        res.append(String.format("Mass : %.3f kg^%d\n", mass.getKey(), mass.getValue()));
+        res.append(String.format("Mass : %.3f x10%s kg\n", mass.getKey(), toExponent(mass.getValue())));
         if (volume.getValue() != 0) {
-            res.append(String.format("Volume : %.3f km^%d\n", volume.getKey(), volume.getValue()));
+            res.append(String.format("Volume : %.3f x10%s km\n", volume.getKey(), toExponent(volume.getValue())));
         }
-        res.append(String.format("Density : %.3f g/cm^3\n", density));
+        res.append(String.format("Density : %.3f g/cm³\n", density));
         if (gravity != 0) {
-            res.append(String.format("Gravity : %.3f m/s^2\n", gravity));
+            res.append(String.format("Gravity : %.3f m/s²\n", gravity));
         }
         discoveredBy.ifPresent(discover -> res.append("Discovered by : ").append(discover).append("\n"));
         discoveryDate.ifPresent(discover -> res.append("Discovery date : ").append(discover).append("\n"));
