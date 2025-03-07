@@ -22,7 +22,6 @@ import com.jme3.renderer.Camera;
 import fr.univtln.faudouard595.solarsystem.App;
 import fr.univtln.faudouard595.solarsystem.space.Body;
 import fr.univtln.faudouard595.solarsystem.space.Planet;
-import fr.univtln.faudouard595.solarsystem.ui.information.DisplayInformation;
 import fr.univtln.faudouard595.solarsystem.utils.collection.CircularHashMapBody;
 import lombok.Getter;
 import lombok.Setter;

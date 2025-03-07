@@ -1,7 +1,6 @@
 package fr.univtln.faudouard595.solarsystem.utils.convertionObject;
 
 import java.io.File;
-import java.util.Map;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.export.binary.BinaryExporter;

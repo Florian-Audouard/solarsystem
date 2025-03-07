@@ -1,12 +1,9 @@
 package fr.univtln.faudouard595.solarsystem.utils.convertionObject;
 
-import java.util.AbstractMap;
-import java.util.Map;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
 import com.jme3.material.Material;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
