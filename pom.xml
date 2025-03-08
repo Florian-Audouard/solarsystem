@@ -23,21 +23,21 @@
 
   <dependencies>
 
-<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-  <dependency>
+    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.36</version>
       <scope>provided</scope>
-  </dependency>
+    </dependency>
 
-<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-<dependency>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-classic</artifactId>
-    <version>1.5.17</version>
-    <scope>compile</scope>
-</dependency>
+    <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.5.17</version>
+      <scope>compile</scope>
+    </dependency>
 
 
     <dependency>
@@ -65,8 +65,8 @@
       <version>${jme3_v}</version>
     </dependency>
 
-<!-- test -->
-      <dependency>
+    <!-- test -->
+    <dependency>
       <groupId>${jme3_g}</groupId>
       <artifactId>jme3-testdata</artifactId>
       <version>${jme3_v}</version>
@@ -85,12 +85,12 @@
       <artifactId>lemur</artifactId>
       <version>1.16.0</version>
     </dependency>
-<!-- https://mvnrepository.com/artifact/com.simsilica/lemur-proto -->
-<dependency>
-    <groupId>com.simsilica</groupId>
-    <artifactId>lemur-proto</artifactId>
-    <version>1.13.0</version>
-</dependency>
+    <!-- https://mvnrepository.com/artifact/com.simsilica/lemur-proto -->
+    <dependency>
+      <groupId>com.simsilica</groupId>
+      <artifactId>lemur-proto</artifactId>
+      <version>1.13.0</version>
+    </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
     <dependency>
@@ -104,97 +104,99 @@
   </dependencies>
 
   <build>
-  <finalName>solarsystem</finalName>
-
-      <plugins>
-        <!-- clean lifecycle, see
+    <finalName>SolarSystem</finalName>
+    <plugins>
+      <!-- clean lifecycle, see
         https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.4.0</version>
-        </plugin>
-        <!-- default lifecycle, jar packaging: see
-        https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.3.0</version>
-          <executions>
-              <execution>
-                  <phase>process-resources</phase>
-                  <goals>
-                      <goal>resources</goal>
-                  </goals>
-              </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.13.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.3.0</version>
-        </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.4.0</version>
+      </plugin>
+      <!-- default lifecycle, jar packaging: see
+      https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.3.0</version>
+      </plugin>
 
-        <plugin>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>3.1.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.1.2</version>
-        </plugin>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>3.1.2</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>3.1.2</version>
+      </plugin>
 
-        <!-- site lifecycle, see
+      <!-- site lifecycle, see
         https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.12.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.6.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.4.1</version>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>shade</goal>
-              </goals>
-              <configuration>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.12.1</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.6.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
               <createDependencyReducedPom>false</createDependencyReducedPom>
-                <transformers>
-                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                    <mainClass>fr.univtln.faudouard595.solarsystem.App</mainClass>
-                  </transformer>
-                </transformers>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>3.1.0</version>
-          <executions>
-              <execution>
-                  <goals>
-                      <goal>java</goal>
-                  </goals>
-  
-              </execution>
-          </executions>
-          <configuration>
-            <mainClass>fr.univtln.faudouard595.solarsystem.App</mainClass>
-          </configuration>
-       </plugin>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+              <outputFile>${project.build.directory}/${project.build.finalName}.jar</outputFile>
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>fr.univtln.faudouard595.solarsystem.App</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
 
-      </plugins>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>fr.univtln.faudouard595.solarsystem.App</mainClass>
+        </configuration>
+      </plugin>
+
+    </plugins>
 
   </build>
 </project>
