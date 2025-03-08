@@ -19,7 +19,7 @@ This project is a simulation of the solar system using Java and the jMonkeyEngin
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/solarsystem.git
+    git clone https://github.com/Florian-Audouard/solarsystem.git
     ```
 2. Navigate to the project directory:
     ```bash
